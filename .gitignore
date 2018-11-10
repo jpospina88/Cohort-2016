@@ -11,11 +11,10 @@
 ~$*.xls*
 *.xlk
 ~$*.ppt*
+*.html
 # Prevent mac users to commit .DS_Store files
 *.DS_Store
 # Prevent users to commit the README files created by RStudio
 *README.html
 *README_cache/
 #*README_files/
-c2016_analyses_negative_binomial_regressions.html
-c2016_analyses_logistic_regressions.html
