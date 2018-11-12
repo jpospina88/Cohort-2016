@@ -806,7 +806,7 @@ dvs_col_rep %>%
 
 ```{r list of variables and graphs parameters}
 tribble_dv <- tribble(
-  ~dv,                        ~dv_name,                                ~scale,             ~limit,     ~position,
+  ~dv,                        ~dv_name,                                ~scale,       ~limit,     ~position,
   ~subheader,
   #---------------------------|---------------------------------------|-------------------|--------
   # Institutional data
