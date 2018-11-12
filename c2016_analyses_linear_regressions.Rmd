@@ -453,7 +453,7 @@ vars_cont <-
     
     # Pre-Matriculation Intervention
     ## Critical Feedback
-    t1critfeedback_improvegrow, 
+    t1critfeedback_improvegrow,
     t1critfeedback_distinguishbtwnSs, # missing
     ## Feelings
     posfeels_comp4,  # missing
@@ -477,61 +477,61 @@ vars_cont <-
     health_behavbingedrink, # missing
     health_behavtobacco, # missing
     health_behavsleepiness, # missing
-    stressdaily, 
-    pss_comp4, 
-    health_behavrelax, 
-    mhealthgeneral, 
-    anxscreener_comp2, 
-    depscreener_comp2, 
-    overallmentalhealth_comp5_z, 
+    stressdaily,
+    pss_comp4,
+    health_behavrelax,
+    mhealthgeneral,
+    anxscreener_comp2,
+    depscreener_comp2,
+    overallmentalhealth_comp5_z,
     anxdepscreener_comp4,
-    bmi, 
+    bmi,
     bmi_chge_scr, # missing
     weight, # missing
     weight_comp3, # missing
     weight_happy_rc, # missing
     weight_feelbad, # missing
     weight_trylose, # missing
-    
+
     ## Well-Being
-    happy_comp4, 
-    purpose_comp2, 
-    lifesat, 
-    
+    happy_comp4,
+    purpose_comp2,
+    lifesat,
+
     ## Belonging and College Experience
-    belong_comp6, 
-    belong_comp4, 
-    buwonder_r_use_this, 
-    overallpositivity, 
-    collexp_comp4, 
-    collhomeinteg_comp4, 
-    wisefeedbacktask_comp4, 
-    critf_distinguish_r, 
-    critf_grow, 
-    perf_highexpect, 
-    perf_comp2, 
-    id_gender, 
-    id_race, 
-    qualitiesind_comp3, 
-    qualitiesinter_2_comp4, 
-    igm_comp2, 
-    igmmajor1_2_3_comp3, 
-    pol_conslib, 
-    next_excited, 
-    next_diffatfirst, 
-    donate_srgifttot, 
-    donate_srgiftplan, 
+    belong_comp6,
+    belong_comp4,
+    buwonder_r_use_this,
+    overallpositivity,
+    collexp_comp4,
+    collhomeinteg_comp4,
+    wisefeedbacktask_comp4,
+    critf_distinguish_r,
+    critf_grow,
+    perf_highexpect,
+    perf_comp2,
+    id_gender,
+    id_race,
+    qualitiesind_comp3,
+    qualitiesinter_2_comp4,
+    igm_comp2,
+    igmmajor1_2_3_comp3,
+    pol_conslib,
+    next_excited,
+    next_diffatfirst,
+    donate_srgifttot,
+    donate_srgiftplan,
     donate_srgift,
-    threat_nogen_comp8, 
-    cthreat_minorities, 
-    cthreat_self, 
-    cthreat_comp2, 
-    stthreat_gender, 
-    stthreat_race, 
-    stthreat_ses, 
-    famrelate_comp2, 
-    integ_idgender, 
-    integ_idrace, 
+    threat_nogen_comp8,
+    cthreat_minorities,
+    cthreat_self,
+    cthreat_comp2,
+    stthreat_gender,
+    stthreat_race,
+    stthreat_ses,
+    famrelate_comp2,
+    integ_idgender,
+    integ_idrace,
     integ_idclass
     ) 
 
@@ -593,57 +593,57 @@ tribble_dv <- tribble(
   c(0, 4),        0.5,            "(Institutional Data)",                                3,
   
   # Pre-Matriculation Intervention
-  "t1critfeedback_improvegrow",   "Crit. Feedback: Help Ss Grow",                        seq(1, 7, 1),  
-  c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,     
+  "t1critfeedback_improvegrow",   "Crit. Feedback: Help Ss Grow",                        seq(1, 7, 1),
+  c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
   
   # Senior Year Survey
   "success_usethis_percent",      "Success: Percentile Ranking",                         seq(0, 100, 10), 
   c(0, 100),      10,             "(Senior Year Survey)",                                3,       
   "potential_usethis_percent",    "Potential: Percentile Ranking",                       seq(0, 100, 10), 
   c(0, 100),      10,             "(Senior Year Survey)",                               3,
-  
-  "healthmosoverall_comp5",       "Composite:\nSelf-Reported General Health",             seq(1, 5, 1), 
-  c(1, 5),        1.5,            "(Senior Year Survey)",                              3, 
-  "stressdaily",                  "How Stressed",                                        seq(1, 10, 1), 
-  c(1, 10),       2,              "(Primary Appraisal; Senior Year Survey)",             3,       
-  "pss_comp4",                    "Composite:\nHow Overwhelmed by Stress",               seq(1, 5, 1),  
-  c(1, 5),        1.5,            "(Secondary Appraisal; Senior Year Survey)",         3,       
-  "health_behavrelax",            "Time to Relax",                                       seq(1, 5, 1),  
-  c(1, 5),        1.5,            "(Senior Year Survey)",                                3,       
-  "mhealthgeneral",               "Overall Mental Health",                               seq(1, 5, 1),  
-  c(1, 5),        1.5,            "(Single Item; Senior Year Survey)",                   3,       
-  "anxscreener_comp2",            "Composite:\nAnxiety Screener",                        seq(0, 3, 1),  
-  c(0, 3),        0.5,            "(Senior Year Survey)",                                3,       
-  "depscreener_comp2",            "Composite:\nDepression Screener",                     seq(0, 3, 1),  
-  c(0, 3),        0.5,            "(Senior Year Survey)",                                3,       
+
+  "healthmosoverall_comp5",       "Composite:\nSelf-Reported General Health",             seq(1, 5, 1),
+  c(1, 5),        1.5,            "(Senior Year Survey)",                              3,
+  "stressdaily",                  "How Stressed",                                        seq(1, 10, 1),
+  c(1, 10),       2,              "(Primary Appraisal; Senior Year Survey)",             3,
+  "pss_comp4",                    "Composite:\nHow Overwhelmed by Stress",               seq(1, 5, 1),
+  c(1, 5),        1.5,            "(Secondary Appraisal; Senior Year Survey)",         3,
+  "health_behavrelax",            "Time to Relax",                                       seq(1, 5, 1),
+  c(1, 5),        1.5,            "(Senior Year Survey)",                                3,
+  "mhealthgeneral",               "Overall Mental Health",                               seq(1, 5, 1),
+  c(1, 5),        1.5,            "(Single Item; Senior Year Survey)",                   3,
+  "anxscreener_comp2",            "Composite:\nAnxiety Screener",                        seq(0, 3, 1),
+  c(0, 3),        0.5,            "(Senior Year Survey)",                                3,
+  "depscreener_comp2",            "Composite:\nDepression Screener",                     seq(0, 3, 1),
+  c(0, 3),        0.5,            "(Senior Year Survey)",                                3,
   "overallmentalhealth_comp5_z",  "Composite:\nOverall Mental Health",                   seq(-1, 1, 0.5),
   c(-1, 1),       -0.75,          "(Average Standardized Score; Senior Year Survey)",      1,
-  "anxdepscreener_comp4",         "Composite:\nAnxiety and Depression Screeners",        seq(0, 3, 1),  
-  c(0, 3),        0.5,            "(4 Items; Senior Year Survey)",                       3,       
-  
-  "bmi",                         "Body Mass Index",                                      seq(0, 40, 10), 
-  c(0, 40),       5,        "(BMI, Senior Year Survey)",                                 3, 
-  
-  "happy_comp4",                  "Composite:\nHappiness",                               seq(1, 7, 1),  
-  c(1, 7),        2,              "(Senior Year Survey)",                                3,       
-  "purpose_comp2",                "Composite:\nPurpose & Meaning",                       seq(1, 5, 1),  
-  c(1, 5),        1.5,              "(Senior Year Survey)",                                3,       
-  
-  "lifesat",                      "Life Satisfaction",                                   seq(1, 10, 1), 
-  c(1, 10),       2,              "(Senior Year Survey)",                                3,       
-  
-  "belong_comp6",                 "Composite:\nBelonging and College Experience",        seq(1, 7, 1),  
-  c(1, 7),        2,              "(6 Items; Senior Year Survey)",                       3,       
-  "belong_comp4",                 "Composite:\nBelonging",                               seq(1, 7, 1),  
-  c(1, 7),        2,              "(4 Items; Senior Year Survey)",                       3,       
-  "buwonder_r_use_this",          "Belonging Uncertainty",                               seq(1, 5, 1),  
-  c(1, 5),        1.5,            "(Senior Year Survey)",                                3,       
-  "overallpositivity",            "Overall Positivity of College Experience",            seq(1, 10, 1), 
-  c(1, 10),       2,              "(Senior Year Survey)",                                3,       
-  "collexp_comp4",                "Composite:\nPositive Evaluations",                    seq(1, 7, 1),  
-  c(1, 7),        2,              "(Senior Year Survey)",                                3,       
-  "collhomeinteg_comp4",          "Composite:\nCollege-Home Integration",                seq(1, 5, 1),  
-  c(1, 5),        1.5,              "(Senior Year Survey)",                                3,       
+  "anxdepscreener_comp4",         "Composite:\nAnxiety and Depression Screeners",        seq(0, 3, 1),
+  c(0, 3),        0.5,            "(4 Items; Senior Year Survey)",                       3,
+
+  "bmi",                         "Body Mass Index",                                      seq(0, 40, 10),
+  c(0, 40),       5,        "(BMI, Senior Year Survey)",                                 3,
+
+  "happy_comp4",                  "Composite:\nHappiness",                               seq(1, 7, 1),
+  c(1, 7),        2,              "(Senior Year Survey)",                                3,
+  "purpose_comp2",                "Composite:\nPurpose & Meaning",                       seq(1, 5, 1),
+  c(1, 5),        1.5,              "(Senior Year Survey)",                                3,
+
+  "lifesat",                      "Life Satisfaction",                                   seq(1, 10, 1),
+  c(1, 10),       2,              "(Senior Year Survey)",                                3,
+
+  "belong_comp6",                 "Composite:\nBelonging and College Experience",        seq(1, 7, 1),
+  c(1, 7),        2,              "(6 Items; Senior Year Survey)",                       3,
+  "belong_comp4",                 "Composite:\nBelonging",                               seq(1, 7, 1),
+  c(1, 7),        2,              "(4 Items; Senior Year Survey)",                       3,
+  "buwonder_r_use_this",          "Belonging Uncertainty",                               seq(1, 5, 1),
+  c(1, 5),        1.5,            "(Senior Year Survey)",                                3,
+  "overallpositivity",            "Overall Positivity of College Experience",            seq(1, 10, 1),
+  c(1, 10),       2,              "(Senior Year Survey)",                                3,
+  "collexp_comp4",                "Composite:\nPositive Evaluations",                    seq(1, 7, 1),
+  c(1, 7),        2,              "(Senior Year Survey)",                                3,
+  "collhomeinteg_comp4",          "Composite:\nCollege-Home Integration",                seq(1, 5, 1),
+  c(1, 5),        1.5,              "(Senior Year Survey)",                                3,
   
   # "threat_nogen_comp8",           ""
   # d4 
@@ -942,14 +942,14 @@ cohend_wf
 
 ## Example
 ```{r}
-lm(purpose_comp2 ~ treat_sc*disadv_sc, data = d) %>% summary
+lm(cum_gpa_y4_spring ~ treat_sc*disadv_sc, data = d) %>% summary
 ```
 
 ```{r}
-d.model <- d %>% select(treat_sc, disadv_sc, !!!vars_cont)
-
-models_lm <- d.model %>% select(-c(treat_sc, disadv_sc)) %>%
-  map(function(dv) lm(dv ~ d$treat_sc*d$disadv_sc, data = .)) 
+# d.model <- d %>% select(treat_sc, disadv_sc, !!!vars_cont)
+# 
+# models_lm <- d.model %>% select(-c(treat_sc, disadv_sc)) %>%
+#   map(function(dv) lm(dv ~ d$treat_sc*d$disadv_sc, data = .)) 
 ```
 
 ```{r}
@@ -967,7 +967,7 @@ d.nest <-
   group_by(dv_name) %>% 
   nest()
 
-d.nest$data[[1]]
+# d.nest$data[[1]]
 
 lm_model <- function(data){
   lm(dv_value ~ treat_sc*disadv_sc, data = data)
@@ -994,7 +994,7 @@ d.nest %<>%
 
 d.nest %<>% 
   mutate(
-    emmean_treat = pmap(
+    emmean_treat = pmap( # treatment effects by disadvantaged status
       .l = list(
         object = lm_model, 
         specs = "treat_sc", 
@@ -1014,7 +1014,29 @@ d.nest %<>%
     emmean_treat_sc_df = map(
       .x = emmean_treat_sc, 
       .f = data.frame),
-    emmean_cond = pmap(
+    
+    emmean_ineq_treat = pmap( # Inequality of disadvantaged status by treatment
+      .l = list(
+        object = lm_model, 
+        specs = "disadv_sc", 
+        by = "treat_sc"
+      ),
+      .f = emmeans
+    ),
+    emmean_ineq_treat_df = map(
+      .x = emmean_ineq_treat, 
+      .f = data.frame),
+    emmean_ineq_treat_sc = map(
+      .x = emmean_ineq_treat,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_ineq_treat_sc_df = map(
+      .x = emmean_ineq_treat_sc, 
+      .f = data.frame),
+    
+    emmean_cond = pmap( # Condition effects by disadvantaged status
       .l = list(
         object = lm_model_cond, 
         specs = "cond_sc", 
@@ -1033,6 +1055,27 @@ d.nest %<>%
     ),
     emmean_cond_sc_df = map(
       .x = emmean_cond_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_cond = pmap( # Inequality of disadvantaged status by any condition
+      .l = list(
+        object = lm_model_cond, 
+        specs = "disadv_sc", 
+        by = "cond_sc"
+      ),
+      .f = emmeans
+    ),
+    emmean_ineq_cond_df = map(
+      .x = emmean_ineq_cond, 
+      .f = data.frame),
+    emmean_ineq_cond_sc = map(
+      .x = emmean_ineq_cond,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_ineq_cond_sc_df = map(
+      .x = emmean_ineq_cond_sc, 
       .f = data.frame)
   ) 
 ```
@@ -1133,7 +1176,21 @@ dvs_col_rep %>%
 
 ## Simple Effects
 
-### Treatment Effects
+### Inequality of Disadvantaged Status by Treatment
+
+```{r}
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 2) %>% # change this number depending on the number of rows of your tidy datasets
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_ineq_treat_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, treat_sc), 2) %>% 
+  kable_format
+```
+
+### Treatment Effects by Disadvantaged Status
 
 ```{r}
 dvs_col_rep <- dvs_col$dv_name %>% 
@@ -1147,9 +1204,20 @@ dvs_col_rep %>%
   kable_format
 ```
 
-### Condition Effects
+### Inequality effects of Disadvantaged Status
+```{r}
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 4) %>% # change this number depending on the number of rows of your tidy datasets
+  as.tibble %>% 
+  rename(dv_name = value)
 
-**NOTE:** p-values are overestimated since the function that I'm using compares each condition to all others.
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_ineq_cond_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, cond_sc), 2) %>% 
+  kable_format
+```
+
+### Condition Effects by Disadvantaged Status
 
 ```{r}
 dvs_col_rep <- dvs_col$dv_name %>% 
@@ -1337,8 +1405,7 @@ plots[[2]]
 
 ## Example
 ```{r}
-lm(purpose_comp2 ~ treat_sc*disadv_sc + gender + sattoact + hsrank + hsrank_no, data = d) %>% summary
-
+lm(cum_gpa_y4_spring ~ treat_sc*disadv_sc + gender + sattoact + hsrank + hsrank_no, data = d) %>% summary
 ```
 
 ```{r}
@@ -1367,7 +1434,7 @@ d.nest %<>%
 
 d.nest %<>% 
   mutate(
-    emmean_treat_cv = pmap(
+    emmean_treat_cv = pmap( # Treatment effects by disadvantaged status
       .l = list(
         object = lm_model_treat_cv, 
         specs = "treat_sc", 
@@ -1387,7 +1454,29 @@ d.nest %<>%
     emmean_treat_cv_sc_df = map(
       .x = emmean_treat_cv_sc, 
       .f = data.frame),
-    emmean_cond_cv = pmap(
+    
+    emmean_ineq_treat_cv = pmap( # Inequality of disadvantaged status by treatment
+      .l = list(
+        object = lm_model_treat_cv, 
+        specs = "disadv_sc", 
+        by = "treat_sc"
+      ),
+      .f = emmeans
+    ),
+    emmean_ineq_treat_cv_df = map(
+      .x = emmean_ineq_treat_cv, 
+      .f = data.frame),
+    emmean_ineq_treat_cv_sc = map(
+      .x = emmean_ineq_treat_cv,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_ineq_treat_cv_sc_df = map(
+      .x = emmean_ineq_treat_cv_sc, 
+      .f = data.frame),
+    
+    emmean_cond_cv = pmap( # Condition effects by disadvantaged status
       .l = list(
         object = lm_model_cond_cv, 
         specs = "cond_sc", 
@@ -1406,6 +1495,27 @@ d.nest %<>%
     ),
     emmean_cond_cv_sc_df = map(
       .x = emmean_cond_cv_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_cond_cv = pmap( # Inequality of disadvantaged status by condition
+      .l = list(
+        object = lm_model_cond_cv, 
+        specs = "disadv_sc", 
+        by = "cond_sc"
+      ),
+      .f = emmeans
+    ),
+    emmean_ineq_cond_cv_df = map(
+      .x = emmean_ineq_cond_cv, 
+      .f = data.frame),
+    emmean_ineq_cond_cv_sc = map(
+      .x = emmean_ineq_cond_cv,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_ineq_cond_cv_sc_df = map(
+      .x = emmean_ineq_cond_cv_sc, 
       .f = data.frame)
   ) 
 ```
@@ -1465,6 +1575,20 @@ dvs_col_rep %>%
 
 ## Simple Effects
 
+### Inequality of Disadvantaged Status by Treatment
+
+```{r}
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 2) %>% # change this number depending on the number of rows of your tidy datasets
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_ineq_treat_cv_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, treat_sc), 2) %>% 
+  kable_format
+```
+
 ### Treatment Effects
 
 ```{r}
@@ -1479,9 +1603,21 @@ dvs_col_rep %>%
   kable_format
 ```
 
-### Condition Effects
+### Inequality of Disadvantaged Status by Treatment
 
-**NOTE:** p-values are overestimated since the function that I'm using compares each condition to all others.
+```{r}
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 4) %>% # change this number depending on the number of rows of your tidy datasets
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_ineq_cond_cv_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, cond_sc), 2) %>% 
+  kable_format
+```
+
+### Condition Effects
 
 ```{r}
 dvs_col_rep <- dvs_col$dv_name %>% 

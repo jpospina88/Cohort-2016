@@ -456,12 +456,15 @@ If we are controlling for other covariates, we will add notes about this before 
 
 vars_categ <- 
   quos(
+    # Institutional Data
     major_grad_4y,
     class_research_ever,
     quintile_bottom,
     major_dbl_hnrs_ctrm,
     honors_yes_usethis,
-    tobaccouse_yes, 
+    
+    # Senior Year Survey
+    tobaccouse_yes,
     bingedrink_yes
     ) 
 ```
@@ -503,7 +506,7 @@ d %>%
 
 ## Example
 ```{r}
-glm(tobaccouse_yes ~ treat_sc*disadv_sc, data = d, family = binomial, na.action = na.omit) %>% 
+glm(major_grad_4y ~ treat_sc*disadv_sc, data = d, family = binomial, na.action = na.omit) %>% 
   summary
 ```
 
@@ -1033,7 +1036,7 @@ mapply(plot_bar_x_y_group_cond_adv, # function
 
 ## Example
 ```{r}
-glm(tobaccouse_yes ~ treat_sc*disadv_sc + gender + sattoact + hsrank + hsrank_no, 
+glm(major_grad_4y ~ treat_sc*disadv_sc + gender + sattoact + hsrank + hsrank_no, 
     data = d, family = binomial, na.action = na.omit) %>% 
   summary
 ```
