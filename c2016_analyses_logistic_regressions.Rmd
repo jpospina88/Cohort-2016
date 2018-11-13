@@ -465,7 +465,8 @@ vars_categ <-
     
     # Senior Year Survey
     tobaccouse_yes,
-    bingedrink_yes
+    bingedrink_yes,
+    next_plans2
     ) 
 ```
 
@@ -828,8 +829,16 @@ tribble_dv <- tribble(
   "tobaccouse_yes",               "% Used Tobacco",                     seq(0, 50, 10),     c(0, 50),   5,
   "(Senior Year Survey)",
   "bingedrink_yes",               "% Drank Alcohol",                    seq(0, 100, 20),    c(0, 100),  10,
-  "(Senior Year Survey)"
-  )
+  "(Senior Year Survey)",
+  # "success_usethis_percent",      "Success:\nPercentile Ranking",       seq(0, 100, 20),    c(0, 100),  10,
+  # "(Senior Year Survey)",
+  # "potential_usethis_percent",    "Potetnial:\nPercentile Ranking",     seq(0, 100, 20),    c(0, 100),  10,
+  # "(Senior Year Survey)",
+  # "",                             "",                
+  # "",
+  "next_plans2",                  "% Taking a Job",                     seq(0, 100, 20),    c(0, 100),  10,
+  "S"
+)
 
 tribble_cond <- data.frame(matrix(c("treat_sc"), nrow = nrow(tribble_dv)),
                            matrix(c("cond_sc"), nrow = nrow(tribble_dv)))
