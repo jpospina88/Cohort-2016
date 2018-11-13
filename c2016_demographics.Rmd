@@ -1,0 +1,110 @@
+---
+title: 'Cohort 2016: Demographics'
+author: "Juan Ospina"
+date: "11/7/2018"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+---
+
+```{r clean system, message=TRUE, warning=TRUE, include=FALSE}
+rm(list = ls()) # clean environment
+```
+
+```{r global options, echo=FALSE}
+knitr::opts_chunk$set(
+  # fig.path = 'figs/', fig.show = 'asis', 
+  dpi = 75, 
+  # include = FALSE, 
+  echo = FALSE, # run the code, show me only the graphs
+  warning = FALSE, message = FALSE, cache = FALSE)
+```
+
+```{r packages}
+# install.packages(c("RColorBrewer", "reshape2", "tidyverse"))
+# install.packages("apaTables", dependencies = TRUE)
+# install.packages("ez",dependencies = TRUE)
+# install.packages("devtools")
+# devtools::install_github("dstanley4/apaTables")
+library(apaTables)
+library(magrittr)
+library(Hmisc)
+library(RColorBrewer)
+library(reshape2)
+library(tidyverse)
+library(emmeans) # to get adjusted means and to plot the summary statistics of models
+library(kableExtra)
+library(psych)
+library(apaTables)
+library(ez)
+library(grid) # For iterative plots
+library(gridExtra) # For iterative plots
+# library(MASS)
+# library(dplyr) # Load dplyr after MASS to be able to use select()
+```
+
+```{r data files}
+d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+options(contrasts = c("contr.helmert", "contr.poly")) # ANOVA contrasts
+```
+
+```{r load custom functions}
+source("../scripts/custom_functions.R")
+```
+
+
+```{r}
+# d %>%
+#   select(starts_with("started"))
+
+# d %>%
+#   select(starts_with("recruited"))
+```
+
+# Race of the participants who completed the Pre-Matriculation Intervention
+
+```{r}
+demogs <- quos(race)
+d %>%
+  # filter(!is.na(race_nointl_wPI_USETHIS)) %>%
+  demographics_pct(demogs)
+
+```
+
+# Race of the participants who started the Freshman Follow-Up in Spring
+
+```{r}
+demogs <- quos(race)
+d %>%
+  filter(startedFYFUS == 1) %>%
+  demographics_pct(demogs)
+```
+
+# Race of the participants who started the Sophomore Follow-Up in Spring
+
+```{r}
+demogs <- quos(race)
+d %>%
+  filter(startedSHYFUS == 1) %>%
+  demographics_pct(demogs)
+```
+
+# Race of the participants who started the Junior Follow-Up in Spring
+
+```{r}
+demogs <- quos(race)
+d %>%
+  filter(startedJYFUS == 1) %>%
+  demographics_pct(demogs)
+```
+
+# Race of the participants who started the Senior Follow-Up in Spring
+
+```{r}
+demogs <- quos(race)
+d %>%
+  filter(startedSYFUS == 1) %>%
+  demographics_pct(demogs)
+```
