@@ -56,8 +56,6 @@ options(contrasts = c("contr.helmert", "contr.poly")) # ANOVA contrasts
 #   setdiff(d_hr %>% select(starts_with("visits_per_day")))
 ```
 
-
-
 ```{r custom functions}
 n_obs <- function(x) sum(!is.na(x))
 mn <- function(x) round(mean(x, na.rm = TRUE), 2)
