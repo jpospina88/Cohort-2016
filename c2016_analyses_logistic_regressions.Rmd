@@ -455,8 +455,7 @@ If we are controlling for other covariates, we will add notes about this before 
 ```{r list of variables}
 source("../Cohort 2016/c2016_lists_variables_settings_plots.R")
 
-select(d, !!!vars_categ)
-
+# select(d, !!!vars_categ)
 # d$major2_yes
 ```
 
@@ -871,26 +870,26 @@ plots
 ```
 
 ```{r eval=FALSE, include=FALSE}
-plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit) d.unnest_treat %>% 
-  filter(!is.na(get(var))) %>% 
-  ggplot(aes(x = get(ftr), y = get(var)*100, fill = get(ftr), group = get(ftr))) + # Remember to add get()
-  geom_bar(position = pd1, stat = "identity") + 
-  theme1 + guides_no +
-  geom_text(aes(label = format(paste0(round(get(var)*100, digits = 1), "%"), digits = 3), y = 10)) +
-  coord_cartesian(ylim = limit) +
-  scale_y_continuous(breaks = scales) +
-  facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-  labels_treat + color_treat + ylab(y_lab) + xlab("") + theme
-
-# [3,] factor
-# [1,] var or dv
-# [2,] names of dv (y_lab)
-# mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
-
-mapply(plot_bar_x_y_group_treat_adv, # function
-       tribble_categ[,"treat_sc"] %>% t, tribble_categ[,"dv"] %>% t, # arguments
-       tribble_categ[,"dv_name"] %>% t, tribble_categ[,"scale"] %>% t, 
-       tribble_categ[,"limit"] %>% t, SIMPLIFY = F)
+# plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit) d.unnest_treat %>% 
+#   filter(!is.na(get(var))) %>% 
+#   ggplot(aes(x = get(ftr), y = get(var)*100, fill = get(ftr), group = get(ftr))) + # Remember to add get()
+#   geom_bar(position = pd1, stat = "identity") + 
+#   theme1 + guides_no +
+#   geom_text(aes(label = format(paste0(round(get(var)*100, digits = 1), "%"), digits = 3), y = 10)) +
+#   coord_cartesian(ylim = limit) +
+#   scale_y_continuous(breaks = scales) +
+#   facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+#   labels_treat + color_treat + ylab(y_lab) + xlab("") + theme
+# 
+# # [3,] factor
+# # [1,] var or dv
+# # [2,] names of dv (y_lab)
+# # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
+# 
+# mapply(plot_bar_x_y_group_treat_adv, # function
+#        tribble_categ[,"treat_sc"] %>% t, tribble_categ[,"dv"] %>% t, # arguments
+#        tribble_categ[,"dv_name"] %>% t, tribble_categ[,"scale"] %>% t, 
+#        tribble_categ[,"limit"] %>% t, SIMPLIFY = F)
 ```
 
 ## By Condition and Disadvantaged Status
