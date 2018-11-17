@@ -420,14 +420,6 @@ kable_format <- . %>%
   kable_styling(bootstrap_options = c("hover", "responsive"), font_size = 12, full_width = F)
 ```
 
-
-```{r}
-vars_count <- quos(visits_per_day, visits_per_day_mh, visits_per_day_resp, visits_per_day_no_resp) 
-
-
-      #mentor_important_usethis, mentor_postgrad_usethis_r, mentor_when_sum, profrel_comp2, entor_comp3_z, closefriends_comp3, closefriendscount, closenessfriends_comp7, friends_atrisk_score, friend_knowsothers_rc_mean, org_howinvcount, org_leadercount, org_count, activism_engaged, activism_hours_usethis, commcount, commimpt_comp5, commgoals_comp5, commcare_comp5, honors_count)
-```
-
 # General Notes
 
 All the analyses are using simple contrasts. Follow this link if you would like to know more:
@@ -442,6 +434,10 @@ All the following analyses are shown in two different versions:
 If we are controlling for other covariates, we will add notes about this before showing the graph.
 
 # Descriptive Statistics
+
+```{r list of variables}
+source("../Cohort 2016/c2016_lists_variables_settings_plots.R")
+```
 
 ## Overall
 ```{r}
@@ -762,27 +758,6 @@ dvs_col_rep %>%
 
 # Bar Plots
 
-```{r list of variables and graphs parameters}
-tribble_dv <- tribble(
-  ~dv,                    ~dv_name,                                       ~scale,             ~limit,  ~position,
-  #----------------------|-----------------------------------------------|-------------------|--------|-----------
-  "visits_per_day",       "# of Days Visited Health Center (5 Years)",    seq(0, 20, 2),     c(0, 20), 2,
-  "visits_per_day_mh",    "# of Days Visited Related to\nMental Health (5 Years)",                                                                                                                seq(0, 8, 1),      c(0, 8),  0.5,
-  "visits_per_day_resp",  "# of Days Visited Related to\nRespiratory Illness (5 Years)",                                                                                                          seq(0, 3, 0.5),      c(0, 3),  0.3,
-  "visits_per_day_no_resp","# of Days Visited Related to\n Non-respiratory Illness (5 Years)",                                                                                                    seq(0, 18, 3),     c(0, 18), 1
-  )
-
-# visits_per_day, visits_per_day_mh, visits_per_day_resp, visits_per_day_no_resp
-
-tribble_cond <- data.frame(matrix(c("treat_sc"), nrow = nrow(tribble_dv)),
-                           matrix(c("cond_sc"), nrow = nrow(tribble_dv)))
-
-names_cond <- c("treat_sc", "cond_sc")
-colnames(tribble_cond) <- names_cond
-
-tribble_comb <- bind_cols(tribble_dv, tribble_cond)
-```
-
 ## By Treatment and Disadvantaged Status
 
 ```{r}
@@ -808,9 +783,9 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit, positio
   labels_treat + color_treat + ylab(y_lab) + xlab("") + theme
 
 mapply(plot_bar_x_y_group_treat_adv, # function
-       tribble_comb[,"treat_sc"] %>% t, tribble_comb[,"dv"] %>% t, # arguments
-       tribble_comb[,"dv_name"] %>% t, tribble_comb[,"scale"] %>% t, 
-       tribble_comb[,"limit"] %>% t, tribble_comb[,"position"] %>% t, SIMPLIFY = F)
+       tribble_count[,"treat_sc"] %>% t, tribble_count[,"dv"] %>% t, # arguments
+       tribble_count[,"dv_name"] %>% t, tribble_count[,"scale"] %>% t, 
+       tribble_count[,"limit"] %>% t, tribble_count[,"position"] %>% t, SIMPLIFY = F)
 ```
 
 ## By Condition and Disadvantaged Status
@@ -836,9 +811,9 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit, position
   labels_cond + color_cond + ylab(y_lab) + xlab("") + theme.cond
 
 mapply(plot_bar_x_y_group_cond_adv, # function
-       tribble_comb[,"cond_sc"] %>% t, tribble_comb[,"dv"] %>% t, # arguments
-       tribble_comb[,"dv_name"] %>% t, tribble_comb[,"scale"] %>% t, 
-       tribble_comb[,"limit"] %>% t, tribble_comb[,"position"] %>% t, SIMPLIFY = F)
+       tribble_count[,"cond_sc"] %>% t, tribble_count[,"dv"] %>% t, # arguments
+       tribble_count[,"dv_name"] %>% t, tribble_count[,"scale"] %>% t, 
+       tribble_count[,"limit"] %>% t, tribble_count[,"position"] %>% t, SIMPLIFY = F)
 ```
 
 # Models with covariates
@@ -1114,9 +1089,9 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit, positio
   labels_treat + color_treat + ylab(y_lab) + xlab("") + theme
 
 mapply(plot_bar_x_y_group_treat_adv, # function
-       tribble_comb[,"treat_sc"] %>% t, tribble_comb[,"dv"] %>% t, # arguments
-       tribble_comb[,"dv_name"] %>% t, tribble_comb[,"scale"] %>% t, 
-       tribble_comb[,"limit"] %>% t, tribble_comb[,"position"] %>% t, SIMPLIFY = F)
+       tribble_count[,"treat_sc"] %>% t, tribble_count[,"dv"] %>% t, # arguments
+       tribble_count[,"dv_name"] %>% t, tribble_count[,"scale"] %>% t, 
+       tribble_count[,"limit"] %>% t, tribble_count[,"position"] %>% t, SIMPLIFY = F)
 ```
 
 ## By Condition and Disadvantaged Status
@@ -1142,7 +1117,7 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit, position
   labels_cond + color_cond + ylab(y_lab) + xlab("") + theme.cond
 
 mapply(plot_bar_x_y_group_cond_adv, # function
-       tribble_comb[,"cond_sc"] %>% t, tribble_comb[,"dv"] %>% t, # arguments
-       tribble_comb[,"dv_name"] %>% t, tribble_comb[,"scale"] %>% t, 
-       tribble_comb[,"limit"] %>% t, tribble_comb[,"position"] %>% t, SIMPLIFY = F)
+       tribble_count[,"cond_sc"] %>% t, tribble_count[,"dv"] %>% t, # arguments
+       tribble_count[,"dv_name"] %>% t, tribble_count[,"scale"] %>% t, 
+       tribble_count[,"limit"] %>% t, tribble_count[,"position"] %>% t, SIMPLIFY = F)
 ```

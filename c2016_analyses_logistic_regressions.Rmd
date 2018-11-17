@@ -47,6 +47,7 @@ library(gridExtra) # For iterative plots
 
 ```{r data files}
 d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+
 options(contrasts = c("contr.helmert", "contr.poly")) # ANOVA contrasts
 ```
 
@@ -451,26 +452,16 @@ If we are controlling for other covariates, we will add notes about this before 
 
 # Descriptive Statistics
 
-```{r}
-# d %>% count(treat, treat_num) %>% select(-n) # If you have the package MASS loaded, this won't work.
+```{r list of variables}
+source("../Cohort 2016/c2016_lists_variables_settings_plots.R")
 
-vars_categ <- 
-  quos(
-    # Institutional Data
-    major_grad_4y,
-    class_research_ever,
-    quintile_bottom,
-    major_dbl_hnrs_ctrm,
-    honors_yes_usethis,
-    
-    # Senior Year Survey
-    tobaccouse_yes,
-    bingedrink_yes,
-    next_plans2
-    ) 
+select(d, !!!vars_categ)
+
+# d$major2_yes
 ```
 
 ## Overall
+
 ```{r}
 d %>% 
   select(!!!vars_categ) %>% 
@@ -808,49 +799,6 @@ dvs_col_rep %>%
 
 # Bar Plots
 
-```{r list of variables and graphs parameters}
-tribble_dv <- tribble(
-  ~dv,                        ~dv_name,                                ~scale,       ~limit,     ~position,
-  ~subheader,
-  #---------------------------|---------------------------------------|-------------------|--------
-  # Institutional data
-  "major_grad_4y",             "% Graduating in Four Years",           seq(0, 100, 20),    c(0, 100),  10,
-  "(Institutional Data)",
-  "class_research_ever",       "% Involved in Research",               seq(0, 100, 20),    c(0, 100),  10,
-  "(Institutional Data)",
-  "quintile_bottom",           "% with GPA in Bottom Quintile of Class", seq(0, 100, 20),  c(0, 100),  10,
-  "(Institutional Data)",
-  "major_dbl_hnrs_ctrm",       "% with High Academic Commitment",      seq(0, 100, 20),    c(0, 100),  10,
-  "(Institutional Data)",
-  "honors_yes_usethis",        "% Reporting Awards or Honors",         seq(0, 100, 20),    c(0, 100),  10,
-  "(Institutional Data)",
-  
-  # Senior Year Survey
-  "tobaccouse_yes",               "% Used Tobacco",                     seq(0, 50, 10),     c(0, 50),   5,
-  "(Senior Year Survey)",
-  "bingedrink_yes",               "% Drank Alcohol",                    seq(0, 100, 20),    c(0, 100),  10,
-  "(Senior Year Survey)",
-  # "success_usethis_percent",      "Success:\nPercentile Ranking",       seq(0, 100, 20),    c(0, 100),  10,
-  # "(Senior Year Survey)",
-  # "potential_usethis_percent",    "Potetnial:\nPercentile Ranking",     seq(0, 100, 20),    c(0, 100),  10,
-  # "(Senior Year Survey)",
-  # "",                             "",                
-  # "",
-  "next_plans2",                  "% Taking a Job",                     seq(0, 100, 20),    c(0, 100),  10,
-  "S"
-)
-
-tribble_cond <- data.frame(matrix(c("treat_sc"), nrow = nrow(tribble_dv)),
-                           matrix(c("cond_sc"), nrow = nrow(tribble_dv)))
-
-names_cond <- c("treat_sc", "cond_sc")
-colnames(tribble_cond) <- names_cond
-
-tribble_comb <- bind_cols(tribble_dv, tribble_cond)
-
-
-```
-
 ## By Treatment and Disadvantaged Status
 
 ```{r}
@@ -909,14 +857,14 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit,
 
 
 plots <- mapply(plot_bar_x_y_group_treat_adv, # function
-       tribble_comb[,"treat_sc"] %>% t,  # arguments
-       tribble_comb[,"dv"] %>% t,
-       tribble_comb[,"dv_name"] %>% t, 
-       tribble_comb[,"scale"] %>% t, 
-       tribble_comb[,"limit"] %>% t, 
-       tribble_comb[,"position"] %>% t,
-       # tribble_comb[,"decimal"] %>% t, 
-       tribble_comb[,"subheader"] %>% t,
+       tribble_categ[,"treat_sc"] %>% t,  # arguments
+       tribble_categ[,"dv"] %>% t,
+       tribble_categ[,"dv_name"] %>% t, 
+       tribble_categ[,"scale"] %>% t, 
+       tribble_categ[,"limit"] %>% t, 
+       tribble_categ[,"position"] %>% t,
+       # tribble_categ[,"decimal"] %>% t, 
+       tribble_categ[,"subheader"] %>% t,
        SIMPLIFY = F)
 
 plots
@@ -940,9 +888,9 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit) d.unnes
 # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
 
 mapply(plot_bar_x_y_group_treat_adv, # function
-       tribble_comb[,"treat_sc"] %>% t, tribble_comb[,"dv"] %>% t, # arguments
-       tribble_comb[,"dv_name"] %>% t, tribble_comb[,"scale"] %>% t, 
-       tribble_comb[,"limit"] %>% t, SIMPLIFY = F)
+       tribble_categ[,"treat_sc"] %>% t, tribble_categ[,"dv"] %>% t, # arguments
+       tribble_categ[,"dv_name"] %>% t, tribble_categ[,"scale"] %>% t, 
+       tribble_categ[,"limit"] %>% t, SIMPLIFY = F)
 ```
 
 ## By Condition and Disadvantaged Status
@@ -962,7 +910,7 @@ theme_cond <-
     axis.text = element_text(size = 12, family = "Helvetica"),  # change size of conditions labels 
     axis.title = element_text(size = 18, family = "Helvetica"), 
     strip.text.x = element_text(size = 14, colour = "white", family = "Helvetica"), # change size of factor labels 
-    plot.title = element_text(size = 18, hjust = 0.5),
+    plot.title = element_text(size = 24, hjust = 0.5),
     plot.subtitle = element_text(size = 14, hjust = 0.5),
     panel.grid.major = element_blank(), 
     panel.grid.minor = element_blank(),
@@ -1004,14 +952,14 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit,
   labels_cond + color_cond + legend_cond
 
 plots <- mapply(plot_bar_x_y_group_cond_adv, # function
-       tribble_comb[,"cond_sc"] %>% t,  # arguments
-       tribble_comb[,"dv"] %>% t,
-       tribble_comb[,"dv_name"] %>% t, 
-       tribble_comb[,"scale"] %>% t, 
-       tribble_comb[,"limit"] %>% t, 
-       tribble_comb[,"position"] %>% t,
-       # tribble_comb[,"decimal"] %>% t, 
-       tribble_comb[,"subheader"] %>% t,
+       tribble_categ[,"cond_sc"] %>% t,  # arguments
+       tribble_categ[,"dv"] %>% t,
+       tribble_categ[,"dv_name"] %>% t, 
+       tribble_categ[,"scale"] %>% t, 
+       tribble_categ[,"limit"] %>% t, 
+       tribble_categ[,"position"] %>% t,
+       # tribble_categ[,"decimal"] %>% t, 
+       tribble_categ[,"subheader"] %>% t,
        SIMPLIFY = F)
 
 plots
@@ -1036,9 +984,9 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit) d.unnest
 # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
 
 mapply(plot_bar_x_y_group_cond_adv, # function
-       tribble_comb[,"cond_sc"] %>% t, tribble_comb[,"dv"] %>% t, # arguments
-       tribble_comb[,"dv_name"] %>% t, tribble_comb[,"scale"] %>% t, 
-       tribble_comb[,"limit"] %>% t, SIMPLIFY = F)
+       tribble_categ[,"cond_sc"] %>% t, tribble_categ[,"dv"] %>% t, # arguments
+       tribble_categ[,"dv_name"] %>% t, tribble_categ[,"scale"] %>% t, 
+       tribble_categ[,"limit"] %>% t, SIMPLIFY = F)
 ```
 
 # Models with covariates
@@ -1314,14 +1262,14 @@ d.unnest_treat <-
 
 ```{r}
 plots <- mapply(plot_bar_x_y_group_treat_adv, # function
-       tribble_comb[,"treat_sc"] %>% t,  # arguments
-       tribble_comb[,"dv"] %>% t,
-       tribble_comb[,"dv_name"] %>% t, 
-       tribble_comb[,"scale"] %>% t, 
-       tribble_comb[,"limit"] %>% t, 
-       tribble_comb[,"position"] %>% t,
-       # tribble_comb[,"decimal"] %>% t, 
-       tribble_comb[,"subheader"] %>% t,
+       tribble_categ[,"treat_sc"] %>% t,  # arguments
+       tribble_categ[,"dv"] %>% t,
+       tribble_categ[,"dv_name"] %>% t, 
+       tribble_categ[,"scale"] %>% t, 
+       tribble_categ[,"limit"] %>% t, 
+       tribble_categ[,"position"] %>% t,
+       # tribble_categ[,"decimal"] %>% t, 
+       tribble_categ[,"subheader"] %>% t,
        SIMPLIFY = F)
 
 plots
@@ -1345,9 +1293,9 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit) d.unnes
 # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
 
 mapply(plot_bar_x_y_group_treat_adv, # function
-       tribble_comb[,"treat_sc"] %>% t, tribble_comb[,"dv"] %>% t, # arguments
-       tribble_comb[,"dv_name"] %>% t, tribble_comb[,"scale"] %>% t, 
-       tribble_comb[,"limit"] %>% t, SIMPLIFY = F)
+       tribble_categ[,"treat_sc"] %>% t, tribble_categ[,"dv"] %>% t, # arguments
+       tribble_categ[,"dv_name"] %>% t, tribble_categ[,"scale"] %>% t, 
+       tribble_categ[,"limit"] %>% t, SIMPLIFY = F)
 ```
 
 ## By Condition and Disadvantaged Status
@@ -1362,14 +1310,14 @@ d.unnest_cond <-
 
 ```{r}
 plots <- mapply(plot_bar_x_y_group_cond_adv, # function
-       tribble_comb[,"cond_sc"] %>% t,  # arguments
-       tribble_comb[,"dv"] %>% t,
-       tribble_comb[,"dv_name"] %>% t, 
-       tribble_comb[,"scale"] %>% t, 
-       tribble_comb[,"limit"] %>% t, 
-       tribble_comb[,"position"] %>% t,
-       # tribble_comb[,"decimal"] %>% t, 
-       tribble_comb[,"subheader"] %>% t,
+       tribble_categ[,"cond_sc"] %>% t,  # arguments
+       tribble_categ[,"dv"] %>% t,
+       tribble_categ[,"dv_name"] %>% t, 
+       tribble_categ[,"scale"] %>% t, 
+       tribble_categ[,"limit"] %>% t, 
+       tribble_categ[,"position"] %>% t,
+       # tribble_categ[,"decimal"] %>% t, 
+       tribble_categ[,"subheader"] %>% t,
        SIMPLIFY = F)
 
 plots
@@ -1393,7 +1341,7 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit) d.unnest
 # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
 
 mapply(plot_bar_x_y_group_cond_adv, # function
-       tribble_comb[,"cond_sc"] %>% t, tribble_comb[,"dv"] %>% t, # arguments
-       tribble_comb[,"dv_name"] %>% t, tribble_comb[,"scale"] %>% t, 
-       tribble_comb[,"limit"] %>% t, SIMPLIFY = F)
+       tribble_categ[,"cond_sc"] %>% t, tribble_categ[,"dv"] %>% t, # arguments
+       tribble_categ[,"dv_name"] %>% t, tribble_categ[,"scale"] %>% t, 
+       tribble_categ[,"limit"] %>% t, SIMPLIFY = F)
 ```
