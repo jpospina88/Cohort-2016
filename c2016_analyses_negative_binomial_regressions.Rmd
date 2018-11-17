@@ -272,14 +272,6 @@ pd3 <- position_dodge(width = 0.9)
 black1 <- element_text(color = "White")
 black2 <- element_rect(fill = "black", colour = "Black", size = NULL, linetype = NULL, color = "Black", inherit.blank = FALSE)
 
-theme <- theme(strip.text = black1, strip.background = black2, axis.text = element_text(size = 14),
-        axis.title = element_text(size = 14), strip.text.x = element_text(size = 14, colour = "white"),
-        panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-
-theme.cond <- theme(strip.text = black1, strip.background = black2, axis.text = element_text(size = 12),
-        axis.title = element_text(size = 14), strip.text.x = element_text(size = 14, colour = "white"),
-        panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-
 theme1 <- theme_light()
 # theme1 <- theme_classic()
 guides_no <- guides(fill = FALSE)
@@ -318,75 +310,6 @@ race_names <-
     'black/hispanic/native/pacificislander' = "Minority")
 
 group_levels_disadv <- c('adv','disadv')
-
-# Scales
-scale_y_3 <- scale_y_continuous(breaks = seq(0, 3, 1))
-scale_y_5 <- scale_y_continuous(breaks = seq(1, 5, 1))
-scale_y_6 <- scale_y_continuous(breaks = seq(1, 6, 1))
-scale_y_7 <- scale_y_continuous(breaks = seq(1, 7, 1))
-scale_y_10 <- scale_y_continuous(breaks = seq(0, 10, 2))
-scale_y_100 <- scale_y_continuous(breaks = seq(0, 100, 20))
-scale_y_50 <- scale_y_continuous(breaks = seq(0, 50, 10))
-scale_y_75 <- scale_y_continuous(breaks = seq(0, 75, 15))
-
-#added "p" in place of "." to mean "point"
-scale_y_200 <- scale_y_continuous(breaks = seq(0, 200, 40))
-scale_y_.15 <- scale_y_continuous(breaks = seq(-.15, .15, .5))
-scale_y_4 <- scale_y_continuous(breaks = seq(1, 4, 1))
-scale_y_40 <- scale_y_continuous(breaks = seq(0, 40, 10))
-scale_y_.5 <- scale_y_continuous(breaks = seq(-.5, .5, .25))
-scale_y_20 <- scale_y_continuous(breaks = seq(0, 20, 5))
-scale_y_25 <- scale_y_continuous(breaks = seq(0, 25, 5))
-
-coord_cartesian_3 <- coord_cartesian(ylim = c(0, 3))
-coord_cartesian_5 <- coord_cartesian(ylim = c(1, 5))
-coord_cartesian_7 <- coord_cartesian(ylim = c(1, 7))
-coord_cartesian_10 <- coord_cartesian(ylim = c(0, 10))
-coord_cartesian_50 <- coord_cartesian(ylim = c(0, 50))
-coord_cartesian_100 <- coord_cartesian(ylim = c(0, 100))
-coord_cartesian_75 <- coord_cartesian(ylim = c(0, 75))
-
-coord_cartesian_200 <- coord_cartesian(ylim = c(0, 200))
-coord_cartesian_.15 <- coord_cartesian(ylim = c(-.15, .15))
-coord_cartesian_4 <- coord_cartesian(ylim = c(1, 4))
-coord_cartesian_40 <- coord_cartesian(ylim = c(0, 40))
-coord_cartesian_.5 <- coord_cartesian(ylim = c(-.5, .5))
-coord_cartesian_20 <- coord_cartesian(ylim = c(0, 20))
-coord_cartesian_25 <- coord_cartesian(ylim = c(0, 25))
-
-
-mean_round3 <- geom_text(aes(label = format(emmean, digits = 3), y = 1))
-mean_round3_10 <- geom_text(aes(label = format(emmean, digits = 3), y = .5))
-mean_round3_50 <- geom_text(aes(label = format(emmean, digits = 3), y = 2))
-mean_round3_100 <- geom_text(aes(label = format(emmean, digits = 3), y = 4))
-
-mean_round_pct <- geom_text(aes(label = paste0(format(prob*100, digits = 3), "%"), y = 5))
-
-mean_count <- geom_text(aes(label = paste0(format(response, digits = 3), ""), y = 2))
-
-error_bar <- geom_errorbar(aes(ymin = emmean - SE, ymax = emmean + SE), width = .2, position = pd2)
-
-error_bar_count <- geom_errorbar(aes(ymin = response - SE, ymax = response + SE), width = .2, position = pd2)
-
-
-# General function version:
-# Need to specify more stuff but it's more general so you can use it with more grouping variables
-plot_bar_x_y_group <- function(data = data, x_var = x_var, x_labels = x_labels, x_color = x_color,
-                               y_var = y_var, labs_y = labs_y,
-                               group_var = group_var, group_names = group_names,
-                               scale = scale, coord_cartesian = coord_cartesian, mean_round = mean_round) {
-x_var <- enquo(x_var)
-y_var <- enquo(y_var)
-group_var <- enquo(group_var)
-
-data %>%
-  ggplot(aes(x = !!x_var, y = !!y_var, fill = !!x_var, group = !!x_var)) +
-  geom_bar(position = pd1, stat = "identity") + error_bar + theme1 + theme + guides_no + mean_round +
-  coord_cartesian + scale + # this is where you change the scale
-  facet_grid(, vars(!!group_var), labeller = as_labeller(group_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-  x_labels + x_color + labs_y
-}
-
 ```
 
 ```{r custom functions describe sample}
@@ -770,22 +693,64 @@ d.unnest_treat <-
 ```
 
 ```{r}
-plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit, position) d.unnest_treat %>% 
+theme <- 
+  theme(
+    strip.text = black1, 
+    strip.background = black2, 
+    axis.text = element_text(size = 20, family = "Helvetica"),
+    axis.title = element_text(size = 20, family = "Helvetica"), 
+    strip.text.x = element_text(size = 20, colour = "white", family = "Helvetica"),
+    plot.title = element_text(size = 24, hjust = 0.5),
+    plot.subtitle = element_text(size = 14, hjust = 0.5),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),
+    axis.title.x = element_blank(),
+    # axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.position = 'top',
+    legend.key = element_rect(size = 10),
+    legend.key.size = unit(1, 'lines')
+  )
+
+guides_no <- guides(fill = FALSE, color = FALSE)
+
+legend_treat <- scale_color_manual(name = "", 
+                                  values = c("ctl" = "salmon", 
+                                             "treat" = "steelblue2"))
+
+plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit,
+                                         position,
+                                         # decimal, 
+                                         subheader
+                                         ) d.unnest_treat %>% 
   filter(!is.na(get(var))) %>% 
-  ggplot(aes(x = get(ftr), y = get(var), fill = get(ftr), group = get(ftr))) + # Remember to add get()
-  geom_bar(position = pd1, stat = "identity") + 
-  geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .2, position = pd2) +
-  theme1 + guides_no +
-  geom_text(aes(label = format(round(get(var), digits = 1), digits = 3), y = position)) +
+  ggplot(aes(x = get(ftr), y = get(var), color = get(ftr), group = get(ftr))) + # Remember to add get()
+  # geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), size = 42, color = "black") +
+  geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), size = 41) +
+  geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
+  theme1 +
+  # geom_text(aes(label = format(get(var)*100, digits = 4), y = 10), size = 8, color = "black") +
+  geom_text(aes(label = format(paste0(round(get(var), digits = 2)), digits = 3), y = position), 
+            size = 8, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
   facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-  labels_treat + color_treat + ylab(y_lab) + xlab("") + theme
+  ylab("") + ggtitle(y_lab) + xlab("") + theme + guides_no +
+  labs(subtitle = subheader) +
+  labels_treat + color_treat + legend_treat
 
-mapply(plot_bar_x_y_group_treat_adv, # function
-       tribble_count[,"treat_sc"] %>% t, tribble_count[,"dv"] %>% t, # arguments
-       tribble_count[,"dv_name"] %>% t, tribble_count[,"scale"] %>% t, 
-       tribble_count[,"limit"] %>% t, tribble_count[,"position"] %>% t, SIMPLIFY = F)
+plots <- mapply(plot_bar_x_y_group_treat_adv, # function
+       tribble_count[,"treat_sc"] %>% t,  # arguments
+       tribble_count[,"dv"] %>% t,
+       tribble_count[,"dv_name"] %>% t, 
+       tribble_count[,"scale"] %>% t, 
+       tribble_count[,"limit"] %>% t, 
+       tribble_count[,"position"] %>% t,
+       # tribble_count[,"decimal"] %>% t, 
+       tribble_count[,"subheader"] %>% t,
+       SIMPLIFY = F)
+
+plots
 ```
 
 ## By Condition and Disadvantaged Status
@@ -798,22 +763,66 @@ d.unnest_cond <-
 ```
 
 ```{r}
-plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit, position) d.unnest_cond %>% 
+theme_cond <- 
+  theme(
+    strip.text = black1, 
+    strip.background = black2, 
+    axis.text = element_text(size = 12, family = "Helvetica"),  # change size of conditions labels 
+    axis.title = element_text(size = 18, family = "Helvetica"), 
+    strip.text.x = element_text(size = 14, colour = "white", family = "Helvetica"), # change size of factor labels 
+    plot.title = element_text(size = 24, hjust = 0.5),
+    plot.subtitle = element_text(size = 14, hjust = 0.5),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),
+    axis.title.x = element_blank(),
+    # axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.position = 'top',
+    legend.key = element_rect(size = 10),
+    legend.key.size = unit(1, 'lines')
+  )
+
+guides_no <- guides(fill = FALSE, color = FALSE)
+
+legend_cond <- scale_color_manual(name = "", 
+                                  values = c("ctl" = "#F8766D", 
+                                             "bel" = "#7CAE00", 
+                                             "cul" = "#00BFC4", 
+                                             "wf" = "#C77CFF"))
+
+plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit,
+                                         position,
+                                         # decimal, 
+                                         subheader
+                                         ) d.unnest_cond %>% 
   filter(!is.na(get(var))) %>% 
-  ggplot(aes(x = get(ftr), y = get(var), fill = get(ftr), group = get(ftr))) + # Remember to add get()
-  geom_bar(position = pd1, stat = "identity") + 
-  geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .2, position = pd2) +
-  theme1 + guides_no + 
-  geom_text(aes(label = format(round(get(var), digits = 1), digits = 3), y = position)) +
+  ggplot(aes(x = get(ftr), y = get(var), color = get(ftr), group = get(ftr))) + # Remember to add get()
+  # geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), size = 42, color = "black") +
+  geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), size = 23) +
+  geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
+  theme1 +
+  # geom_text(aes(label = format(get(var)*100, digits = 4), y = 10), size = 8, color = "black") +
+  geom_text(aes(label = format(paste0(round(get(var), digits = 2)), digits = 3), y = position), 
+            size = 5, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
   facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-  labels_cond + color_cond + ylab(y_lab) + xlab("") + theme.cond
+  ylab("") + ggtitle(y_lab) + xlab("") + theme_cond + guides_no +
+  labs(subtitle = subheader) +
+  labels_cond + color_cond + legend_cond
 
-mapply(plot_bar_x_y_group_cond_adv, # function
-       tribble_count[,"cond_sc"] %>% t, tribble_count[,"dv"] %>% t, # arguments
-       tribble_count[,"dv_name"] %>% t, tribble_count[,"scale"] %>% t, 
-       tribble_count[,"limit"] %>% t, tribble_count[,"position"] %>% t, SIMPLIFY = F)
+plots <- mapply(plot_bar_x_y_group_cond_adv, # function
+       tribble_count[,"cond_sc"] %>% t,  # arguments
+       tribble_count[,"dv"] %>% t,
+       tribble_count[,"dv_name"] %>% t, 
+       tribble_count[,"scale"] %>% t, 
+       tribble_count[,"limit"] %>% t, 
+       tribble_count[,"position"] %>% t,
+       # tribble_count[,"decimal"] %>% t, 
+       tribble_count[,"subheader"] %>% t,
+       SIMPLIFY = F)
+
+plots
 ```
 
 # Models with covariates
@@ -1076,22 +1085,18 @@ d.unnest_treat <-
 ```
 
 ```{r}
-plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit, position) d.unnest_treat %>% 
-  filter(!is.na(get(var))) %>% 
-  ggplot(aes(x = get(ftr), y = get(var), fill = get(ftr), group = get(ftr))) + # Remember to add get()
-  geom_bar(position = pd1, stat = "identity") + 
-  geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .2, position = pd2) +
-  theme1 + guides_no + 
-  geom_text(aes(label = format(round(get(var), digits = 1), digits = 3), y = position)) +
-  coord_cartesian(ylim = limit) +
-  scale_y_continuous(breaks = scales) +
-  facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-  labels_treat + color_treat + ylab(y_lab) + xlab("") + theme
+plots <- mapply(plot_bar_x_y_group_treat_adv, # function
+       tribble_count[,"treat_sc"] %>% t,  # arguments
+       tribble_count[,"dv"] %>% t,
+       tribble_count[,"dv_name"] %>% t, 
+       tribble_count[,"scale"] %>% t, 
+       tribble_count[,"limit"] %>% t, 
+       tribble_count[,"position"] %>% t,
+       # tribble_count[,"decimal"] %>% t, 
+       tribble_count[,"subheader"] %>% t,
+       SIMPLIFY = F)
 
-mapply(plot_bar_x_y_group_treat_adv, # function
-       tribble_count[,"treat_sc"] %>% t, tribble_count[,"dv"] %>% t, # arguments
-       tribble_count[,"dv_name"] %>% t, tribble_count[,"scale"] %>% t, 
-       tribble_count[,"limit"] %>% t, tribble_count[,"position"] %>% t, SIMPLIFY = F)
+plots
 ```
 
 ## By Condition and Disadvantaged Status
@@ -1104,20 +1109,16 @@ d.unnest_cond <-
 ```
 
 ```{r}
-plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit, position) d.unnest_cond %>% 
-  filter(!is.na(get(var))) %>% 
-  ggplot(aes(x = get(ftr), y = get(var), fill = get(ftr), group = get(ftr))) + # Remember to add get()
-  geom_bar(position = pd1, stat = "identity") + 
-  geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .2, position = pd2) +
-  theme1 + guides_no + 
-  geom_text(aes(label = format(round(get(var), digits = 1), digits = 3), y = position)) +
-  coord_cartesian(ylim = limit) +
-  scale_y_continuous(breaks = scales) +
-  facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-  labels_cond + color_cond + ylab(y_lab) + xlab("") + theme.cond
+plots <- mapply(plot_bar_x_y_group_cond_adv, # function
+       tribble_count[,"cond_sc"] %>% t,  # arguments
+       tribble_count[,"dv"] %>% t,
+       tribble_count[,"dv_name"] %>% t, 
+       tribble_count[,"scale"] %>% t, 
+       tribble_count[,"limit"] %>% t, 
+       tribble_count[,"position"] %>% t,
+       # tribble_count[,"decimal"] %>% t, 
+       tribble_count[,"subheader"] %>% t,
+       SIMPLIFY = F)
 
-mapply(plot_bar_x_y_group_cond_adv, # function
-       tribble_count[,"cond_sc"] %>% t, tribble_count[,"dv"] %>% t, # arguments
-       tribble_count[,"dv_name"] %>% t, tribble_count[,"scale"] %>% t, 
-       tribble_count[,"limit"] %>% t, tribble_count[,"position"] %>% t, SIMPLIFY = F)
+plots
 ```
