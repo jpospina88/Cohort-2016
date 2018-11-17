@@ -91,22 +91,16 @@ vars_cont <-
   ) 
 
 tribble_dv <- tribble(
-  ~dv,                            ~dv_name,                                              ~scale,
-  ~limit,         ~position,      ~subheader,                                            ~decimal,
+  ~dv,                            ~dv_name,                                              ~scale,      ~limit,         ~position,      ~subheader,                                            ~decimal,
   #------------------------------|------------------------------------------------------|--------------|--------
   # Institutional data
-  "cum_gpa_y4_spring",            "4-Year Cumulative GPA",                               seq(0, 4, 1), 
-  c(0, 4),        0.5,            "(Institutional Data)",                                3,
-  "cum_stem_gpa_y4_spring",       "4-Year Cumulative GPA in STEM Classes",               seq(0, 4, 1),
-  c(0, 4),        0.5,            "(Institutional Data)",                                3,
+  "cum_gpa_y4_spring",            "4-Year Cumulative GPA",                               seq(0, 4, 1), c(0, 4),        0.5,            "(Institutional Data)",                                3,
+  "cum_stem_gpa_y4_spring",       "4-Year Cumulative GPA in STEM Classes",               seq(0, 4, 1), c(0, 4),        0.5,            "(Institutional Data)",                                3,
   
   # Pre-Matriculation Intervention
-  "t1critfeedback_improvegrow",   "Crit. Feedback: Help Ss Grow",                        seq(1, 7, 1),
-  c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
-  "t1critfeedback_distinguishbtwnSs", "Critical Feedback: Distinguish Btwn Students",    seq(1, 7, 1),
-  c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
-  "posfeels_comp4" , "Overall Positivity of College Experience",                         seq(1, 7, 1),
-  c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
+  "t1critfeedback_improvegrow",   "Crit. Feedback: Help Ss Grow",                        seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
+  "t1critfeedback_distinguishbtwnSs", "Critical Feedback: Distinguish Btwn Students",    seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
+  "posfeels_comp4" , "Overall Positivity of College Experience",                         seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
   "t1posfeelings_profsTAs", "Positive Experiences w/ Profs. and TAs",                    seq(1, 7, 1),
   c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
   "t1posfeelings_gettingtoknowotherSs", "Positive Feelings Getting to Know Other Students", seq(1, 7, 1),
@@ -337,12 +331,12 @@ vars_count <-
     ) 
 
 tribble_dv <- tribble(
-  ~dv,                    ~dv_name,                                       ~scale,             ~limit,  ~position,
-  #----------------------|-----------------------------------------------|-------------------|--------|-----------
-  "visits_per_day",       "# of Days Visited Health Center (5 Years)",    seq(0, 20, 2),     c(0, 20), 2,
-  "visits_per_day_mh",    "# of Days Visited Related to\nMental Health (5 Years)",                                                                                                                seq(0, 8, 1),      c(0, 8),  0.5,
-  "visits_per_day_resp",  "# of Days Visited Related to\nRespiratory Illness (5 Years)",                                                                                                          seq(0, 3, 0.5),      c(0, 3),  0.3,
-  "visits_per_day_no_resp","# of Days Visited Related to\n Non-respiratory Illness (5 Years)",                                                                                                    seq(0, 18, 3),     c(0, 18), 1
+  ~dv,                          ~dv_name,                                       ~scale,             ~limit,  ~position, ~subheader,
+  #----------------------------|-----------------------------------------------|-------------------|--------|-----------
+  "visits_per_day",            "# of Days Visited Health Center",    seq(0, 20, 2),     c(0, 20), 2, "(5 Years; Medical Records)",
+  "visits_per_day_mh",         "# of Days Visited Related to\nMental Health",seq(0, 8, 1),      c(0, 8),  0.5, "(5 Years; Medical Records)",
+  "visits_per_day_resp",       "# of Days Visited Related to\nRespiratory Illness",seq(0, 3, 0.5),      c(0, 3),  0.3, "(5 Years; Medical Records)",
+  "visits_per_day_no_resp",    "# of Days Visited Related to\n Non-respiratory Illness",seq(0, 18, 3),     c(0, 18), 1, "(5 Years; Medical Records)"
 )
 
 # visits_per_day, visits_per_day_mh, visits_per_day_resp, visits_per_day_no_resp
