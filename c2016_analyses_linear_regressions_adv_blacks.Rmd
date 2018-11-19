@@ -376,6 +376,7 @@ group_levels_disadv <- c('adv','disadv')
 
 
 d %>% 
+<<<<<<< HEAD
   count(adv_black_sc)
 
 black_adv_names <- 
@@ -390,6 +391,14 @@ black_adv_names <-
   c('adv' = "Advantaged",
     'black' = "Black",
     'other' = "All Others")
+=======
+  count(adv_hispanic_sc)
+
+hispanic_adv_names <- 
+  c('adv' = "Advantaged",
+    'hispanic' = "Hispanic",
+    'other' = "All Others")
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
 ```
 
 ```{r custom functions describe sample}
@@ -399,7 +408,11 @@ table.describe <- function(data, vector){
 ```
 
 ```{r load custom functions}
+<<<<<<< HEAD
 source("R/custom_functions.R")
+=======
+source("../scripts/custom_functions.R")
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
 ```
 
 # General Notes
@@ -440,7 +453,11 @@ d %>%
 ```{r}
 treat_adv <- list(d$treat_sc, 
                   # d$disadv_sc
+<<<<<<< HEAD
                   d$adv_black_sc
+=======
+                  d$adv_hispanic_sc
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
                   )
 
 d %>% 
@@ -454,7 +471,11 @@ d %>%
 ```{r}
 cond_adv <- list(d$cond_sc, 
                  # d$disadv_sc
+<<<<<<< HEAD
                  d$adv_black_sc
+=======
+                 d$adv_hispanic_sc
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
                  )
 
 d %>% 
@@ -509,7 +530,11 @@ plot_raincloud_map_treat_adv <- function(ftr, var, y_lab, scales, limit, subhead
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
   # facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+<<<<<<< HEAD
   facet_grid(, vars(adv_black_sc), labeller = as_labeller(black_adv_names)) + 
+=======
+  facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) + 
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
   ylab("") + ggtitle(y_lab) + xlab("") + theme + guides_no +
   labs(subtitle = subheader)
 
@@ -568,7 +593,11 @@ plot_raincloud_map_cond_adv <- function(ftr, var, y_lab, scales, limit, subheade
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
   # facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+<<<<<<< HEAD
   facet_grid(, vars(adv_black_sc), labeller = as_labeller(black_adv_names)) + 
+=======
+  facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) + 
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
   ylab("") + ggtitle(y_lab) + xlab("") + theme_cond + guides_no +
   labs(subtitle = subheader)
 
@@ -816,13 +845,21 @@ cohend_wf <-
       select(
         cd_wf_num, 
         # disadv_num, 
+<<<<<<< HEAD
         adv_black_sc,
+=======
+        adv_hispanic_sc,
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
         !!!vars_cont
         ), 
     group = "cd_wf_num", 
     group2 = 
       # "disadv_num",
+<<<<<<< HEAD
       "adv_black_sc",
+=======
+      "adv_hispanic_sc",
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
     alpha = .05) 
 
 # %>% summary
@@ -842,7 +879,11 @@ cohend_wf
 ```{r}
 lm(cum_gpa_y4_spring ~ 
      # treat_sc*disadv_sc, 
+<<<<<<< HEAD
    treat_sc*adv_black_sc,
+=======
+   treat_sc*adv_hispanic_sc,
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
    data = d
    ) %>% summary
 ```
@@ -858,7 +899,11 @@ lm(cum_gpa_y4_spring ~
 vars_ivs <- 
   quos(
     idnum, # IDs
+<<<<<<< HEAD
     disadv_sc, adv_black_sc, # groups
+=======
+    disadv_sc, adv_hispanic_sc, # groups
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
     treat_sc, cond_sc, # conditions
     sattoact, hsrank, hsrank_no, gender # covariates
   )
@@ -878,12 +923,20 @@ d.nest <-
 
 lm_model <- function(data){
   # lm(dv_value ~ treat_sc*disadv_sc, data = data)
+<<<<<<< HEAD
   lm(dv_value ~ treat_sc*adv_black_sc, data = data)
+=======
+  lm(dv_value ~ treat_sc*adv_hispanic_sc, data = data)
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
 }
 
 lm_model_cond <- function(data){
   # lm(dv_value ~ cond_sc*disadv_sc, data = data)
+<<<<<<< HEAD
   lm(dv_value ~ cond_sc*adv_black_sc, data = data)
+=======
+  lm(dv_value ~ cond_sc*adv_hispanic_sc, data = data)
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
 }
 
 d.nest %<>% mutate(lm_model = map(.x = data, .f = lm_model),
@@ -909,7 +962,11 @@ d.nest %<>%
         specs = "treat_sc", 
         by = 
           # "disadv_sc"
+<<<<<<< HEAD
           "adv_black_sc"
+=======
+          "adv_hispanic_sc"
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
       ),
       .f = emmeans
     ),
@@ -931,7 +988,11 @@ d.nest %<>%
         object = lm_model, 
         specs = 
           # "disadv_sc"
+<<<<<<< HEAD
           "adv_black_sc"
+=======
+          "adv_hispanic_sc"
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
         , 
         by = "treat_sc"
       ),
@@ -956,7 +1017,11 @@ d.nest %<>%
         specs = "cond_sc", 
         by = 
           # "disadv_sc"
+<<<<<<< HEAD
           "adv_black_sc"
+=======
+          "adv_hispanic_sc"
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
       ),
       .f = emmeans
     ),
@@ -978,7 +1043,11 @@ d.nest %<>%
         object = lm_model_cond, 
         specs = 
           # "disadv_sc"
+<<<<<<< HEAD
           "adv_black_sc"
+=======
+          "adv_hispanic_sc"
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
         , 
         by = "cond_sc"
       ),
@@ -1147,7 +1216,11 @@ dvs_col_rep %>%
       dv_name, 
       contrast, 
       # disadv_sc
+<<<<<<< HEAD
       adv_black_sc
+=======
+      adv_hispanic_sc
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
     ), 2) %>% 
   kable_format
 ```
@@ -1190,7 +1263,11 @@ dvs_col_rep %>%
       dv_name, 
       contrast, 
       # disadv_sc,
+<<<<<<< HEAD
       adv_black_sc
+=======
+      adv_hispanic_sc
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
       ), 
     2) %>% 
   kable_format
@@ -1225,7 +1302,11 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit, positio
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
   # facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+<<<<<<< HEAD
   facet_grid(, vars(adv_black_sc), labeller = as_labeller(black_adv_names)) +
+=======
+  facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) +
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
   ylab("") + ggtitle(y_lab) + xlab("") + theme + guides_no +
   labs(subtitle = subheader) + 
   labels_treat + color_treat + legend_treat
@@ -1292,7 +1373,11 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit, position
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
   # facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+<<<<<<< HEAD
   facet_grid(, vars(adv_black_sc), labeller = as_labeller(black_adv_names)) +
+=======
+  facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) +
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
   ylab("") + ggtitle(y_lab) + xlab("") + theme_cond + guides_no +
   labs(subtitle = subheader) + 
   labels_cond + color_cond + legend_cond
@@ -1341,19 +1426,31 @@ plots
 ```{r}
 lm(cum_gpa_y4_spring ~ 
      # treat_sc*disadv_sc +
+<<<<<<< HEAD
      treat_sc*adv_black_sc +
+=======
+     treat_sc*adv_hispanic_sc +
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
      gender + sattoact + hsrank + hsrank_no, data = d) %>% summary
 ```
 
 ```{r}
 lm_model_treat_cv <- function(data){
   # lm(dv_value ~ treat_sc*disadv_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+<<<<<<< HEAD
   lm(dv_value ~ treat_sc*adv_black_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+=======
+  lm(dv_value ~ treat_sc*adv_hispanic_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
 }
 
 lm_model_cond_cv <- function(data){
   # lm(dv_value ~ cond_sc*disadv_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+<<<<<<< HEAD
   lm(dv_value ~ cond_sc*adv_black_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+=======
+  lm(dv_value ~ cond_sc*adv_hispanic_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
 }
 
 d.nest %<>% mutate(lm_model_treat_cv = map(.x = data, .f = lm_model_treat_cv),
@@ -1379,7 +1476,11 @@ d.nest %<>%
         specs = "treat_sc", 
         by = 
           # "disadv_sc"
+<<<<<<< HEAD
           "adv_black_sc"
+=======
+          "adv_hispanic_sc"
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
       ),
       .f = emmeans
     ),
@@ -1401,7 +1502,11 @@ d.nest %<>%
         object = lm_model_treat_cv, 
         specs = 
           # "disadv_sc"
+<<<<<<< HEAD
           "adv_black_sc"
+=======
+          "adv_hispanic_sc"
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
         , 
         by = "treat_sc"
       ),
@@ -1426,7 +1531,11 @@ d.nest %<>%
         specs = "cond_sc", 
         by = 
           # "disadv_sc"
+<<<<<<< HEAD
           "adv_black_sc"
+=======
+          "adv_hispanic_sc"
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
       ),
       .f = emmeans
     ),
@@ -1448,7 +1557,11 @@ d.nest %<>%
         object = lm_model_cond_cv, 
         specs = 
           # "disadv_sc"
+<<<<<<< HEAD
           "adv_black_sc"
+=======
+          "adv_hispanic_sc"
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
         , 
         by = "cond_sc"
       ),
@@ -1577,7 +1690,11 @@ dvs_col_rep %>%
       dv_name, 
       contrast, 
       # disadv_sc
+<<<<<<< HEAD
       adv_black_sc
+=======
+      adv_hispanic_sc
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
       ), 
     2) %>% 
   kable_format
@@ -1628,7 +1745,11 @@ dvs_col_rep %>%
       dv_name, 
       contrast, 
       # disadv_sc
+<<<<<<< HEAD
       adv_black_sc
+=======
+      adv_hispanic_sc
+>>>>>>> 89c3352442d81cb878b195f03443e0b9e688885a
       ),
     2) %>% 
   kable_format
