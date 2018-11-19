@@ -122,12 +122,13 @@ tribble_dv <- tribble(
   
   
   # Senior Year Survey
+  ## Success & Potential
   "success_usethis_percent",      "Success: Percentile Ranking",                         seq(0, 100, 10), 
   c(0, 100),      10,             "(Senior Year Survey)",                                4,       
   "potential_usethis_percent",    "Potential: Percentile Ranking",                       seq(0, 100, 10), 
   c(0, 100),      10,             "(Senior Year Survey)",                                4,
   
-  # Health
+  ## Health
   "healthmosoverall_comp5",       "Composite:\nSelf-Reported General Health",            seq(1, 5, 1),
   c(1, 5),        1.5,            "(Senior Year Survey)",                                3,
   "health_behavbingedrink",       "Frequency of Binge Drinking",                         seq(1, 5, 1),
@@ -168,7 +169,7 @@ tribble_dv <- tribble(
   c(1, 7),        2,              "(Senior Year Survey)",                                3,
   
   
-  
+  ## Well-Being
   "happy_comp4",                  "Composite:\nHappiness",                               seq(1, 7, 1),
   c(1, 7),        2,              "(Senior Year Survey)",                                3,
   "purpose_comp2",                "Composite:\nPurpose & Meaning",                       seq(1, 5, 1),
@@ -177,6 +178,7 @@ tribble_dv <- tribble(
   "lifesat",                      "Life Satisfaction",                                   seq(1, 10, 1),
   c(1, 10),       2.5,            "(Senior Year Survey)",                                3,
   
+  ## Belonging & College Experience
   "belong_comp6",                 "Composite:\nBelonging and College Experience",        seq(1, 7, 1),
   c(1, 7),        2,              "(6 Items; Senior Year Survey)",                       3,
   "belong_comp4",                 "Composite:\nBelonging",                               seq(1, 7, 1),
