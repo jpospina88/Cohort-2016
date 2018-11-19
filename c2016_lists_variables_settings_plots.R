@@ -103,8 +103,7 @@ tribble_dv <- tribble(
   "posfeels_comp4" , "Overall Positivity of College Experience",                         seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
   "t1posfeelings_profsTAs", "Positive Experiences w/ Profs. and TAs",                    seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
   "t1posfeelings_gettingtoknowotherSs", "Positive Feelings Getting to Know Other Students", seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
-  "t1posfeelings_beingawayfromhome", "Positive Feelings Being Away from Home",           seq(1, 7, 1),
-  c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
+  "t1posfeelings_beingawayfromhome", "Positive Feelings Being Away from Home",           seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
   "t1posfeelings_receivingfeedback", "Positive Feelings About Receiving Feedback",        seq(1, 7, 1),
   c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
   "negfeels_comp4", "Overall Negativity of College Experience",                           seq(1, 7, 1),
@@ -244,7 +243,7 @@ tribble_dv <- tribble(
   "donate_srgiftplan",             "Plan to Donate",                                      seq(-10, 80, 10), 
   c(-10, 80),     10,             "(Senior Year Survey)",                                4,
   "donate_srgift",                 "Amount of Money Donated",                             seq(-10, 80, 10), 
-  c(-10, 80),     0,              "(Senior Year Survey)",                                4,
+  c(-10, 80),     0,              "(Senior Year Survey)",                                4
 )
 
 tribble_cond <- data.frame(matrix(c("treat_sc"), nrow = nrow(tribble_dv)),
