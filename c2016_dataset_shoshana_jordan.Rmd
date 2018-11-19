@@ -1,0 +1,55 @@
+---
+title: "Dataset for Shoshana and Jordan"
+author: "Juan Ospina"
+date: "11/14/2018"
+output: html_document
+---
+
+```{r clean system, message=TRUE, warning=TRUE, include=FALSE}
+rm(list = ls()) # clean environment
+```
+
+```{r global options, echo=FALSE}
+knitr::opts_chunk$set(
+  # fig.path = 'figs/', fig.show = 'asis', 
+  dpi = 75, 
+  # include = FALSE, 
+  # echo = FALSE, # run the code, show me only the graphs
+  warning = FALSE, message = FALSE, cache = FALSE)
+```
+
+```{r packages}
+library(magrittr)
+library(tidyverse)
+```
+
+```{r data files}
+d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+```
+
+```{r}
+d.trim <-
+  d %>% 
+  select(idnum, # id
+         cond, cond_num, cond_sc, treat, treat_num, treat_sc, # conditions
+         sattoact, hsrank, hsrank_no, hsrank_no.f, gend, gender, # Covariates
+         cum_gpa_y4_spring, cum_stem_gpa_y4_spring, major_grad_4y, # Institutional data
+         success_usethis_percent, potential_usethis_percent, # success and potential
+         starts_with("belong"), buwonder_r_use_this, # belong and belonging uncertainty
+         lifesat, happy_person, happy_comppeers, happy_enjoylife, happy_unhappy_r, happy_unhappy_r_use_this, happy_comp4, # life satisfaction and happiness
+         starts_with("pss_"), # perceived stress
+         starts_with("cthreat_"), # contextual threat
+         starts_with("stthreat_"), # stereotype threat
+         starts_with("mentor_")
+         )
+
+d.trim %<>% select(-c(belonging, mentor_who_8_TEXT, mentor_info_4_TEXT, mentor_info_6_TEXT, mentor_info_10_TEXT, mentor_2info_4_TEXT, mentor_2info_6_TEXT, mentor_2info_10_TEXT, mentor_quality_open, mentor_name, mentor_role, mentor_email, mentor_name2, mentor_role2, mentor_email2))
+```
+
+```{r}
+d.trim %>% write_csv("../../data_for_shoshana_jordan/c2016_dataset_for_shoshana_jordan.csv")
+d.trim %>% write_rds("../../data_for_shoshana_jordan/c2016_dataset_for_shoshana_jordan.rds")
+```
+
+
+
