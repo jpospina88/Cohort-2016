@@ -114,10 +114,8 @@ tribble_dv <- tribble(
   
   # Senior Year Survey
   ## Success & Potential
-  "success_usethis_percent",      "Success: Percentile Ranking",                         seq(0, 100, 10), 
-  c(0, 100),      10,             "(Senior Year Survey)",                                4,       
-  "potential_usethis_percent",    "Potential: Percentile Ranking",                       seq(0, 100, 10), 
-  c(0, 100),      10,             "(Senior Year Survey)",                                4,
+  "success_usethis_percent",      "Success: Percentile Ranking",                         seq(0, 100, 10), c(0, 100),      10,             "(Senior Year Survey)",                                4,       
+  "potential_usethis_percent",    "Potential: Percentile Ranking",                       seq(0, 100, 10), c(0, 100),      10,             "(Senior Year Survey)",                                4,
   
   ## Health
   "healthmosoverall_comp5",       "Composite:\nSelf-Reported General Health",            seq(1, 5, 1),
