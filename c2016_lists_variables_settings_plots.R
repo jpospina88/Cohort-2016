@@ -91,17 +91,17 @@ vars_cont <-
   ) 
 
 tribble_dv <- tribble(
-  ~dv,                            ~dv_name,                                              ~scale,      ~limit,         ~position,      ~subheader,                                            ~decimal,
-  #------------------------------|------------------------------------------------------|--------------|--------
+  ~dv,                                       ~dv_name,                                              ~scale,      ~limit,         ~position,      ~subheader,                                            ~decimal,
+  #-----------------------------------------|------------------------------------------------------|--------------|--------
   # Institutional data
-  "cum_gpa_y4_spring",            "4-Year Cumulative GPA",                               seq(0, 4, 1), c(0, 4),        0.5,            "(Institutional Data)",                                3,
-  "cum_stem_gpa_y4_spring",       "4-Year Cumulative GPA in STEM Classes",               seq(0, 4, 1), c(0, 4),        0.5,            "(Institutional Data)",                                3,
+  "cum_gpa_y4_spring",                       "4-Year Cumulative GPA",                               seq(0, 4, 1), c(0, 4),        0.5,            "(Institutional Data)",                                3,
+  "cum_stem_gpa_y4_spring",                  "4-Year Cumulative GPA in STEM Classes",               seq(0, 4, 1), c(0, 4),        0.5,            "(Institutional Data)",                                3,
   
   # Pre-Matriculation Intervention
-  "t1critfeedback_improvegrow",   "Crit. Feedback: Help Ss Grow",                        seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
-  "t1critfeedback_distinguishbtwnSs", "Critical Feedback: Distinguish Btwn Students",    seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
-  "posfeels_comp4" , "Overall Positivity of College Experience",                         seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
-  "t1posfeelings_profsTAs", "Positive Experiences w/ Profs. and TAs",                    seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
+  "t1critfeedback_improvegrow",              "Crit. Feedback: Help Ss Grow",                        seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
+  "t1critfeedback_distinguishbtwnSs",        "Critical Feedback: Distinguish Btwn Students",    seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
+  "posfeels_comp4",                          "Overall Positivity of College Experience",                         seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
+  "t1posfeelings_profsTAs",                 "Positive Experiences w/ Profs. and TAs",                    seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
   "t1posfeelings_gettingtoknowotherSs", "Positive Feelings Getting to Know Other Students", seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
   "t1posfeelings_beingawayfromhome", "Positive Feelings Being Away from Home",           seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
   "t1posfeelings_receivingfeedback", "Positive Feelings About Receiving Feedback",        seq(1, 7, 1), c(1, 7),        2,              "(Pre-Matriculation Intervention)",                    3,
