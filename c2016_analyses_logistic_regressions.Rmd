@@ -46,7 +46,9 @@ library(gridExtra) # For iterative plots
 ```
 
 ```{r data files}
-d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+# d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+# getwd()
+d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 options(contrasts = c("contr.helmert", "contr.poly")) # ANOVA contrasts
 ```
@@ -415,26 +417,8 @@ kable_format <- . %>%
   kable_styling(bootstrap_options = c("hover", "responsive"), font_size = 12, full_width = F)
 ```
 
-
-```{r compute new variables}
-##Make belong_comp4
-vector_belong2 <- quos(belong_belong, belong_fitin, belong_outsider_r_use_this, belong_similar)
-d <- cv_compute(data = d, cv_name = belong_comp4, cv_vector = vector_belong2)
-
-d %<>% mutate(success_usethis_percent = success_usethis*10)
-d %<>% mutate(potential_usethis_percent = potential_usethis*10)
-
-d %<>% mutate(
-  mc_pass = ifelse(mc_wf == 1 & cond == "wf", 1,
-              ifelse(mc_cul == 1 & cond == "cul", 1,
-                ifelse(mc_bel == 1 & cond == "bel", 1,
-                  ifelse(mc_ctl == 1 & cond == "ctl", 1, 0))))
-)
-```
-
-
 ```{r load custom functions}
-source("../scripts/custom_functions.R")
+source("R/custom_functions.R")
 ```
 
 # General Notes
@@ -453,7 +437,7 @@ If we are controlling for other covariates, we will add notes about this before 
 # Descriptive Statistics
 
 ```{r list of variables}
-source("../Cohort 2016/c2016_lists_variables_settings_plots.R")
+source("c2016_lists_variables_settings_plots.R")
 
 # select(d, !!!vars_categ)
 # d$major2_yes
