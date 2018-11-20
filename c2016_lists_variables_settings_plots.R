@@ -12,7 +12,7 @@ d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_i
 source("R/custom_functions.R")
 
 d %>%
-  check_vars_by_keywords(c("close"))
+  check_vars_by_keywords(c("friends_noshare"))
 
 # d %>%
 #   select(!!!vars_categ) %>%
@@ -136,6 +136,7 @@ vars_cont <-
     
     ##friends 
     friends_close, 
+    friends_noshare_r,
     
   ) 
 
@@ -199,9 +200,9 @@ tribble_dv <- tribble(
   "belong_belong",                           "Belonging:\nBelong",                                  seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item; Senior Year Survey)",                  3,
   "belong_fitin",                            "Belonging:\nFit In",                                  seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item; Senior Year Survey)",                  3,
   "belong_similar",                          "Belonging:\nSimilar",                                 seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item; Senior Year Survey)",                  3,
-  "belong_outsider_r_use_this",              "Belonging:\nOutsider",                                seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item; Senior Year Survey)",                  3,
-  "belong_understand_r_use_this",            "Belonging:\nUnderstand",                              seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item; Senior Year Survey)",                  3,
-  "belong_mystery_r_use_this",               "Belonging:\nMystery",                                 seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item; Senior Year Survey)",                  3,
+  "belong_outsider_r_use_this",              "Belonging:\nOutsider",                                seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item, Reverse Coded; Senior Year Survey)",                  3,
+  "belong_understand_r_use_this",            "Belonging:\nUnderstand",                              seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item, Reverse Coded; Senior Year Survey)",                  3,
+  "belong_mystery_r_use_this",               "Belonging:\nMystery",                                 seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item, Reverse Coded; Senior Year Survey)",                  3,
   "buwonder_r_use_this",                     "Belonging Uncertainty",                               seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "overallpositivity",                       "Overall Positivity of College Experience",            seq(1, 10, 1),      c(1, 10),       2.5,                  "(Senior Year Survey)",                               3,
   "collexp_comp4",                           "Composite:\nPositive Evaluations",                    seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
@@ -236,6 +237,8 @@ tribble_dv <- tribble(
   "donate_srgift",                           "Amount of Money Donated",                             seq(-10, 80, 10),   c(-10, 80),     0,                    "(Senior Year Survey)",                               4, 
   ## friends 
   "friends_close",                           "Made Close Friends at College",                       seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,                  
+  "friends_noshare_r",                       "Can't Share Worries and Fears With Anyone",           seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey, reverse coded)",                3,                  
+  
   )  
 
 tribble_cond <- data.frame(matrix(c("treat_sc"), nrow = nrow(tribble_dv)),
