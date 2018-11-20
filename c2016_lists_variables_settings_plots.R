@@ -1,3 +1,8 @@
+# d %>% 
+#   check_vars_by_keywords(c("opportunity"))
+
+# after t1manipcheck, we need to add the other variables
+
 #### Continuous variables (Linear Regressions) #### 
 
 vars_cont <- 
@@ -7,9 +12,21 @@ vars_cont <-
     cum_stem_gpa_y4_spring,
     
     # Pre-Matriculation Intervention
+    ## Opportunities
+    t1opportunity_joincommunities,    # missing composites
+    t1opportunity_giveback,            
+    t1opportunity_exploreinterests,    
+    t1opportunity_becomeindepthinker,  
+    
+    ## Belonging at Fall
+    t1fall_fitin,                      # missing composites
+    t1fall_belong,                     
+    t1fall_feelathome,   
+    
     ## Critical Feedback
-    t1critfeedback_improvegrow,
+    t1critfeedback_improvegrow,        # missing composites
     t1critfeedback_distinguishbtwnSs,
+    
     ## Feelings
     posfeels_comp4,  
     t1posfeelings_profsTAs,  
