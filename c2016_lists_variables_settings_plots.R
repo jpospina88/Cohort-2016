@@ -1,15 +1,26 @@
 library(tidyverse)
+library(psych)
+library(kableExtra)
 
 # For Juan
-d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+# d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 # For RAs
-# d <- read_rds("../../../Research Assistants/Cohort 2016/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+# getwd()
+d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 source("R/custom_functions.R")
 
 d %>%
-  check_vars_by_keywords(c("belong"))
+  check_vars_by_keywords(c("close"))
+
+# d %>%
+#   select(!!!vars_categ) %>%
+#   describe %>%
+#   as.data.frame() %>%
+#   rownames_to_column(var = "dv_name") %>%
+#   mutate_at(vars(-dv_name), funs(round(., digits = 2))) %>%
+#   kable_format
 
 # after t1manipcheck, we need to add the other variables
 
@@ -121,7 +132,11 @@ vars_cont <-
     next_diffatfirst, 
     donate_srgifttot, 
     donate_srgiftplan, 
-    donate_srgift
+    donate_srgift,
+    
+    ##friends 
+    friends_close, 
+    
   ) 
 
 tribble_dv <- tribble(
@@ -218,8 +233,10 @@ tribble_dv <- tribble(
   "next_diffatfirst",                        "Next Plans: Difficult at First",                      seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
   "donate_srgifttot",                        "Amount of Money Donated",                             seq(-10, 80, 10),   c(-10, 80),     0,                    "(Senior Year Survey)",                               4,
   "donate_srgiftplan",                       "Plan to Donate",                                      seq(-10, 80, 10),   c(-10, 80),    10,                    "(Senior Year Survey)",                               4,
-  "donate_srgift",                           "Amount of Money Donated",                             seq(-10, 80, 10),   c(-10, 80),     0,                    "(Senior Year Survey)",                               4 
-)  
+  "donate_srgift",                           "Amount of Money Donated",                             seq(-10, 80, 10),   c(-10, 80),     0,                    "(Senior Year Survey)",                               4, 
+  ## friends 
+  "friends_close",                           "Made Close Friends at College",                       seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,                  
+  )  
 
 tribble_cond <- data.frame(matrix(c("treat_sc"), nrow = nrow(tribble_dv)),
                            matrix(c("cond_sc"), nrow = nrow(tribble_dv)))
