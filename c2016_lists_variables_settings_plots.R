@@ -7,7 +7,7 @@ library(kableExtra)
 
 # For RAs
 # getwd()
-d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+# d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 source("R/custom_functions.R")
 
