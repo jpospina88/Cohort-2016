@@ -391,7 +391,7 @@ table.describe <- function(data, vector){
 ```
 
 ```{r load custom functions}
-source("../scripts/custom_functions.R")
+source("R/custom_functions.R")
 ```
 
 # General Notes
@@ -512,6 +512,11 @@ plots <- mapply(plot_raincloud_map_treat_adv, # function
        SIMPLIFY = FALSE
        )
 
+# plots[[41]]
+# plots[[42]]
+# plots[[43]]
+# plots[[44]]
+# plots[[45]]
 plots
 ```
 
