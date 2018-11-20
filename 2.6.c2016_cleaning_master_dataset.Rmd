@@ -1264,15 +1264,35 @@ d_all %<>% mutate(
 # Compute new race variables
 
 ```{r load custom functions}
-source("../scripts/custom_functions.R")
+source("R/custom_functions.R")
 ```
-
-**Reminder**: Show to Shannon the White participant who is not first-generation but was coded as a disadvantaged student!
 
 ```{r}
 d_all %>% 
   demographics_pct(quos(race, disadv, firstgen))
+```
 
+**NOTE**: There is one white,	disadvaged,	not first-gen student. As we can see in the data below. This Ss is international. That's why he is coded as a disadvantaged student.
+
+```{r}
+d_all %>% 
+  filter(race == "white" & disadv == "disadv" & firstgen == "not first-gen")
+```
+
+
+```{r}
+d_all %>% 
+  demographics_pct(quos(race_intl, disadv, firstgen))
+```
+
+**NOTE**: There is one international,	advantaged,	first-generation student. As we can see in the data below. This Ss is asian That's why he is coded as an advantaged student, regardless of his first-generation status.
+
+```{r}
+d_all %>% 
+  filter(race_intl == "international student" & disadv == "adv" & firstgen == "first-gen")
+```
+
+```{r}
 d_all %<>%
   mutate(
     adv_hispanic_num = 
