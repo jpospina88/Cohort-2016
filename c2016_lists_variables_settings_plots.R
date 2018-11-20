@@ -8,7 +8,7 @@ vars_cont <-
     
     # Pre-Matriculation Intervention
     ## Critical Feedback
-    t1critfeedback_improvegrow,
+    t1critfeedback_improvegrow, # missing composite
     t1critfeedback_distinguishbtwnSs,
     ## Feelings
     posfeels_comp4,  
