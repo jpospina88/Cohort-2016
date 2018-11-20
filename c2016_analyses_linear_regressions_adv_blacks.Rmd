@@ -374,15 +374,6 @@ group_levels_disadv <- c('adv','disadv')
 #   x_labels + x_color + labs_y
 # }
 
-
-d %>% 
-  count(adv_black_sc)
-
-black_adv_names <- 
-  c('adv' = "Advantaged",
-    'hispanic' = "Hispanic",
-    'other' = "All Others")
-
 d %>% 
   count(adv_black_sc)
 
