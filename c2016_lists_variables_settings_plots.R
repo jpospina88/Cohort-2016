@@ -1,5 +1,15 @@
-# d %>% 
-#   check_vars_by_keywords(c("opportunity"))
+library(tidyverse)
+
+# For Juan
+d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+
+# For RAs
+# d <- read_rds("../../../Research Assistants/Cohort 2016/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+
+source("R/custom_functions.R")
+
+d %>%
+  check_vars_by_keywords(c("belong"))
 
 # after t1manipcheck, we need to add the other variables
 
@@ -74,6 +84,12 @@ vars_cont <-
     ## Belonging and College Experience
     belong_comp6,
     belong_comp4,
+    belong_belong,
+    belong_fitin,
+    belong_similar,
+    belong_outsider_r_use_this,  
+    belong_understand_r_use_this,
+    belong_mystery_r_use_this,
     buwonder_r_use_this,
     overallpositivity,
     collexp_comp4,
@@ -165,6 +181,12 @@ tribble_dv <- tribble(
   ## Belonging & College Experience
   "belong_comp6",                            "Composite:\nBelonging and College Experience",        seq(1, 7, 1),       c(1, 7),        2,                    "(6 Items; Senior Year Survey)",                      3,
   "belong_comp4",                            "Composite:\nBelonging",                               seq(1, 7, 1),       c(1, 7),        2,                    "(4 Items; Senior Year Survey)",                      3,
+  "belong_belong",                           "Belonging:\nBelong",                                  seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item; Senior Year Survey)",                  3,
+  "belong_fitin",                            "Belonging:\nFit In",                                  seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item; Senior Year Survey)",                  3,
+  "belong_similar",                          "Belonging:\nSimilar",                                 seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item; Senior Year Survey)",                  3,
+  "belong_outsider_r_use_this",              "Belonging:\nOutsider",                                seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item; Senior Year Survey)",                  3,
+  "belong_understand_r_use_this",            "Belonging:\nUnderstand",                              seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item; Senior Year Survey)",                  3,
+  "belong_mystery_r_use_this",               "Belonging:\nMystery",                                 seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item; Senior Year Survey)",                  3,
   "buwonder_r_use_this",                     "Belonging Uncertainty",                               seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "overallpositivity",                       "Overall Positivity of College Experience",            seq(1, 10, 1),      c(1, 10),       2.5,                  "(Senior Year Survey)",                               3,
   "collexp_comp4",                           "Composite:\nPositive Evaluations",                    seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
