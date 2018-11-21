@@ -7,15 +7,15 @@ library(kableExtra)
 
 # For RAs
 # getwd()
-d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+# d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 source("R/custom_functions.R")
 
-d %>%
-  check_vars_by_keywords(c("handle"))
+# d %>%
+#   check_vars_by_keywords(c("perf_"))
 
 # d %>%
-#   select(!!!vars_categ) %>%
+#   select(!!!vars_cont) %>%
 #   describe %>%
 #   as.data.frame() %>%
 #   rownames_to_column(var = "dv_name") %>%
@@ -29,27 +29,29 @@ d %>%
 vars_cont <- 
   quos(
     # Institutional Data
+    iHSGpa,
+    cumgpa1y,
     cum_gpa_y4_spring,
     cum_stem_gpa_y4_spring,
     
     # Pre-Matriculation Intervention
     ## Opportunities
-    t1opportunity_joincommunities,    # missing composites
+    t1opportunity_joincommunities,    # missing composite and graphs
     t1opportunity_giveback,            
     t1opportunity_exploreinterests,    
     t1opportunity_becomeindepthinker,  
     
     ## Belonging at Fall
-    t1fall_fitin,                     # missing composites
+    t1fall_fitin,                     # missing composite and graphs
     t1fall_belong,                     
     t1fall_feelathome,   
     
     ## Critical Feedback
-    t1critfeedback_improvegrow,       # missing composites
+    t1critfeedback_improvegrow,       # missing composite
     t1critfeedback_distinguishbtwnSs,
     
     ## Positive Emotions
-    t1excited,                        # missing composites
+    t1excited,                        # missing composite and graphs
     t1enjoy,
     t1fun,
     t1transitiondifficultatfirst,
@@ -118,10 +120,10 @@ vars_cont <-
     overallpositivity,
     collexp_comp4,
     collhomeinteg_comp4,
-    threat_nogen_comp8,
+    threat_nogen_comp8,       # review that we have all the submeasures plotted as well
+    cthreat_comp2,
     cthreat_minorities,
     cthreat_self,
-    cthreat_comp2,
     stthreat_gender,
     stthreat_race,
     stthreat_ses,
@@ -132,8 +134,10 @@ vars_cont <-
     wisefeedbacktask_comp4,
     critf_distinguish_r,
     critf_grow,
-    perf_highexpect,
     perf_comp2,
+    perf_highexpect,
+    perf_neversat,
+    perf_notsatbest,
     id_gender,
     id_race,
     qualitiesind_comp3,
@@ -156,6 +160,8 @@ tribble_dv <- tribble(
   ~dv,                                       ~dv_name,                                              ~scale,            ~limit,          ~position,            ~subheader,                                         ~decimal,
   #-----------------------------------------|------------------------------------------------------|-----------------|----------------|----------------------|----------------------------------------------------|---------
   # Institutional data
+  "iHSGpa",                                  "High School Cumulative GPA",                          seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
+  "cumgpa1y",                                "1-Year Cumulative GPA",                               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   "cum_gpa_y4_spring",                       "4-Year Cumulative GPA",                               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   "cum_stem_gpa_y4_spring",                  "4-Year Cumulative GPA in STEM Classes",               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   
@@ -192,13 +198,13 @@ tribble_dv <- tribble(
   "depscreener_comp2",                       "Composite:\nDepression Screener",                     seq(0, 3, 1),      c(0, 3),         0.5,                  "(Senior Year Survey)",                               3,
   "overallmentalhealth_comp5_z",             "Composite:\nOverall Mental Health",                   seq(-1, 1, 0.5),   c(-1, 1),       -0.75,                 "(Average Standardized Score; Senior Year Survey)",   1,
   "anxdepscreener_comp4",                    "Composite:\nAnxiety and Depression Screeners",        seq(0, 3, 1),      c(0, 3),         0.5,                  "(4 Items; Senior Year Survey)",                      3,
-  "bmi",                                     "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, Senior Year Survey)",                          4,
-  "bmi_chge_scr",                            "BMI Change Score",                                    seq(0, 3, 1),      c(0, 3),         0.5,                  "(Senior Year Survey)",                               3,
-  "weight",                                  "4th-year Weight",                                     seq(0, 200, 50),   c(0, 200),       25,                   "(BMI, Senior Year Survey)",                          5,
-  "weight_comp3",                            "Total Weight Satisfaction",                           seq(1, 7, 1),      c(1, 7),         2,                    "(BMI, Senior Year Survey)",                          3,
-  "weight_happy_rc",                         "Happiness with Weight",                               seq(1, 7, 1),      c(1, 7),         2,                    "(BMI, Senior Year Survey)",                          3,
-  "weight_feelbad",                          "Feel Less Bad About Weight",                          seq(1, 7, 1),      c(1, 7),         2,                    "(BMI, Senior Year Survey)",                          3,
-  "weight_trylose",                          "Trying to Lose Weight",                               seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year Survey)",                               3,
+  "bmi",                                     "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, Senior Year In-Lab Follow-Up)",                          4,
+  "bmi_chge_scr",                            "BMI Change Score",                                    seq(0, 3, 1),      c(0, 3),         0.5,                  "(Senior Year In-Lab Follow-Up)",                               3,
+  "weight",                                  "4th-year Weight",                                     seq(0, 200, 50),   c(0, 200),       25,                   "(Senior Year In-Lab Follow-Up)",                          5,
+  "weight_comp3",                            "Total Weight Satisfaction",                           seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year In-Lab Follow-Up)",                          3,
+  "weight_happy_rc",                         "Happiness with Weight",                               seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year In-Lab Follow-Up)",                          3,
+  "weight_feelbad",                          "Feel Less Bad About Weight",                          seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year In-Lab Follow-Up)",                          3,
+  "weight_trylose",                          "Trying to Lose Weight",                               seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year In-Lab Follow-Up)",                               3,
   
   
   ## Well-Being
@@ -219,34 +225,36 @@ tribble_dv <- tribble(
   "overallpositivity",                       "Overall Positivity of College Experience",            seq(1, 10, 1),      c(1, 10),       2.5,                  "(Senior Year Survey)",                               3,
   "collexp_comp4",                           "Composite:\nPositive Evaluations",                    seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
   "collhomeinteg_comp4",                     "Composite:\nCollege-Home Integration",                seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
-  "threat_nogen_comp8",                      "Threat Composite",                                    seq(-1, 1, 0.5),    c(-1, 1),       -0.75,                "(8 Items; Senior Year Survey)",                      2,
-  "cthreat_minorities",                      "Contextual Threat:\nOthers",                          seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
-  "cthreat_self",                            "Contextual Threat:\nSelf",                            seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
-  "cthreat_comp2",                           "Contextual Threat:\nCombined",                        seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
-  "stthreat_gender",                         "Stereotype Threat: Gender",                           seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
-  "stthreat_race",                           "Stereotype Threat: Race",                             seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
-  "stthreat_ses",                            "Stereotype Threat: Social Class",                     seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
-  "famrelate_comp2",                         "Home-School Disconnect:\nFamily-College Disconnect",  seq(1, 6, 1),       c(1, 6),        2,                    "(Senior Year Survey)",                               3,
-  "integ_idgender",                          "College-Identity Friction:\nGender",                  seq(0, 3, 1),       c(0, 3),        0.5,                  "(Senior Year Survey)",                               3,
-  "integ_idrace",                            "College-Identity Friction:\nRace",                    seq(0, 3, 1),       c(0, 3),        0.5,                  "(Senior Year Survey)",                               3, 
-  "integ_idclass",                           "College-Identity Friction:\nSocial Class",            seq(0, 3, 1),       c(0, 3),        0.5,                  "(Senior Year Survey)",                               3,
-  "wisefeedbacktask_comp4",                  "Wise Feedback Task",                                  seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
+  "threat_nogen_comp8",                      "Threat Composite",                                    seq(-1, 1, 0.5),    c(-1, 1),       -0.75,                "(8 Items; Senior Year Survey)",                      1,
+  "cthreat_comp2",                           "Composite:\nContextual Threat Combined",              seq(1, 7, 1),       c(1, 7),        2,                  "(2 Items; Senior Year Survey)",                               3,
+  "cthreat_minorities",                      "Contextual Threat:\nOthers",                          seq(1, 7, 1),       c(1, 7),        2,                  "(Senior Year Survey)",                               3,
+  "cthreat_self",                            "Contextual Threat:\nSelf",                            seq(1, 7, 1),       c(1, 7),        2,                  "(Senior Year Survey)",                               3,
+  "stthreat_gender",                         "Stereotype Threat: Gender",                           seq(1, 7, 1),       c(1, 7),        2,                  "(Senior Year Survey)",                               3, 
+  "stthreat_race",                           "Stereotype Threat: Race",                             seq(1, 7, 1),       c(1, 7),        2,                  "(Senior Year Survey)",                               3,
+  "stthreat_ses",                            "Stereotype Threat: Social Class",                     seq(1, 7, 1),       c(1, 7),        2,                  "(Senior Year Survey)",                               3, 
+  "famrelate_comp2",                         "Composite:\nHome-School Disconnect",                  seq(1, 6, 1),       c(1, 6),        2,                    "(2 Items; Senior Year Survey)",                               3,
+  "integ_idgender",                          "College-Identity Friction:\nGender",                  seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
+  "integ_idrace",                            "College-Identity Friction:\nRace",                    seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
+  "integ_idclass",                           "College-Identity Friction:\nSocial Class",            seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
+  "wisefeedbacktask_comp4",                  "Composite:\nWise Feedback Task",                      seq(1, 5, 1),       c(1, 5),        1.5,                  "(4 Items; Senior Year Survey)",                               3,
   "critf_distinguish_r",                     "Critical Feedback:\nDistinguish Between Students",    seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3, 
   "critf_grow",                              "Critical Feedback:\nHelp Students Grow",              seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
-  "perf_highexpect",                         "Perfectionism:\nStandards",                           seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
-  "perf_comp2",                              "Perfectionism:\nNever Satisfied",                     seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
+  "perf_comp2",                              "Composite:\nPerfectionism",                           seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
+  "perf_highexpect",                         "Perfectionism:\nHigh Expectations",                   seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
+  "perf_neversat",                           "Perfectionism:\nNever Satisfied",                     seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
+  "perf_notsatbest",                         "Perfectionism:\nNot Satisfied Done Best",             seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
   "id_gender",                               "Identification:\nGender",                             seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
   "id_race",                                 "Identification:\nRace",                               seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
-  "qualitiesind_comp3",                      "Independence Valued",                                 seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
-  "qualitiesinter_2_comp4",                  "Interdependence Valued",                              seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
-  "igm_comp2",                               "Institutional Mindsets:\nGeneral",                    seq(1, 6, 1),       c(1, 6),        2,                    "(Senior Year Survey)",                               3,
-  "igmmajor1_2_3_comp3",                     "Institutional Mindsets:\nMajor",                      seq(1, 6, 1),       c(1, 6),        2,                    "(Senior Year Survey)",                               3,
+  "qualitiesind_comp3",                      "Composite:\nIndependence Valued",                     seq(1, 5, 1),       c(1, 5),        1.5,                  "(3 Items; Senior Year Survey)",                               3,
+  "qualitiesinter_2_comp4",                  "Composite:\nInterdependence Valued",                  seq(1, 5, 1),       c(1, 5),        1.5,                  "(4 Items; Senior Year Survey)",                               3,
+  "igm_comp2",                               "Composite:\nGeneral Institutional Mindsets",          seq(1, 6, 1),       c(1, 6),        2,                    "(2 Items; Senior Year Survey)",                               3,
+  "igmmajor1_2_3_comp3",                     "Composite:\nMajor Institutional Mindsets",            seq(1, 6, 1),       c(1, 6),        2,                    "(3 Items; Senior Year Survey)",                               3,
   "pol_conslib",                             "Politics:\nConservative-Liberal",                     seq(1, 7, 1),       c(1, 6),        2,                    "(Senior Year Survey)",                               3,
   "next_excited",                            "Excitement for Post-college Plans",                   seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
   "next_diffatfirst",                        "Next Plans: Difficult at First",                      seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
-  "donate_srgifttot",                        "Amount of Money Donated",                             seq(-10, 80, 10),   c(-10, 80),     0,                    "(Senior Year Survey)",                               4,
-  "donate_srgiftplan",                       "Plan to Donate",                                      seq(-10, 80, 10),   c(-10, 80),    10,                    "(Senior Year Survey)",                               4,
-  "donate_srgift",                           "Amount of Money Donated",                             seq(-10, 80, 10),   c(-10, 80),     0,                    "(Senior Year Survey)",                               4, 
+  "donate_srgifttot",                        "Amount of Money Donated",                             seq(0, 150, 25),   c(0, 150),       15,                    "(Senior Year Survey)",                               4,
+  "donate_srgiftplan",                       "Plan to Donate",                                      seq(0, 150, 25),   c(0, 150),       15,                    "(Senior Year Survey)",                               4,
+  "donate_srgift",                           "Amount of Money Donated",                             seq(0, 150, 25),   c(0, 150),       15,                    "(Senior Year Survey)",                               4, 
   ## friends 
   "friends_close",                           "Made Close Friends at College",                       seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,                  
   )  
