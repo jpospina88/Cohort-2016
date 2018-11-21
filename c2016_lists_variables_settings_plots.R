@@ -7,12 +7,12 @@ library(kableExtra)
 
 # For RAs
 # getwd()
-# d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 source("R/custom_functions.R")
 
 d %>%
-  check_vars_by_keywords(c("close"))
+  check_vars_by_keywords(c("handle"))
 
 # d %>%
 #   select(!!!vars_categ) %>%
@@ -40,25 +40,39 @@ vars_cont <-
     t1opportunity_becomeindepthinker,  
     
     ## Belonging at Fall
-    t1fall_fitin,                      # missing composites
+    t1fall_fitin,                     # missing composites
     t1fall_belong,                     
     t1fall_feelathome,   
     
     ## Critical Feedback
-    t1critfeedback_improvegrow,        # missing composites
+    t1critfeedback_improvegrow,       # missing composites
     t1critfeedback_distinguishbtwnSs,
     
+    ## Positive Emotions
+    t1excited,                        # missing composites
+    t1enjoy,
+    t1fun,
+    t1transitiondifficultatfirst,
+    t1experiencedifficultiesatfirst,
+    
     ## Feelings
+    ### Positive Feelings
     posfeels_comp4,  
     t1posfeelings_profsTAs,  
     t1posfeelings_gettingtoknowotherSs, 
     t1posfeelings_beingawayfromhome, 
     t1posfeelings_receivingfeedback, 
+    ### Negative Feelings
     negfeels_comp4, 
     t1negfeelings_profsTAs, 
     t1negfeelings_gettingtoknowotherSs, 
     t1negfeelings_beingawayfromhome, 
     t1negfeelings_receivingfeedback,
+    ### Handling Stress
+    t1handleit_profsTAs,              # missing composites 
+    t1handleit_gettingtoknowotherSs,
+    t1handleit_beingawayfromhome,
+    t1handleit_receivingfeedback,
     
     # Senior Year Survey
     ## Success and Potential
