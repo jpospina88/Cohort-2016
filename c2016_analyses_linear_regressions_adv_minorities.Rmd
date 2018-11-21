@@ -1186,7 +1186,7 @@ plots <- mapply(plot_bar_x_y_group_treat_adv, # function
        tribble_cont[,"decimal"] %>% t, tribble_cont[,"subheader"] %>% t,
        SIMPLIFY = F)
 
-plots[[1]]
+plots
 ```
 
 ## By Condition and Disadvantaged Status
@@ -1229,7 +1229,7 @@ plots <- mapply(plot_bar_x_y_group_cond_adv, # function
        tribble_cont[,"decimal"] %>% t, tribble_cont[,"subheader"] %>% t,
        SIMPLIFY = F)
 
-plots[[1]]
+plots
 ```
 
 ```{r eval=FALSE, include=FALSE}
@@ -1429,7 +1429,7 @@ dvs_col %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        8 # change this number depending on the number of rows of your tidy datasets
+        14 # change this number depending on the number of rows of your tidy datasets
         # 10
       ) %>% 
   as.tibble %>% 
@@ -1447,11 +1447,18 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        12 # change this number depending on the number of rows of your tidy datasets
+        24 # change this number depending on the number of rows of your tidy datasets
         # 16
       ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
+
+# dvs_col_rep
+# d.nest %>% head
+# d.nest$tidy_cond_cv[[83]]
+# d.nest[83,]$tidy_cond_cv
+
+dvs_col_rep <- dvs_col_rep[-c(1992), ] # Remember to change this as we add more variables
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond_cv %>% bind_rows) %>% 
@@ -1468,7 +1475,7 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        2  # change this number depending on the number of rows of your tidy datasets
+        20  # change this number depending on the number of rows of your tidy datasets
         # 6
       ) %>%
   as.tibble %>% 
@@ -1487,7 +1494,7 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        2 # change this number depending on the number of rows of your tidy datasets
+        5 # change this number depending on the number of rows of your tidy datasets
         # 3
       ) %>% 
   as.tibble %>% 
@@ -1513,7 +1520,7 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        4 # change this number depending on the number of rows of your tidy datasets
+        40 # change this number depending on the number of rows of your tidy datasets
         # 12
       ) %>% 
   as.tibble %>% 
@@ -1538,7 +1545,7 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        12 # change this number depending on the number of rows of your tidy datasets
+        30 # change this number depending on the number of rows of your tidy datasets
         # 18
       ) %>% 
   as.tibble %>% 
@@ -1579,31 +1586,6 @@ plots <- mapply(plot_bar_x_y_group_treat_adv, # function
 plots
 ```
 
-
-```{r eval=FALSE, include=FALSE}
-# plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit) d.unnest_treat %>% 
-#   filter(!is.na(get(var))) %>% 
-#   ggplot(aes(x = get(ftr), y = get(var), fill = get(ftr), group = get(ftr))) + # Remember to add get()
-#   geom_bar(position = pd1, stat = "identity") + 
-#   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .2, position = pd2) +
-#   theme1 + guides_no + 
-#   geom_text(aes(label = format(get(var), digits = 3), y = 1)) +
-#   coord_cartesian(ylim = limit) +
-#   scale_y_continuous(breaks = scales) +
-#   facet_grid(, vars(adv_minority_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-#   labels_treat + color_treat + ylab(y_lab) + xlab("") + theme
-# 
-# # [3,] factor
-# # [1,] var or dv
-# # [2,] names of dv (y_lab)
-# # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
-# 
-# mapply(plot_bar_x_y_group_treat_adv, # function
-#        tribble_cont[,"treat_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
-#        tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
-#        tribble_cont[,"limit"] %>% t, SIMPLIFY = F)
-```
-
 ## By Condition and Disadvantaged Status
 
 ```{r}
@@ -1622,28 +1604,4 @@ plots <- mapply(plot_bar_x_y_group_cond_adv, # function
        SIMPLIFY = F)
 
 plots
-```
-
-```{r eval=FALSE, include=FALSE}
-# plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit) d.unnest_cond %>% 
-#   filter(!is.na(get(var))) %>% 
-#   ggplot(aes(x = get(ftr), y = get(var), fill = get(ftr), group = get(ftr))) + # Remember to add get()
-#   geom_bar(position = pd1, stat = "identity") + 
-#   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .2, position = pd2) +
-#   theme1 + guides_no + 
-#   geom_text(aes(label = format(get(var), digits = 3), y = 1)) +
-#   coord_cartesian(ylim = limit) +
-#   scale_y_continuous(breaks = scales) +
-#   facet_grid(, vars(adv_minority_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-#   labels_cond + color_cond + ylab(y_lab) + xlab("") + theme.cond
-# 
-# # [3,] factor
-# # [1,] var or dv
-# # [2,] names of dv (y_lab)
-# # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
-# 
-# mapply(plot_bar_x_y_group_cond_adv, # function
-#        tribble_cont[,"cond_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
-#        tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
-#        tribble_cont[,"limit"] %>% t, SIMPLIFY = F)
 ```
