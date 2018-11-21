@@ -1276,7 +1276,11 @@ d_all %>%
 
 ```{r}
 d_all %>% 
-  filter(race == "white" & disadv == "disadv" & firstgen == "not first-gen")
+  filter(
+    race == "white" & 
+      disadv == "disadv" & 
+      firstgen == "not first-gen"
+  )
 ```
 
 
@@ -1289,7 +1293,11 @@ d_all %>%
 
 ```{r}
 d_all %>% 
-  filter(race_intl == "international student" & disadv == "adv" & firstgen == "first-gen")
+  filter(
+    race_intl == "international student" & 
+      disadv == "adv" & 
+      firstgen == "first-gen"
+  )
 ```
 
 ```{r}
@@ -1300,28 +1308,59 @@ d_all %<>%
         race == "hispanic", 2,
         ifelse(
           disadv == "adv", 1, 3
-          )
-        ),
-    adv_hispanic = factor(adv_hispanic_num, labels = c("adv", "hispanic", "other")),
+        )
+      ),
+    adv_hispanic = 
+      factor(
+        adv_hispanic_num, 
+        labels = c("adv", "hispanic", "other")
+      ),
+    adv_hispanic_sc = adv_hispanic,
     adv_black_num = 
       ifelse(
         race == "black", 1,
         ifelse(
           disadv == "adv", 0, 2
-          )
-        ),
-    adv_hispanic_sc = adv_hispanic,
-    adv_black = factor(adv_black_num, labels = c("adv", "black", "other")),
+        )
+      ),
+    adv_black = 
+      factor(
+        adv_black_num, 
+        labels = c("adv", "black", "other")
+      ),
     adv_black_sc = adv_black,
     adv_pi_num = 
       ifelse(
         race == "pacific islander", 1,
         ifelse(
           disadv == "adv", 0, 2
+        )
+      ),
+    adv_pi = 
+      factor(
+        adv_pi_num, 
+        labels = c("adv", "pacific islander", "other")
+      ),
+    adv_pi_sc = adv_pi,
+    adv_minority_num = 
+      ifelse(
+        race == "black", 2,
+        ifelse(
+          race == "hispanic", 3,
+          ifelse(
+            race == "pacific islander" | race == "native", 4,
+            ifelse(
+              disadv == "adv", 1, 5
+            )
           )
-        ),
-    adv_pi = factor(adv_pi_num, labels = c("adv", "pacific islander", "other")),
-    adv_pi_sc = adv_pi
+        )
+      ),
+    adv_minority = 
+      factor(
+        adv_minority_num, 
+        labels = c("adv", "black", "hispanic", "pi.native", "white first-gen")
+      ),
+    adv_minority_sc = adv_minority
   )
 
 # Three levels
@@ -1329,7 +1368,6 @@ c <- contr.treatment(3)
 my.coding <- matrix(rep(1/3, 6), ncol=2)
 my.simple <- c - my.coding
 # my.simple
-
 contrasts(d_all$adv_hispanic_sc) <- my.simple
 d_all$adv_hispanic_sc %>% attr("contrasts")
 
@@ -1340,10 +1378,40 @@ contrasts(d_all$adv_pi_sc) <- my.simple
 d_all$adv_pi_sc %>% attr("contrasts")
 
 d_all %>% 
-  demographics_pct(quos(race, disadv, adv_hispanic, adv_black, adv_pi))
+  demographics_pct(
+    quos(
+      race, disadv, adv_hispanic, adv_black, adv_pi
+      )
+    )
 
 d_all %>% 
-  demographics_pct(quos(race, disadv_sc, adv_hispanic_sc, adv_black_sc, adv_pi_sc))
+  demographics_pct(
+    quos(
+      race, disadv_sc, adv_hispanic_sc, adv_black_sc, adv_pi_sc
+      )
+    )
+
+# Five levels
+c <- contr.treatment(5)
+my.coding <- matrix(rep(1/5, 20), ncol=4)
+my.simple <- c - my.coding
+# my.simple
+contrasts(d_all$adv_minority_sc) <- my.simple
+d_all$adv_minority_sc %>% attr("contrasts")
+
+d_all %>% 
+  demographics_pct(
+    quos(
+      adv_minority_sc
+      )
+    )
+
+d_all %>% 
+  demographics_pct(
+    quos(
+      race, disadv_sc, adv_minority_sc
+      )
+    )
 ```
 
 
