@@ -338,10 +338,10 @@ vars_count <-
 tribble_dv <- tribble(
   ~dv,                          ~dv_name,                                                  ~scale,             ~limit,     ~position,   ~subheader,
   #----------------------------|----------------------------------------------------------|-------------------|-----------|-------------|-----------------------------
-  "visits_per_day",             "# of Days Visited Health Center",                         seq(0, 20, 2),      c(0, 20),   2,            "(5 Years; Medical Records)",
-  "visits_per_day_mh",          "# of Days Visited Related to\nMental Health",             seq(0, 8, 1),       c(0, 8),    0.5,          "(5 Years; Medical Records)",
+  "visits_per_day",             "# of Days Visited Health Center",                         seq(0, 32, 4),      c(0, 32),   2,            "(5 Years; Medical Records)",
+  "visits_per_day_mh",          "# of Days Visited Related to\nMental Health",             seq(0, 12, 3),      c(0, 12),   2,          "(5 Years; Medical Records)",
   "visits_per_day_resp",        "# of Days Visited Related to\nRespiratory Illness",       seq(0, 3, 0.5),     c(0, 3),    0.3,          "(5 Years; Medical Records)",
-  "visits_per_day_no_resp",     "# of Days Visited Related to\n Non-respiratory Illness",  seq(0, 18, 3),      c(0, 18),   1,            "(5 Years; Medical Records)"
+  "visits_per_day_no_resp",     "# of Days Visited Related to\n Non-respiratory Illness",  seq(0, 32, 4),      c(0, 32),   2,            "(5 Years; Medical Records)"
 )
 
 # visits_per_day, visits_per_day_mh, visits_per_day_resp, visits_per_day_no_resp
