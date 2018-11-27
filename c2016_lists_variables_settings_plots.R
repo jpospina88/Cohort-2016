@@ -187,7 +187,7 @@ tribble_dv <- tribble(
   "potential_usethis_percent",               "Potential: Percentile Ranking",                       seq(0, 100, 10),   c(0, 100),       10,                   "(Senior Year Survey)",                               4,
   
   ## Health
-  "healthmosoverall_comp5",                  "Composite:\nSelf-Reported General Health",            seq(1, 5, 1),      c(1, 5),         1.5,                  "(Senior Year Survey)",                               3,
+  "healthmosoverall_comp5",                  "Composite:\nSelf-Reported General Health",            seq(1, 5, 1),      c(1, 5),         1.5,                  "(5 Items; Senior Year Survey)",                               3,
   "health_behavbingedrink",                  "Frequency of Binge Drinking",                         seq(1, 5, 1),      c(1, 5),         1.5,                  "(Senior Year Survey)",                               3,
   "health_behavtobacco",                     "Tobacco Use During the Last Month",                   seq(0, 3, 1),      c(0, 3),         0.5,                  "(Senior Year Survey)",                               3,
   "health_behavsleepiness",                  "Daytime Sleepiness During the Last Month",            seq(1, 5, 1),      c(1, 5),         1.5,                  "(Senior Year Survey)",                               3,
