@@ -207,7 +207,7 @@ tribble_dv <- tribble(
   "overallpositivity",                       "Overall Positivity of College Experience",            seq(1, 10, 1),      c(1, 10),       2.5,                  "(Senior Year Survey)",                               3,
   "collexp_comp4",                           "Composite:\nPositive Evaluations",                    seq(1, 7, 1),       c(1, 7),        2,                    "(4 items; Senior Year Survey)",                      3,
   "collhomeinteg_comp4",                     "Composite:\nCollege-Home Integration",                seq(1, 5, 1),       c(1, 5),        1.5,                  "(4 items; Senior Year Survey)",                      3,
-  "threat_nogen_comp8",                      "Threat Composite",                                    seq(-1, 1, 0.5),    c(-1, 1),       -0.75,                "(8 Items; Senior Year Survey)",                      2,
+  "threat_nogen_comp8",                      "Composite:\nFeelings of Psychological Threat",        seq(-1, 1, 0.5),    c(-1, 1),       -0.75,                "(8 Items; Senior Year Survey)",                      2,
   "cthreat_minorities",                      "Contextual Threat:\nOthers",                          seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "cthreat_self",                            "Contextual Threat:\nSelf",                            seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "cthreat_comp2",                           "Contextual Threat:\nCombined",                        seq(1, 5, 1),       c(1, 5),        1.5,                  "(2 items; Senior Year Survey)",                      3,
