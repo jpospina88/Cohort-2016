@@ -1125,7 +1125,7 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit, position
     ) +
   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
   theme1 +
-  geom_text(aes(label = format(get(var), digits = decimal), y = position), size = 3.5, color = "black") +
+  geom_text(aes(label = format(get(var), digits = decimal), y = position), size = 3, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
   facet_grid(, vars(adv_minority_sc), labeller = as_labeller(minority_adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
