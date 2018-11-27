@@ -7,15 +7,16 @@ library(kableExtra)
 
 # For RAs
 # getwd()
-d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+# d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 source("R/custom_functions.R")
 
 d %>%
-  check_vars_by_keywords(c("friends_noshare"))
+  check_vars_by_keywords(c("bmi"))
+
 
 # d %>%
-#   select(!!!vars_categ) %>%
+#   select(!!!vars_cont) %>%
 #   describe %>%
 #   as.data.frame() %>%
 #   rownames_to_column(var = "dv_name") %>%
@@ -29,37 +30,52 @@ d %>%
 vars_cont <- 
   quos(
     # Institutional Data
+    # iHSGpa,                         # need to review this variable since it's not in the right scale
+    cumgpa1y,
     cum_gpa_y4_spring,
     cum_stem_gpa_y4_spring,
     
     # Pre-Matriculation Intervention
     ## Opportunities
-    t1opportunity_joincommunities,    # missing composites
+    t1opportunity_joincommunities,    # missing composite and graphs
     t1opportunity_giveback,            
     t1opportunity_exploreinterests,    
     t1opportunity_becomeindepthinker,  
     
     ## Belonging at Fall
-    t1fall_fitin,                      # missing composites
+    t1fall_fitin,                     # missing composite and graphs
     t1fall_belong,                     
     t1fall_feelathome,   
     
     ## Critical Feedback
-    t1critfeedback_improvegrow,        # missing composites
-
+    t1critfeedback_improvegrow,       # missing composite
     t1critfeedback_distinguishbtwnSs,
     
+    ## Positive Emotions
+    t1excited,                        # missing composite and graphs
+    t1enjoy,
+    t1fun,
+    t1transitiondifficultatfirst,
+    t1experiencedifficultiesatfirst,
+    
     ## Feelings
+    ### Positive Feelings
     posfeels_comp4,  
     t1posfeelings_profsTAs,  
     t1posfeelings_gettingtoknowotherSs, 
     t1posfeelings_beingawayfromhome, 
     t1posfeelings_receivingfeedback, 
+    ### Negative Feelings
     negfeels_comp4, 
     t1negfeelings_profsTAs, 
     t1negfeelings_gettingtoknowotherSs, 
     t1negfeelings_beingawayfromhome, 
     t1negfeelings_receivingfeedback,
+    ### Handling Stress
+    t1handleit_profsTAs,              # missing composites 
+    t1handleit_gettingtoknowotherSs,
+    t1handleit_beingawayfromhome,
+    t1handleit_receivingfeedback,
     
     # Senior Year Survey
     ## Success and Potential
@@ -79,6 +95,7 @@ vars_cont <-
     depscreener_comp2,
     overallmentalhealth_comp5_z,
     anxdepscreener_comp4,
+    bmi_1y,
     bmi,
     bmi_chge_scr,
     weight, 
@@ -105,10 +122,10 @@ vars_cont <-
     overallpositivity,
     collexp_comp4,
     collhomeinteg_comp4,
-    threat_nogen_comp8,
+    threat_nogen_comp8,       # review that we have all the submeasures plotted as well
+    cthreat_comp2,
     cthreat_minorities,
     cthreat_self,
-    cthreat_comp2,
     stthreat_gender,
     stthreat_race,
     stthreat_ses,
@@ -119,8 +136,10 @@ vars_cont <-
     wisefeedbacktask_comp4,
     critf_distinguish_r,
     critf_grow,
-    perf_highexpect,
     perf_comp2,
+    perf_highexpect,
+    perf_neversat,
+    perf_notsatbest,
     id_gender,
     id_race,
     qualitiesind_comp3,
@@ -144,6 +163,8 @@ tribble_dv <- tribble(
   ~dv,                                       ~dv_name,                                              ~scale,            ~limit,          ~position,            ~subheader,                                         ~decimal,
   #-----------------------------------------|------------------------------------------------------|-----------------|----------------|----------------------|----------------------------------------------------|---------
   # Institutional data
+  # "iHSGpa",                                  "High School Cumulative GPA",                          seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
+  "cumgpa1y",                                "1-Year Cumulative GPA",                               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   "cum_gpa_y4_spring",                       "4-Year Cumulative GPA",                               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   "cum_stem_gpa_y4_spring",                  "4-Year Cumulative GPA in STEM Classes",               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   
@@ -152,7 +173,7 @@ tribble_dv <- tribble(
   "t1critfeedback_distinguishbtwnSs",        "Critical Feedback: Distinguish Btwn Students",        seq(1, 7, 1),      c(1, 7),         2,                    "(Pre-Matriculation Intervention)",                   3,
   "posfeels_comp4",                          "Overall Positivity of College Experience",            seq(1, 7, 1),      c(1, 7),         2,                    "(4 items; Pre-Matriculation Intervention)",          3,
   "t1posfeelings_profsTAs",                  "Positive Experiences w/ Profs. and TAs",              seq(1, 7, 1),      c(1, 7),         2,                    "(Pre-Matriculation Intervention)",                   3,  
-  "t1posfeelings_gettingtoknowotherSs",      "Positive Feelings Getting to Know Other Students",    seq(1, 7, 1),      c(1, 7),         2,                    "(Pre-Matriculation Intervention)",                   3,
+  "t1posfeelings_gettingtoknowotherSs",      "Positive Feelings Getting to Know Other Ss",          seq(1, 7, 1),      c(1, 7),         2,                    "(Pre-Matriculation Intervention)",                   3,
   "t1posfeelings_beingawayfromhome",         "Positive Feelings Being Away from Home",              seq(1, 7, 1),      c(1, 7),         2,                    "(Pre-Matriculation Intervention)",                   3,
   "t1posfeelings_receivingfeedback",         "Positive Feelings About Receiving Feedback",          seq(1, 7, 1),      c(1, 7),         2,                    "(Pre-Matriculation Intervention)",                   3,
   "negfeels_comp4",                          "Overall Negativity of College Experience",            seq(1, 7, 1),      c(1, 7),         2,                    "(4 items; Pre-Matriculation Intervention)",          3,
@@ -180,13 +201,14 @@ tribble_dv <- tribble(
   "depscreener_comp2",                       "Composite:\nDepression Screener",                     seq(0, 3, 1),      c(0, 3),         0.5,                  "(2 items; Senior Year Survey)",                      3,
   "overallmentalhealth_comp5_z",             "Composite:\nOverall Mental Health",                   seq(-1, 1, 0.5),   c(-1, 1),       -0.75,                 "(5 items; Average Standardized Score; Senior Year Survey)",   1,
   "anxdepscreener_comp4",                    "Composite:\nAnxiety and Depression Screeners",        seq(0, 3, 1),      c(0, 3),         0.5,                  "(4 Items; Senior Year Survey)",                      3,
-  "bmi",                                     "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, Senior Year Survey)",                          4,
-  "bmi_chge_scr",                            "BMI Change Score",                                    seq(0, 3, 1),      c(0, 3),         0.5,                  "(Senior Year Survey)",                               3,
-  "weight",                                  "4th-year Weight",                                     seq(0, 200, 50),   c(0, 200),       25,                   "(BMI, Senior Year Survey)",                          5,
-  "weight_comp3",                            "Total Weight Satisfaction",                           seq(1, 7, 1),      c(1, 7),         2,                    "(3 items, BMI, Senior Year Survey)",                 3,
-  "weight_happy_rc",                         "Happiness with Weight",                               seq(1, 7, 1),      c(1, 7),         2,                    "(BMI, Senior Year Survey)",                          3,
-  "weight_feelbad",                          "Feel Less Bad About Weight",                          seq(1, 7, 1),      c(1, 7),         2,                    "(BMI, Senior Year Survey)",                          3,
-  "weight_trylose",                          "Trying to Lose Weight",                               seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year Survey)",                               3,
+  "bmi_1y",                                  "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, First-Year Survey)",                           4,
+  "bmi",                                     "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, Senior Year In-Lab Follow-Up)",                          4,
+  "bmi_chge_scr",                            "BMI Change Score",                                    seq(0, 4, 1),      c(0, 4),         0.5,                  "(Senior Year In-Lab Follow-Up)",                               3,
+  "weight",                                  "4th-year Weight",                                     seq(0, 200, 50),   c(0, 200),       25,                   "(Senior Year In-Lab Follow-Up)",                          5,
+  "weight_comp3",                            "Total Weight Satisfaction",                           seq(1, 7, 1),      c(1, 7),         2,                    "(3 items; Senior Year In-Lab Follow-Up)",                          3,
+  "weight_happy_rc",                         "Happiness with Weight",                               seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year In-Lab Follow-Up)",                          3,
+  "weight_feelbad",                          "Feel Less Bad About Weight",                          seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year In-Lab Follow-Up)",                          3,
+  "weight_trylose",                          "Trying to Lose Weight",                               seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year In-Lab Follow-Up)",                               3,
   
   
   ## Well-Being
@@ -232,9 +254,9 @@ tribble_dv <- tribble(
   "pol_conslib",                             "Politics:\nConservative-Liberal",                     seq(1, 7, 1),       c(1, 6),        2,                    "(Senior Year Survey)",                               3,
   "next_excited",                            "Excitement for Post-college Plans",                   seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
   "next_diffatfirst",                        "Next Plans: Difficult at First",                      seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
-  "donate_srgifttot",                        "Amount of Money Donated",                             seq(-10, 80, 10),   c(-10, 80),     0,                    "(Senior Year Survey)",                               4,
-  "donate_srgiftplan",                       "Plan to Donate",                                      seq(-10, 80, 10),   c(-10, 80),    10,                    "(Senior Year Survey)",                               4,
-  "donate_srgift",                           "Amount of Money Donated",                             seq(-10, 80, 10),   c(-10, 80),     0,                    "(Senior Year Survey)",                               4, 
+  "donate_srgifttot",                        "Amount of Money Donated",                             seq(0, 550, 25),   c(0, 550),       45,                    "(Senior Year Survey)",                               1,
+  "donate_srgiftplan",                       "Plan to Donate",                                      seq(0, 150, 25),   c(0, 150),       15,                    "(Senior Year Survey)",                               1,
+  "donate_srgift",                           "Amount of Money Donated",                             seq(0, 150, 25),   c(0, 150),       15,                    "(Senior Year Survey)",                               4, 
   ## friends 
   "friends_close",                           "Made Close Friends at College",                       seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,                  
   "friends_noshare_r",                       "Can't Share Worries and Fears With Anyone",           seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey, reverse coded)",                3,                  
@@ -272,7 +294,9 @@ vars_categ <-
     bingedrink_yes,
     next_plans2,
     next_plans8,
-    srgift_planordonated
+    srgift_donated, # donated senior gift
+    srgift_plandonate, # plan to donate senior gift
+    srgift_planordonated # donated or plan to donate senior gift
   )
 
 tribble_dv <- tribble(

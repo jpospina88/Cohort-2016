@@ -1,5 +1,5 @@
 ---
-title: "C2016 Linear Regression Analyses"
+title: "C2016 Linear Regression Analyses: Advantaged vs Minorities"
 author: "Juan Ospina"
 date: "2018/9/12"
 output: 
@@ -44,7 +44,12 @@ library(gridExtra) # For iterative plots
 ```
 
 ```{r data files}
+# For Juan
 d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+
+# For RAs
+# d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+
 options(contrasts = c("contr.helmert", "contr.poly")) # ANOVA contrasts
 ```
 
@@ -265,11 +270,23 @@ legend_treat <- scale_color_manual(name = "",
 
 positions_treat <- c("ctl", "treat")
 
-labels_treat <- scale_x_discrete(labels = c('Control','Treatment'), limits = positions_treat)
+# labels_treat <- 
+#   scale_x_discrete(labels = c('Control','Treatment'), limits = positions_treat)
+labels_treat <- 
+  scale_x_discrete(labels = c('X','T'), limits = positions_treat)
 
 positions_cond <- c("ctl", "bel", "cul", "wf")
 
-labels_cond <- scale_x_discrete(labels = c('Control', 'Belonging','Culture', 'Wise\nFeedback'), limits = positions_cond)
+# labels_cond <- 
+#   scale_x_discrete(
+#     labels = c('Control', 'Belonging','Culture', 'Wise\nFeedback'), 
+#     limits = positions_cond
+#     )
+labels_cond <- 
+  scale_x_discrete(
+    labels = c('X', 'B','C', 'F'), 
+    limits = positions_cond
+    )
 
 color_cond <- scale_fill_manual("legend", 
                                 values = c("ctl" = "#F8766D", 
@@ -283,103 +300,16 @@ legend_cond <- scale_color_manual(name = "",
                                              "cul" = "#00BFC4", 
                                              "wf" = "#C77CFF"))
 
-adv_names <- 
-  c('adv'="Advantaged",
-    'disadv'="Disadvantaged")
-
-gend_names <- 
-  c('m'="Male",
-    'f'="Female")
-
-# tob_names <-
-#   c('0' = "Non-smoking",
-#     '1' = "Smoking")
-
-fgen_names <-
-  c('not first-gen' = "Continuing-Generation",
-    'first-gen' = "First-Generation")
-
-race_names <-
-  c('white/asian' = "Majority",
-    'black/hispanic/native/pacificislander' = "Minority")
-
-group_levels_disadv <- c('adv','disadv')
-
-# # Scales
-# scale_y_3 <- scale_y_continuous(breaks = seq(0, 3, 1))
-# scale_y_5 <- scale_y_continuous(breaks = seq(1, 5, 1))
-# scale_y_6 <- scale_y_continuous(breaks = seq(1, 6, 1))
-# scale_y_7 <- scale_y_continuous(breaks = seq(1, 7, 1))
-# scale_y_10 <- scale_y_continuous(breaks = seq(0, 10, 2))
-# scale_y_100 <- scale_y_continuous(breaks = seq(0, 100, 20))
-# scale_y_50 <- scale_y_continuous(breaks = seq(0, 50, 10))
-# scale_y_75 <- scale_y_continuous(breaks = seq(0, 75, 15))
-# 
-# #added "p" in place of "." to mean "point"
-# scale_y_200 <- scale_y_continuous(breaks = seq(0, 200, 40))
-# scale_y_.15 <- scale_y_continuous(breaks = seq(-.15, .15, .5))
-# scale_y_4 <- scale_y_continuous(breaks = seq(1, 4, 1))
-# scale_y_40 <- scale_y_continuous(breaks = seq(0, 40, 10))
-# scale_y_.5 <- scale_y_continuous(breaks = seq(-.5, .5, .25))
-# scale_y_20 <- scale_y_continuous(breaks = seq(0, 20, 5))
-# scale_y_25 <- scale_y_continuous(breaks = seq(0, 25, 5))
-# 
-# coord_cartesian_3 <- coord_cartesian(ylim = c(0, 3))
-# coord_cartesian_5 <- coord_cartesian(ylim = c(1, 5))
-# coord_cartesian_7 <- coord_cartesian(ylim = c(1, 7))
-# coord_cartesian_10 <- coord_cartesian(ylim = c(0, 10))
-# coord_cartesian_50 <- coord_cartesian(ylim = c(0, 50))
-# coord_cartesian_100 <- coord_cartesian(ylim = c(0, 100))
-# coord_cartesian_75 <- coord_cartesian(ylim = c(0, 75))
-# 
-# coord_cartesian_200 <- coord_cartesian(ylim = c(0, 200))
-# coord_cartesian_.15 <- coord_cartesian(ylim = c(-.15, .15))
-# coord_cartesian_4 <- coord_cartesian(ylim = c(1, 4))
-# coord_cartesian_40 <- coord_cartesian(ylim = c(0, 40))
-# coord_cartesian_.5 <- coord_cartesian(ylim = c(-.5, .5))
-# coord_cartesian_20 <- coord_cartesian(ylim = c(0, 20))
-# coord_cartesian_25 <- coord_cartesian(ylim = c(0, 25))
-# 
-# 
-# mean_round3 <- geom_text(aes(label = format(emmean, digits = 3), y = 1))
-# mean_round3_10 <- geom_text(aes(label = format(emmean, digits = 3), y = .5))
-# mean_round3_50 <- geom_text(aes(label = format(emmean, digits = 3), y = 2))
-# mean_round3_100 <- geom_text(aes(label = format(emmean, digits = 3), y = 4))
-# 
-# mean_round_pct <- geom_text(aes(label = paste0(format(prob*100, digits = 3), "%"), y = 5))
-# 
-# mean_count <- geom_text(aes(label = paste0(format(response, digits = 3), ""), y = 2))
-# 
-# error_bar <- geom_errorbar(aes(ymin = emmean - SE, ymax = emmean + SE), width = .2, position = pd2)
-# 
-# error_bar_count <- geom_errorbar(aes(ymin = response - SE, ymax = response + SE), width = .2, position = pd2)
-# 
-# 
-# # General function version:
-# # Need to specify more stuff but it's more general so you can use it with more grouping variables
-# plot_bar_x_y_group <- function(data = data, x_var = x_var, x_labels = x_labels, x_color = x_color,
-#                                y_var = y_var, labs_y = labs_y,
-#                                group_var = group_var, group_names = group_names,
-#                                scale = scale, coord_cartesian = coord_cartesian, mean_round = mean_round) {
-# x_var <- enquo(x_var)
-# y_var <- enquo(y_var)
-# group_var <- enquo(group_var)
-# 
-# data %>%
-#   ggplot(aes(x = !!x_var, y = !!y_var, fill = !!x_var, group = !!x_var)) +
-#   geom_bar(position = pd1, stat = "identity") + error_bar + theme1 + theme + guides_no + mean_round +
-#   coord_cartesian + scale + # this is where you change the scale
-#   facet_grid(, vars(!!group_var), labeller = as_labeller(group_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-#   x_labels + x_color + labs_y
-# }
 
 d %>% 
-  count(adv_black_sc)
+  count(adv_minority_sc)
 
-black_adv_names <- 
+minority_adv_names <- 
   c('adv' = "Advantaged",
     'black' = "Black",
-    'other' = "All Others")
+    'hispanic' = "Hispanic",
+    'pi.native' = "Pacific/Native",
+    'white first-gen' = "White FG")
 ```
 
 ```{r custom functions describe sample}
@@ -429,8 +359,8 @@ d %>%
 
 ```{r}
 treat_adv <- list(d$treat_sc, 
-                  # d$disadv_sc
-                  d$adv_black_sc
+                  d$adv_minority_sc
+                  # d$adv_hispanic_sc
                   )
 
 d %>% 
@@ -443,8 +373,8 @@ d %>%
 
 ```{r}
 cond_adv <- list(d$cond_sc, 
-                 # d$disadv_sc
-                 d$adv_black_sc
+                 d$adv_minority_sc
+                 # d$adv_hispanic_sc
                  )
 
 d %>% 
@@ -466,15 +396,15 @@ theme <-
       element_text(
         size = 20, 
         family = "Helvetica"),
-    axis.text.x = # change size of x-axis and y-axis text
+    axis.text.x = # change size of x-axis text
       element_text(
         size = 
           # 20
-          16
+          18
         , 
         family = "Helvetica"),
     axis.title = element_text(size = 22, family = "Helvetica"), 
-    strip.text.x = element_text(size = 22, colour = "white", family = "Helvetica"),
+    strip.text.x = element_text(size = 14, colour = "white", family = "Helvetica"),
     plot.title = element_text(size = 22, hjust = 0.5),
     plot.subtitle = element_text(size = 16, hjust = 0.5),
     panel.grid.major = element_blank(), 
@@ -498,8 +428,8 @@ plot_raincloud_map_treat_adv <- function(ftr, var, y_lab, scales, limit, subhead
   # ylab(y_lab) + xlab("") + 
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
-  # facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-  facet_grid(, vars(adv_black_sc), labeller = as_labeller(black_adv_names)) + 
+  facet_grid(, vars(adv_minority_sc), labeller = as_labeller(minority_adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) + 
   ylab("") + ggtitle(y_lab) + xlab("") + theme + guides_no +
   labs(subtitle = subheader)
 
@@ -510,6 +440,11 @@ plots <- mapply(plot_raincloud_map_treat_adv, # function
        SIMPLIFY = FALSE
        )
 
+# plots[[41]]
+# plots[[42]]
+# plots[[43]]
+# plots[[44]]
+# plots[[45]]
 plots
 ```
 
@@ -524,15 +459,16 @@ theme_cond <-
       element_text(
         size = 20, 
         family = "Helvetica"),
-    axis.text.x = # change size of x-axis and y-axis text
+    axis.text.x = # change size of x-axis text
       element_text(
         size = 
           # 12
-          9
+          18
         , 
         family = "Helvetica"),
     axis.title = element_text(size = 18, family = "Helvetica"), 
-    strip.text.x = element_text(size = 14, colour = "white", family = "Helvetica"), # change size of factor labels 
+    strip.text.x = 
+      element_text(size = 14, colour = "white", family = "Helvetica"), # change size of factor labels 
     plot.title = element_text(size = 18, hjust = 0.5),
     plot.subtitle = element_text(size = 14, hjust = 0.5),
     panel.grid.major = element_blank(), 
@@ -557,8 +493,8 @@ plot_raincloud_map_cond_adv <- function(ftr, var, y_lab, scales, limit, subheade
   # ylab(y_lab) + xlab("") + 
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
-  # facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-  facet_grid(, vars(adv_black_sc), labeller = as_labeller(black_adv_names)) + 
+  facet_grid(, vars(adv_minority_sc), labeller = as_labeller(minority_adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) + 
   ylab("") + ggtitle(y_lab) + xlab("") + theme_cond + guides_no +
   labs(subtitle = subheader)
 
@@ -570,25 +506,6 @@ plots <- mapply(plot_raincloud_map_cond_adv, # function
        )
 
 plots
-```
-
-
-```{r eval=FALSE, include=FALSE}
-plot_raincloud_map_cond_adv <- function(ftr, var, y_lab, scales, limit) d %>% 
-  ggplot(aes(y = get(var), x = get(ftr), fill = get(ftr))) +
-  raincloud_violin +
-  geom_point(aes(y = get(var), color = get(ftr)), 
-             position = position_jitter(width = .15), size = .5, alpha = 0.8) +
-  stat_summary_se + raincloud_boxplot + raincloud_guides + raincloud_theme_light + raincloud_theme +
-  color_cond + labels_cond + theme1 + theme.cond + ylab(y_lab) + xlab("") + 
-  coord_cartesian(ylim = limit) +
-  scale_y_continuous(breaks = scales) +
-  facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) # ignore warning, this is to make the plot facet the variables in the way that we want it
-
-mapply(plot_raincloud_map_cond_adv, # function
-       tribble_cont[,"cond_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
-       tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
-       tribble_cont[,"limit"] %>% t, SIMPLIFY = F)
 ```
 
 # Effect sizes
@@ -605,11 +522,11 @@ Effect sizes (Cohen's *d*) between advantaged and disadvantaged students in cont
 cohend_ineq <- 
   cohen.d.by(x = d %>% 
                select(treat_num, 
-                      # disadv_num, 
-                      adv_hispanic_num,
+                      adv_minority_num,
+                      # adv_hispanic_num,
                       !!!vars_cont), 
-             # group = "disadv_num", 
-             group = "adv_hispanic_num",
+             group = "adv_minority_num",
+             # group = "adv_hispanic_num",
              group2 = "treat_num", 
              alpha = .05) 
 
@@ -618,7 +535,7 @@ cohend_ineq
 # cohend_ineq <- 
 #   cohend_ineq %>%
 #   rownames_to_column() %>% 
-#   filter(rowname == "disadv_numfortreat_num0") %>%
+#   filter(rowname == "adv_minority_numfortreat_num0") %>%
 #   select(-rowname) %>%
 #   round(., digits = 2)
 ```
@@ -631,12 +548,12 @@ cohend_ineq
 cohend_disadv_all <- 
   cohen.d(d %>% 
             select(
-              # disadv_num, 
-              adv_hispanic_num,
+              adv_minority_num,
+              # adv_hispanic_num,
               !!!vars_cont), 
           group = 
-            # "disadv_num", 
-            "adv_hispanic_num",
+            "adv_minority_num",
+            # "adv_hispanic_num",
           alpha = .05)
 
 cohend_disadv_all
@@ -674,10 +591,6 @@ cohend_treat_all
 ```{r}
 cohend_bel_all <- cohen.d(d %>% select(cd_bel_num, !!!vars_cont), group = "cd_bel_num", alpha = .05)
 
-# cohend_bel_all <- cohend_bel_all$cohen.d
-# 
-# cohend_bel_all %<>% as.data.frame() %>% rownames_to_column()
-
 cohend_bel_all
 ```
 
@@ -685,10 +598,6 @@ cohend_bel_all
 
 ```{r}
 cohend_cul_all <- cohen.d(d %>% select(cd_cul_num, !!!vars_cont), group = "cd_cul_num", alpha = .05)
-
-# cohend_cul_all <- cohend_cul_all$cohen.d
-# 
-# cohend_cul_all %<>% as.data.frame() %>% rownames_to_column()
 
 cohend_cul_all
 ```
@@ -698,10 +607,6 @@ cohend_cul_all
 ```{r}
 cohend_wf_all <- cohen.d(d %>% select(cd_wf_num, !!!vars_cont), group = "cd_wf_num", alpha = .05)
 
-# cohend_wf_all <- cohend_wf_all$cohen.d
-# 
-# cohend_wf_all %<>% as.data.frame() %>% rownames_to_column()
-
 cohend_wf_all
 ```
 
@@ -710,27 +615,27 @@ cohend_wf_all
 Effect sizes (Cohen's *d*) between control and any treatment for advantaged and disadvantaged students:
 
 ```{r}
-# d %>% count(disadv, disadv_num) %>% select(-n)
+# d %>% count(disadv, adv_minority_num) %>% select(-n)
 
 cohend_treat <- 
   cohen.d.by(
     x = d %>% 
       select(
         treat_num, 
-        # disadv_num, 
-        adv_hispanic_num,
+        adv_minority_num,
+        # adv_hispanic_num,
         !!!vars_cont), 
     group = "treat_num", 
     group2 = 
-      # "disadv_num", 
-      "adv_hispanic_num",
+      "adv_minority_num",
+      # "adv_hispanic_num",
     alpha = .05)
 
 # %>% summary
 
 # cohend_treat %<>% 
 #   rownames_to_column() %>% 
-#   # filter(rowname == "treat_numfordisadv_num1") %>% 
+#   # filter(rowname == "treat_numforadv_minority_num1") %>% 
 #   select(-rowname) %>%
 #   round(., digits = 2)
 
@@ -746,15 +651,15 @@ cohend_bel <-
   cohen.d.by(
     x = d %>% 
       select(
-        cd_bel_num, 
-        # disadv_num, 
-        adv_hispanic_num,
+        cd_bel_num,
+        adv_minority_num,
+        # adv_hispanic_num,
         !!!vars_cont
         ), 
     group = "cd_bel_num", 
     group2 = 
-      # "disadv_num", 
-      "adv_hispanic_num",
+      "adv_minority_num",
+      # "adv_hispanic_num",
     alpha = .05
     )
 
@@ -762,7 +667,7 @@ cohend_bel <-
 
 # cohend_bel %<>% 
 #   rownames_to_column() %>% 
-#   # filter(rowname == "cd_bel_numfordisadv_num1") %>% 
+#   # filter(rowname == "cd_bel_numforadv_minority_num1") %>% 
 #   select(-rowname) %>% 
 #   round(., digits = 2)
 
@@ -776,14 +681,14 @@ cohend_cul <-
     x = d %>% 
       select(
         cd_cul_num, 
-        # disadv_num, 
-        adv_hispanic_num,
+        adv_minority_num,
+        # adv_hispanic_num,
         !!!vars_cont
         ), 
     group = "cd_cul_num", 
     group2 = 
-      # "disadv_num",
-      "adv_hispanic_num",
+      "adv_minority_num",
+      # "adv_hispanic_num",
     alpha = .05
     ) 
 
@@ -791,7 +696,7 @@ cohend_cul <-
 
 # cohend_cul %<>% 
 #   rownames_to_column() %>% 
-#   # filter(rowname == "cd_cul_numfordisadv_num1") %>% 
+#   # filter(rowname == "cd_cul_numforadv_minority_num1") %>% 
 #   select(-rowname) %>% 
 #   round(., digits = 2)
 
@@ -805,21 +710,21 @@ cohend_wf <-
     x = d %>% 
       select(
         cd_wf_num, 
-        # disadv_num, 
-        adv_black_sc,
+        adv_minority_num,
+        # adv_hispanic_sc,
         !!!vars_cont
         ), 
     group = "cd_wf_num", 
     group2 = 
-      # "disadv_num",
-      "adv_black_sc",
+      "adv_minority_num",
+      # "adv_hispanic_sc",
     alpha = .05) 
 
 # %>% summary
 
 # cohend_wf %<>% 
 #   rownames_to_column() %>% 
-#   # filter(rowname == "cd_wf_numfordisadv_num1") %>% 
+#   # filter(rowname == "cd_wf_numforadv_minority_num1") %>% 
 #   select(-rowname) %>% 
 #   round(., digits = 2)
 
@@ -831,24 +736,24 @@ cohend_wf
 ## Example
 ```{r}
 lm(cum_gpa_y4_spring ~ 
-     # treat_sc*disadv_sc, 
-   treat_sc*adv_black_sc,
+     treat_sc*adv_minority_sc,
+   # treat_sc*adv_hispanic_sc,
    data = d
    ) %>% summary
 ```
 
 ```{r}
-# d.model <- d %>% select(treat_sc, disadv_sc, !!!vars_cont)
+# d.model <- d %>% select(treat_sc, adv_minority_sc, !!!vars_cont)
 # 
-# models_lm <- d.model %>% select(-c(treat_sc, disadv_sc)) %>%
-#   map(function(dv) lm(dv ~ d$treat_sc*d$disadv_sc, data = .)) 
+# models_lm <- d.model %>% select(-c(treat_sc, adv_minority_sc)) %>%
+#   map(function(dv) lm(dv ~ d$treat_sc*d$adv_minority_sc, data = .)) 
 ```
 
 ```{r}
 vars_ivs <- 
   quos(
     idnum, # IDs
-    disadv_sc, adv_black_sc, # groups
+    adv_minority_sc, # groups
     treat_sc, cond_sc, # conditions
     sattoact, hsrank, hsrank_no, gender # covariates
   )
@@ -867,13 +772,13 @@ d.nest <-
 # d.nest$data[[1]]
 
 lm_model <- function(data){
-  # lm(dv_value ~ treat_sc*disadv_sc, data = data)
-  lm(dv_value ~ treat_sc*adv_black_sc, data = data)
+  lm(dv_value ~ treat_sc*adv_minority_sc, data = data)
+  # lm(dv_value ~ treat_sc*adv_hispanic_sc, data = data)
 }
 
 lm_model_cond <- function(data){
-  # lm(dv_value ~ cond_sc*disadv_sc, data = data)
-  lm(dv_value ~ cond_sc*adv_black_sc, data = data)
+  lm(dv_value ~ cond_sc*adv_minority_sc, data = data)
+  # lm(dv_value ~ cond_sc*adv_hispanic_sc, data = data)
 }
 
 d.nest %<>% mutate(lm_model = map(.x = data, .f = lm_model),
@@ -898,8 +803,8 @@ d.nest %<>%
         object = lm_model, 
         specs = "treat_sc", 
         by = 
-          # "disadv_sc"
-          "adv_black_sc"
+          "adv_minority_sc"
+          # "adv_hispanic_sc"
       ),
       .f = emmeans
     ),
@@ -920,8 +825,8 @@ d.nest %<>%
       .l = list(
         object = lm_model, 
         specs = 
-          # "disadv_sc"
-          "adv_black_sc"
+          "adv_minority_sc"
+          # "adv_hispanic_sc"
         , 
         by = "treat_sc"
       ),
@@ -945,8 +850,8 @@ d.nest %<>%
         object = lm_model_cond, 
         specs = "cond_sc", 
         by = 
-          # "disadv_sc"
-          "adv_black_sc"
+          "adv_minority_sc"
+          # "adv_hispanic_sc"
       ),
       .f = emmeans
     ),
@@ -967,8 +872,8 @@ d.nest %<>%
       .l = list(
         object = lm_model_cond, 
         specs = 
-          # "disadv_sc"
-          "adv_black_sc"
+          "adv_minority_sc"
+          # "adv_hispanic_sc"
         , 
         by = "cond_sc"
       ),
@@ -1014,19 +919,6 @@ dvs_col %>%
   kable_format
 ```
 
-```{r eval=FALSE, include=FALSE}
-# glance_lm <- 
-#   models_lm %>% 
-#   map(broom::glance) 
-# 
-# names_dvs <- glance_lm %>% names %>% as.tibble %>% rename(variable = value)
-# 
-# glance_lm %>% 
-#   bind_rows %>% 
-#   bind_cols(names_dvs) %>% 
-#   moveme(., c("variable"), "first") %>% 
-#   kable_format
-```
 
 ## Main Effects and Interactions
 
@@ -1036,8 +928,8 @@ dvs_col %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        # 4 # change this number depending on the number of rows of your tidy datasets
-        6
+        10 # change this number depending on the number of rows of your tidy datasets
+        # 6
       ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
@@ -1048,33 +940,6 @@ dvs_col_rep %>%
   kable_format
 ```
 
-```{r eval=FALSE, include=FALSE}
-# tidy_lm <- 
-#   models_lm %>% 
-#   map(broom::tidy)
-# 
-# # Get the names of your variables
-# names_dvs <- 
-#   tidy_lm %>% 
-#   names %>% 
-#   as.tibble %>% 
-#   rename(variable = value)
-# 
-# # Remember to change this number depending on the number of rows for each variable below
-# names_dvs_all <-
-#   rep(names_dvs$variable, 
-#       each = 4) %>% 
-#   as.tibble %>% 
-#   rename(variable = value) 
-# 
-# tidy_lm %>% 
-#   bind_rows %>% 
-#   bind_cols(names_dvs_all) %>% 
-#   moveme(., c("variable"), "first") %>% 
-#   mutate(term = str_remove_all(term, "[$]")) %>% 
-#   kable_format
-```
-
 ### By Condition and Disadvantaged Status
 ```{r}
 # d.nest$tidy_cond[[1]]
@@ -1082,16 +947,24 @@ dvs_col_rep %>%
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(
     each = 
-      # 8 # change this number depending on the number of rows of your tidy datasets
-      12
+      20 # change this number depending on the number of rows of your tidy datasets
+      # 12
     ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
+
+# d.nest %>% head
+# d.nest$tidy_cond[[83]]
+# dvs_col_rep %>% 
+#   filter(dv_name == "donate_srgifttot")
+
+dvs_col_rep <- dvs_col_rep[-c(1660), ] # Remember to change this as we add more variables
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond %>% bind_rows) %>% 
   round_table(quos(dv_name, term), 2) %>% 
   kable_format
+
 ```
 
 ## Simple Effects
@@ -1104,8 +977,8 @@ dvs_col_rep %>%
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(
     each = 
-      # 2 # change this number depending on the number of rows of your tidy datasets
-      6
+      20 # change this number depending on the number of rows of your tidy datasets
+      # 6
     ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
@@ -1124,8 +997,8 @@ dvs_col_rep %>%
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(
     each = 
-      # 2 # change this number depending on the number of rows of your tidy datasets
-      3
+      5 # change this number depending on the number of rows of your tidy datasets
+      # 3
     ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
@@ -1136,8 +1009,8 @@ dvs_col_rep %>%
     quos(
       dv_name, 
       contrast, 
-      # disadv_sc
-      adv_black_sc
+      adv_minority_sc
+      # adv_hispanic_sc
     ), 2) %>% 
   kable_format
 ```
@@ -1148,8 +1021,8 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        # 4 # change this number depending on the number of rows of your tidy datasets
-        12
+        40 # change this number depending on the number of rows of your tidy datasets
+        # 12
       ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
@@ -1167,8 +1040,8 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        # 12 # change this number depending on the number of rows of your tidy datasets
-        18
+        30 # change this number depending on the number of rows of your tidy datasets
+        # 18
       ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
@@ -1179,8 +1052,8 @@ dvs_col_rep %>%
     quos(
       dv_name, 
       contrast, 
-      # disadv_sc,
-      adv_black_sc
+      adv_minority_sc
+      # adv_hispanic_sc
       ), 
     2) %>% 
   kable_format
@@ -1207,15 +1080,15 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit, positio
   geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), 
                size = 
                  # 41
-                 30
+                 17
                ) +
   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
   theme1 +
-  geom_text(aes(label = format(get(var), digits = decimal), y = position), size = 8, color = "black") +
+  geom_text(aes(label = format(get(var), digits = decimal), y = position), size = 5, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
-  # facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-  facet_grid(, vars(adv_black_sc), labeller = as_labeller(black_adv_names)) +
+  facet_grid(, vars(adv_minority_sc), labeller = as_labeller(minority_adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) +
   ylab("") + ggtitle(y_lab) + xlab("") + theme + guides_no +
   labs(subtitle = subheader) + 
   labels_treat + color_treat + legend_treat
@@ -1228,32 +1101,6 @@ plots <- mapply(plot_bar_x_y_group_treat_adv, # function
        SIMPLIFY = F)
 
 plots
-```
-
-```{r eval=FALSE, include=FALSE}
-# plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit) d.unnest_treat %>% 
-#   filter(!is.na(get(var))) %>% 
-#   ggplot(aes(x = get(ftr), y = get(var), fill = get(ftr), group = get(ftr))) + # Remember to add get()
-#   geom_bar(position = pd1, stat = "identity") + 
-#   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .2, position = pd2) +
-#   theme1 + guides_no + 
-#   geom_text(aes(label = format(get(var), digits = 3), y = 1)) +
-#   coord_cartesian(ylim = limit) +
-#   scale_y_continuous(breaks = scales) +
-#   facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-#   labels_treat + color_treat + ylab(y_lab) + xlab("") + theme
-# 
-# # [3,] factor
-# # [1,] var or dv
-# # [2,] names of dv (y_lab)
-# # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
-# 
-# plots <- mapply(plot_bar_x_y_group_treat_adv, # function
-#        tribble_cont[,"treat_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
-#        tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
-#        tribble_cont[,"limit"] %>% t, SIMPLIFY = F)
-# 
-# plots[[1]]
 ```
 
 ## By Condition and Disadvantaged Status
@@ -1274,15 +1121,15 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit, position
     aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), 
     size = 
       # 24 # change from disadvantaged to other groups
-      16
+      9
     ) +
   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
   theme1 +
-  geom_text(aes(label = format(get(var), digits = decimal), y = position), size = 6, color = "black") +
+  geom_text(aes(label = format(get(var), digits = decimal), y = position), size = 3, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
-  # facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-  facet_grid(, vars(adv_black_sc), labeller = as_labeller(black_adv_names)) +
+  facet_grid(, vars(adv_minority_sc), labeller = as_labeller(minority_adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) +
   ylab("") + ggtitle(y_lab) + xlab("") + theme_cond + guides_no +
   labs(subtitle = subheader) + 
   labels_cond + color_cond + legend_cond
@@ -1309,7 +1156,7 @@ plots
 #   geom_text(aes(label = format(get(var), digits = 3), y = 1)) +
 #   coord_cartesian(ylim = limit) +
 #   scale_y_continuous(breaks = scales) +
-#   facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+#   facet_grid(, vars(adv_minority_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
 #   labels_cond + color_cond + ylab(y_lab) + xlab("") + theme.cond
 # 
 # # [3,] factor
@@ -1330,20 +1177,20 @@ plots
 ## Example
 ```{r}
 lm(cum_gpa_y4_spring ~ 
-     # treat_sc*disadv_sc +
-     treat_sc*adv_black_sc +
+     treat_sc*adv_minority_sc +
+     # treat_sc*adv_hispanic_sc +
      gender + sattoact + hsrank + hsrank_no, data = d) %>% summary
 ```
 
 ```{r}
 lm_model_treat_cv <- function(data){
-  # lm(dv_value ~ treat_sc*disadv_sc + gender + sattoact + hsrank + hsrank_no, data = data)
-  lm(dv_value ~ treat_sc*adv_black_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+  lm(dv_value ~ treat_sc*adv_minority_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+  # lm(dv_value ~ treat_sc*adv_hispanic_sc + gender + sattoact + hsrank + hsrank_no, data = data)
 }
 
 lm_model_cond_cv <- function(data){
-  # lm(dv_value ~ cond_sc*disadv_sc + gender + sattoact + hsrank + hsrank_no, data = data)
-  lm(dv_value ~ cond_sc*adv_black_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+  lm(dv_value ~ cond_sc*adv_minority_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+  # lm(dv_value ~ cond_sc*adv_hispanic_sc + gender + sattoact + hsrank + hsrank_no, data = data)
 }
 
 d.nest %<>% mutate(lm_model_treat_cv = map(.x = data, .f = lm_model_treat_cv),
@@ -1368,8 +1215,8 @@ d.nest %<>%
         object = lm_model_treat_cv, 
         specs = "treat_sc", 
         by = 
-          # "disadv_sc"
-          "adv_black_sc"
+          "adv_minority_sc"
+          # "adv_hispanic_sc"
       ),
       .f = emmeans
     ),
@@ -1390,8 +1237,8 @@ d.nest %<>%
       .l = list(
         object = lm_model_treat_cv, 
         specs = 
-          # "disadv_sc"
-          "adv_black_sc"
+          "adv_minority_sc"
+          # "adv_hispanic_sc"
         , 
         by = "treat_sc"
       ),
@@ -1415,8 +1262,8 @@ d.nest %<>%
         object = lm_model_cond_cv, 
         specs = "cond_sc", 
         by = 
-          # "disadv_sc"
-          "adv_black_sc"
+          "adv_minority_sc"
+          # "adv_hispanic_sc"
       ),
       .f = emmeans
     ),
@@ -1437,8 +1284,8 @@ d.nest %<>%
       .l = list(
         object = lm_model_cond_cv, 
         specs = 
-          # "disadv_sc"
-          "adv_black_sc"
+          "adv_minority_sc"
+          # "adv_hispanic_sc"
         , 
         by = "cond_sc"
       ),
@@ -1496,8 +1343,8 @@ dvs_col %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        # 8 # change this number depending on the number of rows of your tidy datasets
-        10
+        14 # change this number depending on the number of rows of your tidy datasets
+        # 10
       ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
@@ -1514,11 +1361,18 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        # 12 # change this number depending on the number of rows of your tidy datasets
-        16
+        24 # change this number depending on the number of rows of your tidy datasets
+        # 16
       ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
+
+# dvs_col_rep
+# d.nest %>% head
+# d.nest$tidy_cond_cv[[83]]
+# d.nest[83,]$tidy_cond_cv
+
+dvs_col_rep <- dvs_col_rep[-c(1992), ] # Remember to change this as we add more variables
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond_cv %>% bind_rows) %>% 
@@ -1535,8 +1389,8 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        # 2  # change this number depending on the number of rows of your tidy datasets
-        6
+        20  # change this number depending on the number of rows of your tidy datasets
+        # 6
       ) %>%
   as.tibble %>% 
   rename(dv_name = value)
@@ -1554,8 +1408,8 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        # 2 # change this number depending on the number of rows of your tidy datasets
-        3
+        5 # change this number depending on the number of rows of your tidy datasets
+        # 3
       ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
@@ -1566,8 +1420,8 @@ dvs_col_rep %>%
     quos(
       dv_name, 
       contrast, 
-      # disadv_sc
-      adv_black_sc
+      adv_minority_sc
+      # adv_hispanic_sc
       ), 
     2) %>% 
   kable_format
@@ -1580,8 +1434,8 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        # 4 # change this number depending on the number of rows of your tidy datasets
-        12
+        40 # change this number depending on the number of rows of your tidy datasets
+        # 12
       ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
@@ -1605,8 +1459,8 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        # 12 # change this number depending on the number of rows of your tidy datasets
-        18
+        30 # change this number depending on the number of rows of your tidy datasets
+        # 18
       ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
@@ -1617,8 +1471,8 @@ dvs_col_rep %>%
     quos(
       dv_name, 
       contrast, 
-      # disadv_sc
-      adv_black_sc
+      adv_minority_sc
+      # adv_hispanic_sc
       ),
     2) %>% 
   kable_format
@@ -1646,31 +1500,6 @@ plots <- mapply(plot_bar_x_y_group_treat_adv, # function
 plots
 ```
 
-
-```{r eval=FALSE, include=FALSE}
-# plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit) d.unnest_treat %>% 
-#   filter(!is.na(get(var))) %>% 
-#   ggplot(aes(x = get(ftr), y = get(var), fill = get(ftr), group = get(ftr))) + # Remember to add get()
-#   geom_bar(position = pd1, stat = "identity") + 
-#   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .2, position = pd2) +
-#   theme1 + guides_no + 
-#   geom_text(aes(label = format(get(var), digits = 3), y = 1)) +
-#   coord_cartesian(ylim = limit) +
-#   scale_y_continuous(breaks = scales) +
-#   facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-#   labels_treat + color_treat + ylab(y_lab) + xlab("") + theme
-# 
-# # [3,] factor
-# # [1,] var or dv
-# # [2,] names of dv (y_lab)
-# # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
-# 
-# mapply(plot_bar_x_y_group_treat_adv, # function
-#        tribble_cont[,"treat_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
-#        tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
-#        tribble_cont[,"limit"] %>% t, SIMPLIFY = F)
-```
-
 ## By Condition and Disadvantaged Status
 
 ```{r}
@@ -1689,28 +1518,4 @@ plots <- mapply(plot_bar_x_y_group_cond_adv, # function
        SIMPLIFY = F)
 
 plots
-```
-
-```{r eval=FALSE, include=FALSE}
-# plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit) d.unnest_cond %>% 
-#   filter(!is.na(get(var))) %>% 
-#   ggplot(aes(x = get(ftr), y = get(var), fill = get(ftr), group = get(ftr))) + # Remember to add get()
-#   geom_bar(position = pd1, stat = "identity") + 
-#   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .2, position = pd2) +
-#   theme1 + guides_no + 
-#   geom_text(aes(label = format(get(var), digits = 3), y = 1)) +
-#   coord_cartesian(ylim = limit) +
-#   scale_y_continuous(breaks = scales) +
-#   facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-#   labels_cond + color_cond + ylab(y_lab) + xlab("") + theme.cond
-# 
-# # [3,] factor
-# # [1,] var or dv
-# # [2,] names of dv (y_lab)
-# # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
-# 
-# mapply(plot_bar_x_y_group_cond_adv, # function
-#        tribble_cont[,"cond_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
-#        tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
-#        tribble_cont[,"limit"] %>% t, SIMPLIFY = F)
 ```
