@@ -1261,7 +1261,9 @@ d_all %<>% mutate(
 ```
 
 
-# Compute new race variables
+# Compute New Demographics Variables
+
+## Disadvantaged Status and Race
 
 ```{r load custom functions}
 source("R/custom_functions.R")
@@ -1410,6 +1412,52 @@ d_all %>%
   demographics_pct(
     quos(
       race, disadv_sc, adv_minority_sc
+      )
+    )
+```
+
+## First-Generation and Race
+
+```{r}
+d_all %<>%
+  mutate(
+    firstgen_race_num = 
+      ifelse(
+        race == "white" & firstgen == "not first-gen", 1,
+        ifelse(
+          race == "white" & firstgen == "first-gen", 2,
+          ifelse(
+            race == "asian" & firstgen == "not first-gen", 3,
+            ifelse(
+              race == "asian" & firstgen == "first-gen", 4,
+              ifelse(
+                race_asianmaj == "black/hispanic/native/pacificislander" & 
+                  firstgen == "not first-gen", 5, 6
+              )
+            )
+          )
+        )
+      ),
+    firstgen_race = 
+      factor(
+        firstgen_race_num, 
+        labels = c("white CG", "white FG", "asian CG", "asian FG", "minority CG", "minority FG")
+      ),
+    firstgen_race_sc = firstgen_race
+  )
+
+# Five levels
+c <- contr.treatment(6)
+my.coding <- matrix(rep(1/6, 30), ncol=5)
+my.simple <- c - my.coding
+# my.simple
+contrasts(d_all$firstgen_race_sc) <- my.simple
+d_all$firstgen_race_sc %>% attr("contrasts")
+
+d_all %>% 
+  demographics_pct(
+    quos(
+      race, firstgen, firstgen_race_sc, firstgen_race_num
       )
     )
 ```
