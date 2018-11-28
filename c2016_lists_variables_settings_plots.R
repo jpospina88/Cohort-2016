@@ -153,10 +153,15 @@ vars_cont <-
     donate_srgiftplan, 
     donate_srgift,
     
-    ##friends 
+    ## Friends 
     friends_close, 
+    closefriendscount,
+    closenessfriends_comp7,
     friends_noshare_r,
     
+    # Involvement
+    org_howinvcount,
+    activism_engaged
   ) 
 
 tribble_dv <- tribble(
@@ -227,7 +232,7 @@ tribble_dv <- tribble(
   "belong_mystery_r_use_this",               "Belonging:\nMystery",                                 seq(1, 7, 1),       c(1, 7),        2,                    "(Single Item, Reverse Coded; Senior Year Survey)",                  3,
   "buwonder_r_use_this",                     "Belonging Uncertainty",                               seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "overallpositivity",                       "Overall Positivity of College Experience",            seq(1, 10, 1),      c(1, 10),       2.5,                  "(Senior Year Survey)",                               3,
-  "collexp_comp4",                           "Composite:\nPositive Evaluations",                    seq(1, 7, 1),       c(1, 7),        2,                    "(4 items; Senior Year Survey)",                      3,
+  "collexp_comp4",                           "Composite:\nPositive Perception of Stanford",         seq(1, 7, 1),       c(1, 7),        2,                    "(4 items; Senior Year Survey)",                      3,
   "collhomeinteg_comp4",                     "Composite:\nCollege-Home Integration",                seq(1, 5, 1),       c(1, 5),        1.5,                  "(4 items; Senior Year Survey)",                      3,
   "threat_nogen_comp8",                      "Composite:\nFeelings of Psychological Threat",        seq(-1, 1, 0.5),    c(-1, 1),       -0.75,                "(8 Items; Senior Year Survey)",                      2,
   "cthreat_minorities",                      "Contextual Threat:\nOthers",                          seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
@@ -254,13 +259,19 @@ tribble_dv <- tribble(
   "pol_conslib",                             "Politics:\nConservative-Liberal",                     seq(1, 7, 1),       c(1, 6),        2,                    "(Senior Year Survey)",                               3,
   "next_excited",                            "Excitement for Post-college Plans",                   seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
   "next_diffatfirst",                        "Next Plans: Difficult at First",                      seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
-  "donate_srgifttot",                        "Amount of Money Donated",                             seq(0, 550, 25),   c(0, 550),       45,                    "(Senior Year Survey)",                               1,
-  "donate_srgiftplan",                       "Plan to Donate",                                      seq(0, 150, 25),   c(0, 150),       15,                    "(Senior Year Survey)",                               1,
-  "donate_srgift",                           "Amount of Money Donated",                             seq(0, 150, 25),   c(0, 150),       15,                    "(Senior Year Survey)",                               4, 
-  ## friends 
+  "donate_srgifttot",                        "Amount of Money Donated",                             seq(0, 550, 25),   c(0, 550),       45,                   "(Senior Year Survey)",                               1,
+  "donate_srgiftplan",                       "Plan to Donate",                                      seq(0, 150, 25),   c(0, 150),       15,                   "(Senior Year Survey)",                               1,
+  "donate_srgift",                           "Amount of Money Donated",                             seq(0, 150, 25),   c(0, 150),       15,                   "(Senior Year Survey)",                               4, 
+ 
+  ## Friends 
   "friends_close",                           "Made Close Friends at College",                       seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,                  
+  "closefriendscount",                       "Number of Close Friends",                             seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,                  
+  "closenessfriends_comp7",                  "Close Friends (Average Closeness)",                   seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,                  
   "friends_noshare_r",                       "Can't Share Worries and Fears With Anyone",           seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey, reverse coded)",                3,                  
   
+  ## Involvement
+  "org_howinvcount",                         "Involvement in Extracurricular Activities",           seq(0, 25, 5),       c(0, 25),      2,                    "(Five Activites; Senior Year Survey)",               3,
+  "activism_engaged",                        "Involvement in Service/Social Change",                seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,                  
   )  
 
 tribble_cond <- data.frame(matrix(c("treat_sc"), nrow = nrow(tribble_dv)),
@@ -284,6 +295,7 @@ vars_categ <-
     quintile_bottom,
     major_dbl_hnrs_ctrm,
     honors_yes_usethis,
+    major_double,
     
     # Pre-Matriculation Intervention
     mc_wf,
@@ -309,6 +321,7 @@ tribble_dv <- tribble(
   "quintile_bottom",           "% with GPA in Bottom Quintile of Class",            seq(0, 100, 25),    c(0, 100),     5,             "(Institutional Data)",
   "major_dbl_hnrs_ctrm",       "% with High Academic Commitment",                   seq(0, 100, 25),    c(0, 100),     10,            "(Double/Triple Major, Honors, or Co-term; Institutional Data)",
   "honors_yes_usethis",        "% Reporting Awards or Honors",                      seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
+  "major_double",              "% Double or Triple Major",                          seq(0, 25, 5),    c(0, 25),        3,             "(Institutional Data)",
   
   # Senior Year Survey
   "tobaccouse_yes",             "% Used Tobacco",                                   seq(0, 50, 10),     c(0, 50),      5,             "(Senior Year Survey)",
@@ -359,3 +372,5 @@ colnames(tribble_cond) <- names_cond
 tribble_count <- bind_cols(tribble_dv, tribble_cond)
 
 rm(tribble_dv, tribble_cond)
+
+d$howinv_comp5
