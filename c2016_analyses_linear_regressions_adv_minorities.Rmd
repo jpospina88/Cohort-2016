@@ -270,11 +270,18 @@ legend_treat <- scale_color_manual(name = "",
 
 positions_treat <- c("ctl", "treat")
 
-labels_treat <- scale_x_discrete(labels = c('Control','Treatment'), limits = positions_treat)
+# labels_treat <- scale_x_discrete(labels = c('Control','Treatment'), limits = positions_treat)
+labels_treat <- 
+  scale_x_discrete(labels = c('X','T'), limits = positions_treat)
 
 positions_cond <- c("ctl", "bel", "cul", "wf")
 
-labels_cond <- scale_x_discrete(labels = c('Control', 'Belonging','Culture', 'Wise\nFeedback'), limits = positions_cond)
+# labels_cond <- scale_x_discrete(labels = c('Control', 'Belonging','Culture', 'Wise\nFeedback'), limits = positions_cond)
+labels_cond <- 
+  scale_x_discrete(
+    labels = c('X', 'B','C', 'F'), 
+    limits = positions_cond
+    )
 
 color_cond <- scale_fill_manual("legend", 
                                 values = c("ctl" = "#F8766D", 
@@ -288,9 +295,104 @@ legend_cond <- scale_color_manual(name = "",
                                              "cul" = "#00BFC4", 
                                              "wf" = "#C77CFF"))
 
+adv_names <- 
+  c('adv'="Advantaged",
+    'disadv'="Disadvantaged")
+
+gend_names <- 
+  c('m'="Male",
+    'f'="Female")
+
+# tob_names <-
+#   c('0' = "Non-smoking",
+#     '1' = "Smoking")
+
+fgen_names <-
+  c('not first-gen' = "Continuing-Generation",
+    'first-gen' = "First-Generation")
+
+race_names <-
+  c('white/asian' = "Majority",
+    'black/hispanic/native/pacificislander' = "Minority")
+
+group_levels_disadv <- c('adv','disadv')
+
+# # Scales
+# scale_y_3 <- scale_y_continuous(breaks = seq(0, 3, 1))
+# scale_y_5 <- scale_y_continuous(breaks = seq(1, 5, 1))
+# scale_y_6 <- scale_y_continuous(breaks = seq(1, 6, 1))
+# scale_y_7 <- scale_y_continuous(breaks = seq(1, 7, 1))
+# scale_y_10 <- scale_y_continuous(breaks = seq(0, 10, 2))
+# scale_y_100 <- scale_y_continuous(breaks = seq(0, 100, 20))
+# scale_y_50 <- scale_y_continuous(breaks = seq(0, 50, 10))
+# scale_y_75 <- scale_y_continuous(breaks = seq(0, 75, 15))
+# 
+# #added "p" in place of "." to mean "point"
+# scale_y_200 <- scale_y_continuous(breaks = seq(0, 200, 40))
+# scale_y_.15 <- scale_y_continuous(breaks = seq(-.15, .15, .5))
+# scale_y_4 <- scale_y_continuous(breaks = seq(1, 4, 1))
+# scale_y_40 <- scale_y_continuous(breaks = seq(0, 40, 10))
+# scale_y_.5 <- scale_y_continuous(breaks = seq(-.5, .5, .25))
+# scale_y_20 <- scale_y_continuous(breaks = seq(0, 20, 5))
+# scale_y_25 <- scale_y_continuous(breaks = seq(0, 25, 5))
+# 
+# coord_cartesian_3 <- coord_cartesian(ylim = c(0, 3))
+# coord_cartesian_5 <- coord_cartesian(ylim = c(1, 5))
+# coord_cartesian_7 <- coord_cartesian(ylim = c(1, 7))
+# coord_cartesian_10 <- coord_cartesian(ylim = c(0, 10))
+# coord_cartesian_50 <- coord_cartesian(ylim = c(0, 50))
+# coord_cartesian_100 <- coord_cartesian(ylim = c(0, 100))
+# coord_cartesian_75 <- coord_cartesian(ylim = c(0, 75))
+# 
+# coord_cartesian_200 <- coord_cartesian(ylim = c(0, 200))
+# coord_cartesian_.15 <- coord_cartesian(ylim = c(-.15, .15))
+# coord_cartesian_4 <- coord_cartesian(ylim = c(1, 4))
+# coord_cartesian_40 <- coord_cartesian(ylim = c(0, 40))
+# coord_cartesian_.5 <- coord_cartesian(ylim = c(-.5, .5))
+# coord_cartesian_20 <- coord_cartesian(ylim = c(0, 20))
+# coord_cartesian_25 <- coord_cartesian(ylim = c(0, 25))
+# 
+# 
+# mean_round3 <- geom_text(aes(label = format(emmean, digits = 3), y = 1))
+# mean_round3_10 <- geom_text(aes(label = format(emmean, digits = 3), y = .5))
+# mean_round3_50 <- geom_text(aes(label = format(emmean, digits = 3), y = 2))
+# mean_round3_100 <- geom_text(aes(label = format(emmean, digits = 3), y = 4))
+# 
+# mean_round_pct <- geom_text(aes(label = paste0(format(prob*100, digits = 3), "%"), y = 5))
+# 
+# mean_count <- geom_text(aes(label = paste0(format(response, digits = 3), ""), y = 2))
+# 
+# error_bar <- geom_errorbar(aes(ymin = emmean - SE, ymax = emmean + SE), width = .2, position = pd2)
+# 
+# error_bar_count <- geom_errorbar(aes(ymin = response - SE, ymax = response + SE), width = .2, position = pd2)
+# 
+# 
+# # General function version:
+# # Need to specify more stuff but it's more general so you can use it with more grouping variables
+# plot_bar_x_y_group <- function(data = data, x_var = x_var, x_labels = x_labels, x_color = x_color,
+#                                y_var = y_var, labs_y = labs_y,
+#                                group_var = group_var, group_names = group_names,
+#                                scale = scale, coord_cartesian = coord_cartesian, mean_round = mean_round) {
+# x_var <- enquo(x_var)
+# y_var <- enquo(y_var)
+# group_var <- enquo(group_var)
+# 
+# data %>%
+#   ggplot(aes(x = !!x_var, y = !!y_var, fill = !!x_var, group = !!x_var)) +
+#   geom_bar(position = pd1, stat = "identity") + error_bar + theme1 + theme + guides_no + mean_round +
+#   coord_cartesian + scale + # this is where you change the scale
+#   facet_grid(, vars(!!group_var), labeller = as_labeller(group_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+#   x_labels + x_color + labs_y
+# }
+
 
 d %>% 
-  count(adv_minority_sc)
+  count(adv_hispanic_sc)
+
+hispanic_adv_names <- 
+  c('adv' = "Advantaged",
+    'hispanic' = "Hispanic",
+    'other' = "All Others")
 
 minority_adv_names <- 
   c('adv' = "Advantaged",
@@ -349,7 +451,7 @@ d %>%
   kable_format
 ```
 
-## By Treatment and Disadvatanged Status
+## By Treatment and Advantaged Status and Minority
 
 ```{r}
 treat_adv <- list(d$treat_sc, 
@@ -363,7 +465,7 @@ d %>%
   kable_format
 ```
 
-## By Condition and Disadvatanged Status
+## By Condition and Advantaged Status and Minority
 
 ```{r}
 cond_adv <- list(d$cond_sc, 
@@ -379,7 +481,7 @@ d %>%
 
 # Raincloud plots
 
-## By Treatment and Disadvantaged Status
+## By Treatment and Advantaged and Minority Students
 
 ```{r}
 theme <- 
@@ -442,7 +544,7 @@ plots <- mapply(plot_raincloud_map_treat_adv, # function
 plots
 ```
 
-## By Condition and Disadvantaged Status
+## By Condition and Advantaged and Minority Students
 
 ```{r}
 theme_cond <- 
@@ -506,11 +608,11 @@ plots
 
 ## Is there inequality?
 
-We want to focus on the effect sizes between advantaged and disadvantaged students in the control group.
+We want to focus on the effect sizes between advantaged and advantaged and minority students  in the control group.
 
-### Inequalities between advantaged and disadvantaged students in control
+### Inequalities between advantaged and advantaged and minority students  in control
 
-Effect sizes (Cohen's *d*) between advantaged and disadvantaged students in control:
+Effect sizes (Cohen's *d*) between advantaged and advantaged and minority students  in control:
 
 ```{r}
 cohend_ineq <- 
@@ -534,7 +636,7 @@ cohend_ineq
 #   round(., digits = 2)
 ```
 
-## Is there a disadvantaged status effect?
+## Is there a Advantaged and Minority Students effect?
 
 ### Differences between advantaged and disadvantaged for all conditions
 
@@ -604,9 +706,9 @@ cohend_wf_all <- cohen.d(d %>% select(cd_wf_num, !!!vars_cont), group = "cd_wf_n
 cohend_wf_all
 ```
 
-### Differences between control and any treatment for disadvantaged students
+### Differences between control and any treatment for advantaged and minority students 
 
-Effect sizes (Cohen's *d*) between control and any treatment for advantaged and disadvantaged students:
+Effect sizes (Cohen's *d*) between control and any treatment for advantaged and advantaged and minority students :
 
 ```{r}
 # d %>% count(disadv, adv_minority_num) %>% select(-n)
@@ -636,7 +738,7 @@ cohend_treat <-
 cohend_treat
 ```
 
-### Differences between control and each condition for advantaged and disadvantaged students
+### Differences between control and each condition for advantaged and advantaged and minority students 
 
 #### Belonging
 
@@ -792,7 +894,7 @@ d.nest %<>%
 
 d.nest %<>% 
   mutate(
-    emmean_treat = pmap( # treatment effects by disadvantaged status
+    emmean_treat = pmap( # treatment effects by Advantaged and Minority Students
       .l = list(
         object = lm_model, 
         specs = "treat_sc", 
@@ -815,7 +917,7 @@ d.nest %<>%
       .x = emmean_treat_sc, 
       .f = data.frame),
     
-    emmean_ineq_treat = pmap( # Inequality of disadvantaged status by treatment
+    emmean_ineq_treat = pmap( # Inequality of Advantaged and Minority Students by treatment
       .l = list(
         object = lm_model, 
         specs = 
@@ -839,7 +941,7 @@ d.nest %<>%
       .x = emmean_ineq_treat_sc, 
       .f = data.frame),
     
-    emmean_cond = pmap( # Condition effects by disadvantaged status
+    emmean_cond = pmap( # Condition effects by Advantaged and Minority Students
       .l = list(
         object = lm_model_cond, 
         specs = "cond_sc", 
@@ -862,7 +964,7 @@ d.nest %<>%
       .x = emmean_cond_sc, 
       .f = data.frame),
     
-    emmean_ineq_cond = pmap( # Inequality of disadvantaged status by any condition
+    emmean_ineq_cond = pmap( # Inequality of Advantaged and Minority Students by any condition
       .l = list(
         object = lm_model_cond, 
         specs = 
@@ -916,7 +1018,7 @@ dvs_col %>%
 
 ## Main Effects and Interactions
 
-### By Treatment and Disadvantaged Status
+### By Treatment and Advantaged and Minority Students
 ```{r}
 # d.nest$tidy[[1]]
 
@@ -934,7 +1036,7 @@ dvs_col_rep %>%
   kable_format
 ```
 
-### By Condition and Disadvantaged Status
+### By Condition and Advantaged and Minority Students
 ```{r}
 # d.nest$tidy_cond[[1]]
 
@@ -963,7 +1065,7 @@ dvs_col_rep %>%
 
 ## Simple Effects
 
-### Inequality of Disadvantaged Status by Treatment
+### Inequality of Advantaged and Minority Students by Treatment
 
 ```{r}
 # d.nest$emmean_ineq_treat_sc_df[[1]]
@@ -983,7 +1085,7 @@ dvs_col_rep %>%
   kable_format
 ```
 
-### Treatment Effects by Disadvantaged Status
+### Treatment Effects by Advantaged and Minority Students
 
 ```{r}
 # d.nest$emmean_treat_sc_df[[1]]
@@ -1009,7 +1111,7 @@ dvs_col_rep %>%
   kable_format
 ```
 
-### Inequality effects of Disadvantaged Status
+### Inequality effects of Advantaged and Minority Students
 ```{r}
 # d.nest$emmean_ineq_cond_sc_df[[1]]
 
@@ -1027,7 +1129,7 @@ dvs_col_rep %>%
   kable_format
 ```
 
-### Condition Effects by Disadvantaged Status
+### Condition Effects by Advantaged and Minority Students
 
 ```{r}
 # d.nest$emmean_cond_sc_df[[1]]
@@ -1055,7 +1157,7 @@ dvs_col_rep %>%
 
 # Bar Plots
 
-## By Treatment and Disadvantaged Status
+## By Treatment and Advantaged and Minority Students
 
 ```{r}
 d.unnest_treat <-
@@ -1097,7 +1199,7 @@ plots <- mapply(plot_bar_x_y_group_treat_adv, # function
 plots[[1]]
 ```
 
-## By Condition and Disadvantaged Status
+## By Condition and Advantaged and Minority Students
 
 ```{r}
 d.unnest_cond <-
@@ -1204,7 +1306,7 @@ d.nest %<>%
 
 d.nest %<>% 
   mutate(
-    emmean_treat_cv = pmap( # Treatment effects by disadvantaged status
+    emmean_treat_cv = pmap( # Treatment effects by Advantaged and Minority Students
       .l = list(
         object = lm_model_treat_cv, 
         specs = "treat_sc", 
@@ -1227,7 +1329,7 @@ d.nest %<>%
       .x = emmean_treat_cv_sc, 
       .f = data.frame),
     
-    emmean_ineq_treat_cv = pmap( # Inequality of disadvantaged status by treatment
+    emmean_ineq_treat_cv = pmap( # Inequality of Advantaged and Minority Students by treatment
       .l = list(
         object = lm_model_treat_cv, 
         specs = 
@@ -1251,7 +1353,7 @@ d.nest %<>%
       .x = emmean_ineq_treat_cv_sc, 
       .f = data.frame),
     
-    emmean_cond_cv = pmap( # Condition effects by disadvantaged status
+    emmean_cond_cv = pmap( # Condition effects by Advantaged and Minority Students
       .l = list(
         object = lm_model_cond_cv, 
         specs = "cond_sc", 
@@ -1274,7 +1376,7 @@ d.nest %<>%
       .x = emmean_cond_cv_sc, 
       .f = data.frame),
     
-    emmean_ineq_cond_cv = pmap( # Inequality of disadvantaged status by condition
+    emmean_ineq_cond_cv = pmap( # Inequality of Advantaged and Minority Students by condition
       .l = list(
         object = lm_model_cond_cv, 
         specs = 
@@ -1331,13 +1433,13 @@ dvs_col %>%
 
 ## Main Effects and Interactions
 
-### By Treatment and Disadvantaged Status
+### By Treatment and Advantaged and Minority Students
 ```{r}
 # d.nest$tidy_treat_cv[[1]]
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        8 # change this number depending on the number of rows of your tidy datasets
+        14 # change this number depending on the number of rows of your tidy datasets
         # 10
       ) %>% 
   as.tibble %>% 
@@ -1349,17 +1451,23 @@ dvs_col_rep %>%
   kable_format
 ```
 
-### By Condition and Disadvantaged Status
+### By Condition and Advantaged and Minority Students
 ```{r}
 # d.nest$tidy_cond_cv[[1]]
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        12 # change this number depending on the number of rows of your tidy datasets
+        24 # change this number depending on the number of rows of your tidy datasets
         # 16
       ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
+
+# dvs_col_rep
+# d.nest %>% head
+# d.nest$tidy_cond_cv[[83]]
+# d.nest[83,]$tidy_cond_cv
+dvs_col_rep <- dvs_col_rep[-c(1992), ] # Remember to change this as we add more variables
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond_cv %>% bind_rows) %>% 
@@ -1369,14 +1477,14 @@ dvs_col_rep %>%
 
 ## Simple Effects
 
-### Inequality of Disadvantaged Status by Treatment
+### Inequality of Advantaged and Minority Students by Treatment
 
 ```{r}
 # d.nest$emmean_ineq_treat_cv_sc_df[[1]]
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        2  # change this number depending on the number of rows of your tidy datasets
+        20  # change this number depending on the number of rows of your tidy datasets
         # 6
       ) %>%
   as.tibble %>% 
@@ -1395,7 +1503,7 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        2 # change this number depending on the number of rows of your tidy datasets
+        5 # change this number depending on the number of rows of your tidy datasets
         # 3
       ) %>% 
   as.tibble %>% 
@@ -1414,14 +1522,14 @@ dvs_col_rep %>%
   kable_format
 ```
 
-### Inequality of Disadvantaged Status by Treatment
+### Inequality of Advantaged and Minority Students by Treatment
 
 ```{r}
 # d.nest$emmean_ineq_cond_cv_sc_df[[1]]
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        4 # change this number depending on the number of rows of your tidy datasets
+        40 # change this number depending on the number of rows of your tidy datasets
         # 12
       ) %>% 
   as.tibble %>% 
@@ -1446,7 +1554,7 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        12 # change this number depending on the number of rows of your tidy datasets
+        30 # change this number depending on the number of rows of your tidy datasets
         # 18
       ) %>% 
   as.tibble %>% 
@@ -1467,7 +1575,7 @@ dvs_col_rep %>%
 
 # Bar Plots with covariates
 
-## By Treatment and Disadvantaged Status
+## By Treatment and Advantaged and Minority Students
 
 ```{r}
 d.unnest_treat <-
@@ -1487,32 +1595,7 @@ plots <- mapply(plot_bar_x_y_group_treat_adv, # function
 plots
 ```
 
-
-```{r eval=FALSE, include=FALSE}
-# plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit) d.unnest_treat %>% 
-#   filter(!is.na(get(var))) %>% 
-#   ggplot(aes(x = get(ftr), y = get(var), fill = get(ftr), group = get(ftr))) + # Remember to add get()
-#   geom_bar(position = pd1, stat = "identity") + 
-#   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .2, position = pd2) +
-#   theme1 + guides_no + 
-#   geom_text(aes(label = format(get(var), digits = 3), y = 1)) +
-#   coord_cartesian(ylim = limit) +
-#   scale_y_continuous(breaks = scales) +
-#   facet_grid(, vars(adv_minority_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-#   labels_treat + color_treat + ylab(y_lab) + xlab("") + theme
-# 
-# # [3,] factor
-# # [1,] var or dv
-# # [2,] names of dv (y_lab)
-# # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
-# 
-# mapply(plot_bar_x_y_group_treat_adv, # function
-#        tribble_cont[,"treat_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
-#        tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
-#        tribble_cont[,"limit"] %>% t, SIMPLIFY = F)
-```
-
-## By Condition and Disadvantaged Status
+## By Condition and Advantaged and Minority Students
 
 ```{r}
 d.unnest_cond <-
@@ -1530,28 +1613,4 @@ plots <- mapply(plot_bar_x_y_group_cond_adv, # function
        SIMPLIFY = F)
 
 plots
-```
-
-```{r eval=FALSE, include=FALSE}
-# plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit) d.unnest_cond %>% 
-#   filter(!is.na(get(var))) %>% 
-#   ggplot(aes(x = get(ftr), y = get(var), fill = get(ftr), group = get(ftr))) + # Remember to add get()
-#   geom_bar(position = pd1, stat = "identity") + 
-#   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .2, position = pd2) +
-#   theme1 + guides_no + 
-#   geom_text(aes(label = format(get(var), digits = 3), y = 1)) +
-#   coord_cartesian(ylim = limit) +
-#   scale_y_continuous(breaks = scales) +
-#   facet_grid(, vars(adv_minority_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-#   labels_cond + color_cond + ylab(y_lab) + xlab("") + theme.cond
-# 
-# # [3,] factor
-# # [1,] var or dv
-# # [2,] names of dv (y_lab)
-# # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
-# 
-# mapply(plot_bar_x_y_group_cond_adv, # function
-#        tribble_cont[,"cond_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
-#        tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
-#        tribble_cont[,"limit"] %>% t, SIMPLIFY = F)
 ```
