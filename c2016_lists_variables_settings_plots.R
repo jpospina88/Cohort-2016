@@ -316,8 +316,8 @@ vars_categ <-
     major_culture_2,
     major_socialscience, 
     major_humanities, 
-    major_stem_all, # % Graduated with a STEM Major (All majors from “Math & Sciences” interest)
-    
+    major_stem_all,
+    major_stem_hard,
     
     # Pre-Matriculation Intervention
     mc_wf,
