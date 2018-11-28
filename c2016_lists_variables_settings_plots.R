@@ -301,6 +301,7 @@ vars_categ <-
     class_research_ever,
     quintile_top,
     quintile_bottom,
+    probation,
     major_dbl_hnrs_ctrm,
     major_double,
     major_grad_yes_honors,
@@ -308,7 +309,12 @@ vars_categ <-
     major_bs_yes,
     major_ba_yes,
     major_cs_yes,
-    probation,
+    major_school_engineering, # Graduated with an Engineering Major
+    major_school_environmental, # Graduated with an Environmental Major
+    major_school_humanitiesscience, # Graduated with a Humanities and Science Major
+    major_culture_2, # Graduated with a Culture Major
+    major_socialscience, # Graduated with a Social Science Major
+    major_humanities, # Graduated with a Humanities Major
     
     # Pre-Matriculation Intervention
     mc_wf,
@@ -335,6 +341,7 @@ tribble_dv <- tribble(
   "class_research_ever",       "% Involved in Research",                            seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
   "quintile_top",              "% with GPA in Top Quintile of Class",               seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
   "quintile_bottom",           "% with GPA in Bottom Quintile of Class",            seq(0, 75, 25),     c(0, 75),      4,             "(Institutional Data)",
+  "probation",                 "% Ever on Probation",                               seq(0, 100, 25),    c(0, 100),     10,            "(GPA Less Than 2 and Term Units Not 0; Institutional Data)",
   "major_dbl_hnrs_ctrm",       "% with High Academic Commitment",                   seq(0, 75, 25),     c(0, 75),      4,             "(Double/Triple Major, Honors, or Co-term; Institutional Data)",
   "major_double",              "% Double or Triple Major",                          seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
   "major_grad_yes_honors",     "% Graduated with Honors",                           seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
@@ -342,7 +349,12 @@ tribble_dv <- tribble(
   "major_bs_yes",              "% Graduated with a Bachelor of Science",            seq(0, 100, 25),    c(0, 100),     5,             "(Institutional Data)",
   "major_ba_yes",              "% Graduated with a Bachelor of Arts",               seq(0, 100, 25),    c(0, 100),     5,             "(Institutional Data)",
   "major_cs_yes",              "% Graduated in Computer Science",                   seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
-  "probation",                 "% Ever on Probation",                               seq(0, 100, 25),    c(0, 100),     10,            "(GPA Less Than 2 and Term Units Not 0; Institutional Data)",
+  "major_school_engineering",  "Graduated with an Engineering Major",               seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
+  "major_school_environmental","% Graduated with an Environmental Major",           seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",          
+  "major_school_humanitiesscience","% Graduated with a Humanities and Science Major",seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
+  "major_culture_2",           "% Graduated with a Culture Major",                  seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
+  "major_socialscience",       "% Graduated with a Social Science Major",           seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
+  "major_humanities",          "% Graduated with a Humanities Major",               seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
   
   # Senior Year Survey
   "tobaccouse_yes",             "% Used Tobacco",                                   seq(0, 50, 10),     c(0, 50),      5,             "(Senior Year Survey)",
