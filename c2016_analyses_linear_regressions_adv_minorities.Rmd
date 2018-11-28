@@ -1386,16 +1386,21 @@ dvs_col_rep <- dvs_col$dv_name %>%
   as.tibble %>% 
   rename(dv_name = value)
 
+# The variable "donate_srgifttot" is the one that has less rows. Right now it is row 99.
+# d.nest %>% select(dv_name) %>% View
 # dvs_col_rep
 # d.nest %>% head
-# d.nest$tidy_cond_cv[[83]]
-# d.nest[83,]$tidy_cond_cv
-dvs_col_rep <- dvs_col_rep[-c(1992), ] # Remember to change this as we add more variables
+# d.nest$tidy_cond_cv[[99]]
+# d.nest[99,]$tidy_cond_cv
+# 24*99
+dvs_col_rep <- dvs_col_rep[-c(2376), ] # Remember to change this as we add more variables
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond_cv %>% bind_rows) %>% 
   round_table(quos(dv_name, term), 2) %>% 
   kable_format
+
+
 ```
 
 ## Simple Effects
