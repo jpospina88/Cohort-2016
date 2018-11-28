@@ -277,7 +277,7 @@ tribble_dv <- tribble(
   
   ## Involvement
   "org_howinvcount",                         "Involvement in Extracurricular Activities",           seq(0, 25, 5),       c(0, 25),      2,                    "(Five Activites; Senior Year Survey)",               3,
-  "activism_engaged",                        "Involvement in Service/Social Change",                seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,                  
+  "activism_engaged",                        "Involvement in Service/Social Change",                seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3                 
   )  
 
 tribble_cond <- data.frame(matrix(c("treat_sc"), nrow = nrow(tribble_dv)),
@@ -297,11 +297,18 @@ vars_categ <-
   quos(
     # Institutional Data
     major_grad_4y,
+    major_grad_5y,
     class_research_ever,
+    quintile_top,
     quintile_bottom,
     major_dbl_hnrs_ctrm,
-    honors_yes_usethis,
     major_double,
+    major_grad_yes_honors,
+    coterm_ever,
+    major_bs_yes,
+    major_ba_yes,
+    major_cs_yes,
+    probation,
     
     # Pre-Matriculation Intervention
     mc_wf,
@@ -315,7 +322,8 @@ vars_categ <-
     srgift_donated, # donated senior gift
     srgift_plandonate, # plan to donate senior gift
     srgift_planordonated, # donated or plan to donate senior gift
-    mentor_yes
+    mentor_yes,
+    honors_yes_usethis
   )
 
 tribble_dv <- tribble(
@@ -323,11 +331,18 @@ tribble_dv <- tribble(
   #---------------------------|----------------------------------------------------|-------------------|--------------|--------------|-----------------------------------------------------------------
   # Institutional data
   "major_grad_4y",             "% Graduating in Four Years",                        seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
+  "major_grad_5y",             "% Graduating in five Years",                        seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
   "class_research_ever",       "% Involved in Research",                            seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
-  "quintile_bottom",           "% with GPA in Bottom Quintile of Class",            seq(0, 100, 25),    c(0, 100),     5,             "(Institutional Data)",
-  "major_dbl_hnrs_ctrm",       "% with High Academic Commitment",                   seq(0, 100, 25),    c(0, 100),     10,            "(Double/Triple Major, Honors, or Co-term; Institutional Data)",
-  "honors_yes_usethis",        "% Reporting Awards or Honors",                      seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
-  "major_double",              "% Double or Triple Major",                          seq(0, 25, 5),    c(0, 25),        3,             "(Institutional Data)",
+  "quintile_top",              "% with GPA in Top Quintile of Class",               seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
+  "quintile_bottom",           "% with GPA in Bottom Quintile of Class",            seq(0, 75, 25),     c(0, 75),      4,             "(Institutional Data)",
+  "major_dbl_hnrs_ctrm",       "% with High Academic Commitment",                   seq(0, 75, 25),     c(0, 75),      4,             "(Double/Triple Major, Honors, or Co-term; Institutional Data)",
+  "major_double",              "% Double or Triple Major",                          seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
+  "major_grad_yes_honors",     "% Graduated with Honors",                           seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
+  "coterm_ever",               "% Coterm Ever",                                     seq(0, 75, 25),     c(0, 75),      4,             "(Institutional Data)",
+  "major_bs_yes",              "% Graduated with a Bachelor of Science",            seq(0, 100, 25),    c(0, 100),     5,             "(Institutional Data)",
+  "major_ba_yes",              "% Graduated with a Bachelor of Arts",               seq(0, 100, 25),    c(0, 100),     5,             "(Institutional Data)",
+  "major_cs_yes",              "% Graduated in Computer Science",                   seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
+  "probation",                 "% Ever on Probation",                               seq(0, 100, 25),    c(0, 100),     10,            "(GPA Less Than 2 and Term Units Not 0; Institutional Data)",
   
   # Senior Year Survey
   "tobaccouse_yes",             "% Used Tobacco",                                   seq(0, 50, 10),     c(0, 50),      5,             "(Senior Year Survey)",
@@ -335,7 +350,9 @@ tribble_dv <- tribble(
   "next_plans2",                "% Taking a Job",                                   seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
   "next_plans8",                "% Pursuing Graduate Studies Next Year",            seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
   "srgift_planordonated",       "% Donated or Planned to Donate\nto Senior Gift",   seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
-  "mentor_yes",                 "% with a Mentor",                                  seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)"
+  "mentor_yes",                 "% with a Mentor",                                  seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
+  "honors_yes_usethis",         "% Reporting Awards or Honors",                     seq(0, 100, 25),    c(0, 100),     10,           "(Senior Year Survey)"
+  
 )
 
 tribble_cond <- data.frame(matrix(c("treat_sc"), nrow = nrow(tribble_dv)),
