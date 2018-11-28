@@ -317,83 +317,6 @@ race_names <-
 
 group_levels_disadv <- c('adv','disadv')
 
-# # Scales
-# scale_y_3 <- scale_y_continuous(breaks = seq(0, 3, 1))
-# scale_y_5 <- scale_y_continuous(breaks = seq(1, 5, 1))
-# scale_y_6 <- scale_y_continuous(breaks = seq(1, 6, 1))
-# scale_y_7 <- scale_y_continuous(breaks = seq(1, 7, 1))
-# scale_y_10 <- scale_y_continuous(breaks = seq(0, 10, 2))
-# scale_y_100 <- scale_y_continuous(breaks = seq(0, 100, 20))
-# scale_y_50 <- scale_y_continuous(breaks = seq(0, 50, 10))
-# scale_y_75 <- scale_y_continuous(breaks = seq(0, 75, 15))
-# 
-# #added "p" in place of "." to mean "point"
-# scale_y_200 <- scale_y_continuous(breaks = seq(0, 200, 40))
-# scale_y_.15 <- scale_y_continuous(breaks = seq(-.15, .15, .5))
-# scale_y_4 <- scale_y_continuous(breaks = seq(1, 4, 1))
-# scale_y_40 <- scale_y_continuous(breaks = seq(0, 40, 10))
-# scale_y_.5 <- scale_y_continuous(breaks = seq(-.5, .5, .25))
-# scale_y_20 <- scale_y_continuous(breaks = seq(0, 20, 5))
-# scale_y_25 <- scale_y_continuous(breaks = seq(0, 25, 5))
-# 
-# coord_cartesian_3 <- coord_cartesian(ylim = c(0, 3))
-# coord_cartesian_5 <- coord_cartesian(ylim = c(1, 5))
-# coord_cartesian_7 <- coord_cartesian(ylim = c(1, 7))
-# coord_cartesian_10 <- coord_cartesian(ylim = c(0, 10))
-# coord_cartesian_50 <- coord_cartesian(ylim = c(0, 50))
-# coord_cartesian_100 <- coord_cartesian(ylim = c(0, 100))
-# coord_cartesian_75 <- coord_cartesian(ylim = c(0, 75))
-# 
-# coord_cartesian_200 <- coord_cartesian(ylim = c(0, 200))
-# coord_cartesian_.15 <- coord_cartesian(ylim = c(-.15, .15))
-# coord_cartesian_4 <- coord_cartesian(ylim = c(1, 4))
-# coord_cartesian_40 <- coord_cartesian(ylim = c(0, 40))
-# coord_cartesian_.5 <- coord_cartesian(ylim = c(-.5, .5))
-# coord_cartesian_20 <- coord_cartesian(ylim = c(0, 20))
-# coord_cartesian_25 <- coord_cartesian(ylim = c(0, 25))
-# 
-# 
-# mean_round3 <- geom_text(aes(label = format(emmean, digits = 3), y = 1))
-# mean_round3_10 <- geom_text(aes(label = format(emmean, digits = 3), y = .5))
-# mean_round3_50 <- geom_text(aes(label = format(emmean, digits = 3), y = 2))
-# mean_round3_100 <- geom_text(aes(label = format(emmean, digits = 3), y = 4))
-# 
-# mean_round_pct <- geom_text(aes(label = paste0(format(prob*100, digits = 3), "%"), y = 5))
-# 
-# mean_count <- geom_text(aes(label = paste0(format(response, digits = 3), ""), y = 2))
-# 
-# error_bar <- geom_errorbar(aes(ymin = emmean - SE, ymax = emmean + SE), width = .2, position = pd2)
-# 
-# error_bar_count <- geom_errorbar(aes(ymin = response - SE, ymax = response + SE), width = .2, position = pd2)
-# 
-# 
-# # General function version:
-# # Need to specify more stuff but it's more general so you can use it with more grouping variables
-# plot_bar_x_y_group <- function(data = data, x_var = x_var, x_labels = x_labels, x_color = x_color,
-#                                y_var = y_var, labs_y = labs_y,
-#                                group_var = group_var, group_names = group_names,
-#                                scale = scale, coord_cartesian = coord_cartesian, mean_round = mean_round) {
-# x_var <- enquo(x_var)
-# y_var <- enquo(y_var)
-# group_var <- enquo(group_var)
-# 
-# data %>%
-#   ggplot(aes(x = !!x_var, y = !!y_var, fill = !!x_var, group = !!x_var)) +
-#   geom_bar(position = pd1, stat = "identity") + error_bar + theme1 + theme + guides_no + mean_round +
-#   coord_cartesian + scale + # this is where you change the scale
-#   facet_grid(, vars(!!group_var), labeller = as_labeller(group_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-#   x_labels + x_color + labs_y
-# }
-
-
-d %>% 
-  count(adv_hispanic_sc)
-
-hispanic_adv_names <- 
-  c('adv' = "Advantaged",
-    'hispanic' = "Hispanic",
-    'other' = "All Others")
-
 minority_adv_names <- 
   c('adv' = "Advantaged",
     'black' = "Black",
@@ -1049,12 +972,14 @@ dvs_col_rep <- dvs_col$dv_name %>%
   as.tibble %>% 
   rename(dv_name = value)
 
+# The variable "donate_srgifttot" is the one that has less rows. Right now it is row 99.
+# d.nest %>% select(dv_name) %>% View
+# dvs_col_rep
 # d.nest %>% head
-# d.nest$tidy_cond[[83]]
-# dvs_col_rep %>% 
-#   filter(dv_name == "donate_srgifttot")
-
-dvs_col_rep <- dvs_col_rep[-c(1660), ] # Remember to change this as we add more variables
+# d.nest$tidy_cond_cv[[99]]
+# d.nest[99,]$tidy_cond_cv
+# 20*99
+dvs_col_rep <- dvs_col_rep[-c(1980), ] # Remember to change this as we add more variables
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond %>% bind_rows) %>% 
@@ -1463,16 +1388,21 @@ dvs_col_rep <- dvs_col$dv_name %>%
   as.tibble %>% 
   rename(dv_name = value)
 
+# The variable "donate_srgifttot" is the one that has less rows. Right now it is row 99.
+# d.nest %>% select(dv_name) %>% View
 # dvs_col_rep
 # d.nest %>% head
-# d.nest$tidy_cond_cv[[83]]
-# d.nest[83,]$tidy_cond_cv
-dvs_col_rep <- dvs_col_rep[-c(1992), ] # Remember to change this as we add more variables
+# d.nest$tidy_cond_cv[[99]]
+# d.nest[99,]$tidy_cond_cv
+# 24*99
+dvs_col_rep <- dvs_col_rep[-c(2376), ] # Remember to change this as we add more variables
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond_cv %>% bind_rows) %>% 
   round_table(quos(dv_name, term), 2) %>% 
   kable_format
+
+
 ```
 
 ## Simple Effects
