@@ -481,8 +481,7 @@ theme_cond <-
     axis.text.x = # change size of x-axis text
       element_text(
         size = 
-          # 12
-          5
+          12
         , 
         family = "Helvetica"),
     axis.title = element_text(size = 18, family = "Helvetica"), 
@@ -979,7 +978,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 # d.nest$tidy_cond_cv[[99]]
 # d.nest[99,]$tidy_cond_cv
 # 20*99
-dvs_col_rep <- dvs_col_rep[-c(1980), ] # Remember to change this as we add more variables
+# dvs_col_rep <- dvs_col_rep[-c(1980), ] # Remember to change this as we add more variables
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond %>% bind_rows) %>% 
@@ -1121,7 +1120,7 @@ plots <- mapply(plot_bar_x_y_group_treat_adv, # function
        tribble_cont[,"decimal"] %>% t, tribble_cont[,"subheader"] %>% t,
        SIMPLIFY = F)
 
-plots[[1]]
+plots
 ```
 
 ## By Condition and Advantaged and Minority Students
@@ -1164,7 +1163,7 @@ plots <- mapply(plot_bar_x_y_group_cond_adv, # function
        tribble_cont[,"decimal"] %>% t, tribble_cont[,"subheader"] %>% t,
        SIMPLIFY = F)
 
-plots[[1]]
+plots
 ```
 
 ```{r eval=FALSE, include=FALSE}
@@ -1395,7 +1394,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 # d.nest$tidy_cond_cv[[99]]
 # d.nest[99,]$tidy_cond_cv
 # 24*99
-dvs_col_rep <- dvs_col_rep[-c(2376), ] # Remember to change this as we add more variables
+# dvs_col_rep <- dvs_col_rep[-c(2376), ] # Remember to change this as we add more variables
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond_cv %>% bind_rows) %>% 
