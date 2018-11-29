@@ -33,6 +33,7 @@ vars_cont <-
     # iHSGpa,                         # need to review this variable since it's not in the right scale
     cumgpa1y,
     cum_gpa_y1_spring,
+    # Y2_Sp_CumGPA,                  # check that we have this variable in the dataset
     cum_gpa_y2_spring,
     cum_gpa_y3_spring,
     cum_gpa_y4_spring,
@@ -174,6 +175,7 @@ tribble_dv <- tribble(
   # "iHSGpa",                                  "High School Cumulative GPA",                          seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   "cumgpa1y",                                "1-Year Cumulative GPA",                               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   "cum_gpa_y1_spring",                       "New 1-Year Cumulative GPA",                           seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
+  # "Y2_Sp_CumGPA",
   "cum_gpa_y2_spring",                       "2-Year Cumulative GPA",                               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   "cum_gpa_y3_spring",                       "3-Year Cumulative GPA",                               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   "cum_gpa_y4_spring",                       "4-Year Cumulative GPA",                               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
@@ -210,13 +212,13 @@ tribble_dv <- tribble(
   "mhealthgeneral",                          "Overall Mental Health",                               seq(1, 5, 1),      c(1, 5),         1.5,                  "(Single Item; Senior Year Survey)",                  3,
   "anxscreener_comp2",                       "Composite:\nAnxiety Screener",                        seq(0, 3, 1),      c(0, 3),         0.5,                  "(2 items; Senior Year Survey)",                      3,
   "depscreener_comp2",                       "Composite:\nDepression Screener",                     seq(0, 3, 1),      c(0, 3),         0.5,                  "(2 items; Senior Year Survey)",                      3,
-  "overallmentalhealth_comp5_z",             "Composite:\nOverall Mental Health",                   seq(-1, 1, 0.5),   c(-1, 1),       -0.75,                 "(5 items; Average Standardized Score; Senior Year Survey)",   0,
+  "overallmentalhealth_comp5_z",             "Composite:\nOverall Mental Health",                   seq(-1, 1, 0.5),   c(-1, 1),       -0.75,                 "(5 items; Average Standardized Score; Senior Year Survey)",   1,
   "anxdepscreener_comp4",                    "Composite:\nAnxiety and Depression Screeners",        seq(0, 3, 1),      c(0, 3),         0.5,                  "(4 Items; Senior Year Survey)",                      3,
   "bmi_1y",                                  "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, First-Year Survey)",                           3,
   "bmi",                                     "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, Senior Year In-Lab Follow-Up)",                          3,
   "bmi_chge_scr",                            "BMI Change Score",                                    seq(0, 4, 1),      c(0, 4),         0.5,                  "(Senior Year In-Lab Follow-Up)",                               3,
-  "weight",                                  "4th-year Weight",                                     seq(0, 200, 50),   c(0, 200),       25,                   "(Senior Year In-Lab Follow-Up)",                          2,
-  "weight_comp3",                            "Total Weight Satisfaction",                           seq(1, 7, 1),      c(1, 7),         2,                    "(3 items; Senior Year In-Lab Follow-Up)",                          1,
+  "weight",                                  "4-Year Weight",                                       seq(0, 200, 50),   c(0, 200),       25,                   "(Senior Year In-Lab Follow-Up)",                          3,
+  "weight_comp3",                            "Total Weight Satisfaction",                           seq(1, 7, 1),      c(1, 7),         2,                    "(3 items; Senior Year In-Lab Follow-Up)",                          3,
   "weight_happy_rc",                         "Happiness with Weight",                               seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year In-Lab Follow-Up)",                          3,
   "weight_feelbad",                          "Feel Less Bad About Weight",                          seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year In-Lab Follow-Up)",                          3,
   "weight_trylose",                          "Trying to Lose Weight",                               seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year In-Lab Follow-Up)",                               3,
@@ -248,9 +250,9 @@ tribble_dv <- tribble(
   "stthreat_race",                           "Stereotype Threat: Race",                             seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "stthreat_ses",                            "Stereotype Threat: Social Class",                     seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
   "famrelate_comp2",                         "Home-School Disconnect:\nFamily-College Disconnect",  seq(1, 6, 1),       c(1, 6),        2,                    "(2 items; Senior Year Survey)",                      3,
-  "integ_idgender",                          "College-Identity Friction:\nGender",                  seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
+  "integ_idgender",                          "College-Identity Friction:\nGender",                  seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               3,
   "integ_idrace",                            "College-Identity Friction:\nRace",                    seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
-  "integ_idclass",                           "College-Identity Friction:\nSocial Class",            seq(1, 5, 1),       c(1, 3),        1.5,                  "(Senior Year Survey)",                               3,
+  "integ_idclass",                           "College-Identity Friction:\nSocial Class",            seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "wisefeedbacktask_comp4",                  "Wise Feedback Task",                                  seq(1, 5, 1),       c(1, 5),        1.5,                  "(4 items; Senior Year Survey)",                      3,
   "critf_distinguish_r",                     "Critical Feedback:\nDistinguish Between Students",    seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3, 
   "critf_grow",                              "Critical Feedback:\nHelp Students Grow",              seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
@@ -273,10 +275,10 @@ tribble_dv <- tribble(
   "friends_close",                           "Made Close Friends at College",                       seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,                  
   "closefriendscount",                       "Number of Close Friends",                             seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,                  
   "closenessfriends_comp7",                  "Close Friends (Average Closeness)",                   seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,                  
-  "friends_noshare_r",                       "Can't Share Worries and Fears With Friends",          seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey, reverse coded)",                3,                  
+  "friends_noshare_r",                       "Can't Share Worries and Fears With Friends",          seq(1, 7, 1),       c(1, 7),        2.5,                    "(Senior Year Survey, reverse coded)",                3,                  
   
   ## Involvement
-  "org_howinvcount",                         "Involvement in Extracurricular Activities",           seq(0, 25, 5),       c(0, 25),      2,                    "(Five Activites; Senior Year Survey)",               3,
+  "org_howinvcount",                         "Involvement in Extracurricular Activities",           seq(0, 25, 5),       c(0, 25),      2,                    "(Five Activites; Senior Year Survey)",               2,
   "activism_engaged",                        "Involvement in Service/Social Change",                seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3                 
   )  
 

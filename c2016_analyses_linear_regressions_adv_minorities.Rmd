@@ -419,7 +419,7 @@ theme <-
       element_text(
         size = 
           # 20
-          10
+          18
         , 
         family = "Helvetica"),
     axis.title = element_text(size = 22, family = "Helvetica"), 
@@ -481,7 +481,7 @@ theme_cond <-
     axis.text.x = # change size of x-axis text
       element_text(
         size = 
-          12
+          18
         , 
         family = "Helvetica"),
     axis.title = element_text(size = 18, family = "Helvetica"), 
@@ -665,21 +665,21 @@ cohend_treat
 #### Belonging
 
 ```{r}
-cohend_bel <- 
-  cohen.d.by(
-    x = d %>% 
-      select(
-        cd_bel_num,
-        adv_minority_num,
-        # adv_hispanic_num,
-        !!!vars_cont
-        ), 
-    group = "cd_bel_num", 
-    group2 = 
-      "adv_minority_num",
-      # "adv_hispanic_num",
-    alpha = .05
-    )
+# cohend_bel <- 
+#   cohen.d.by(
+#     x = d %>% 
+#       select(
+#         cd_bel_num,
+#         adv_minority_num,
+#         # adv_hispanic_num,
+#         !!!vars_cont
+#         ), 
+#     group = "cd_bel_num", 
+#     group2 = 
+#       "adv_minority_num",
+#       # "adv_hispanic_num",
+#     alpha = .05
+#     )
 
 # %>% summary
 
@@ -689,26 +689,26 @@ cohend_bel <-
 #   select(-rowname) %>% 
 #   round(., digits = 2)
 
-cohend_bel
+# cohend_bel
 ```
 
 #### Culture
 ```{r}
-cohend_cul <- 
-  cohen.d.by(
-    x = d %>% 
-      select(
-        cd_cul_num, 
-        adv_minority_num,
-        # adv_hispanic_num,
-        !!!vars_cont
-        ), 
-    group = "cd_cul_num", 
-    group2 = 
-      "adv_minority_num",
-      # "adv_hispanic_num",
-    alpha = .05
-    ) 
+# cohend_cul <- 
+#   cohen.d.by(
+#     x = d %>% 
+#       select(
+#         cd_cul_num, 
+#         adv_minority_num,
+#         # adv_hispanic_num,
+#         !!!vars_cont
+#         ), 
+#     group = "cd_cul_num", 
+#     group2 = 
+#       "adv_minority_num",
+#       # "adv_hispanic_num",
+#     alpha = .05
+#     ) 
 
 # %>% summary
 
@@ -718,25 +718,25 @@ cohend_cul <-
 #   select(-rowname) %>% 
 #   round(., digits = 2)
 
-cohend_cul
+# cohend_cul
 ```
 
 #### Wise Feedback
 ```{r}
-cohend_wf <- 
-  cohen.d.by(
-    x = d %>% 
-      select(
-        cd_wf_num, 
-        adv_minority_num,
-        # adv_hispanic_sc,
-        !!!vars_cont
-        ), 
-    group = "cd_wf_num", 
-    group2 = 
-      "adv_minority_num",
-      # "adv_hispanic_sc",
-    alpha = .05) 
+# cohend_wf <- 
+#   cohen.d.by(
+#     x = d %>% 
+#       select(
+#         cd_wf_num, 
+#         adv_minority_num,
+#         # adv_hispanic_sc,
+#         !!!vars_cont
+#         ), 
+#     group = "cd_wf_num", 
+#     group2 = 
+#       "adv_minority_num",
+#       # "adv_hispanic_sc",
+#     alpha = .05) 
 
 # %>% summary
 
@@ -746,7 +746,7 @@ cohend_wf <-
 #   select(-rowname) %>% 
 #   round(., digits = 2)
 
-cohend_wf
+# cohend_wf
 ```
 
 # Models
