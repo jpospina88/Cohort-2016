@@ -33,6 +33,7 @@ vars_cont <-
     # iHSGpa,                         # need to review this variable since it's not in the right scale
     cumgpa1y,
     cum_gpa_y1_spring,
+    # Y2_Sp_CumGPA,                  # check that we have this variable in the dataset
     cum_gpa_y2_spring,
     cum_gpa_y3_spring,
     cum_gpa_y4_spring,
@@ -174,6 +175,7 @@ tribble_dv <- tribble(
   # "iHSGpa",                                  "High School Cumulative GPA",                          seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   "cumgpa1y",                                "1-Year Cumulative GPA",                               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   "cum_gpa_y1_spring",                       "New 1-Year Cumulative GPA",                           seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
+  # "Y2_Sp_CumGPA",
   "cum_gpa_y2_spring",                       "2-Year Cumulative GPA",                               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   "cum_gpa_y3_spring",                       "3-Year Cumulative GPA",                               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
   "cum_gpa_y4_spring",                       "4-Year Cumulative GPA",                               seq(0, 4, 1),      c(0, 4),         0.5,                  "(Institutional Data)",                               3,
