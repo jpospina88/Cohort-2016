@@ -497,7 +497,7 @@ d.nest %<>%
     augment = glm_model %>% map(broom::augment),
     glance_cond = glm_model_cond %>% map(broom::glance),
     tidy_cond = glm_model_cond %>% map(broom::tidy),
-    # tidy_cond_irr = glm_model_cond %>% map(coef.irr),
+    tidy_cond_irr = glm_model_cond %>% map(coef.irr),
     augment_cond = glm_model_cond %>% map(broom::augment)
   )
 
@@ -605,6 +605,7 @@ dvs_col <-
 
 dvs_col %>% 
   bind_cols(d.nest$glance %>% bind_rows) %>% 
+  round_table(quos(dv_name), 2) %>% 
   kable_format
 ```
 
@@ -613,6 +614,7 @@ dvs_col %>%
 ```{r}
 dvs_col %>% 
   bind_cols(d.nest$glance_cond %>% bind_rows) %>% 
+  round_table(quos(dv_name), 2) %>% 
   kable_format
 ```
 
@@ -631,6 +633,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy %>% bind_rows) %>% 
+  round_table(quos(dv_name, term), 2) %>% 
   kable_format
 ```
 
@@ -656,12 +659,14 @@ dvs_col_rep <- dvs_col$dv_name %>%
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond %>% bind_rows) %>% 
+  round_table(quos(dv_name, term), 2) %>% 
   kable_format
 ```
 
 #### Incidence Rate Ratio Summary of Models
 
 ```{r}
+# d.nest$tidy_cond_irr[[1]]
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond_irr %>% bind_rows) %>% 
   kable_format
@@ -680,6 +685,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_ineq_treat_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, treat_sc), 2) %>% 
   kable_format
 ```
 
@@ -695,6 +701,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_treat_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, adv_minority_sc), 2) %>% 
   kable_format
 ```
 
@@ -710,6 +717,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_ineq_cond_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, cond_sc), 2) %>% 
   kable_format
 ```
 
@@ -724,6 +732,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_cond_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, adv_minority_sc), 2) %>% 
   kable_format
 ```
 
@@ -788,7 +797,7 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit,
   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
   theme1 +
   # geom_text(aes(label = format(get(var)*100, digits = 4), y = 10), size = 8, color = "black") +
-  geom_text(aes(label = format(paste0(round(get(var), digits = 2)), digits = 3), y = position), 
+  geom_text(aes(label = format(paste0(round(get(var), digits = 1)), digits = 1), y = position), 
             size = 5, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
@@ -870,7 +879,7 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit,
   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
   theme1 +
   # geom_text(aes(label = format(get(var)*100, digits = 4), y = 10), size = 8, color = "black") +
-  geom_text(aes(label = format(paste0(round(get(var), digits = 2)), digits = 3), y = position), 
+  geom_text(aes(label = format(paste0(round(get(var), digits = 1)), digits = 1), y = position), 
             size = 3, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
@@ -1029,6 +1038,7 @@ dvs_col <-
 
 dvs_col %>% 
   bind_cols(d.nest$glance_treat_cv %>% bind_rows) %>% 
+  round_table(quos(dv_name), 2) %>% 
   kable_format
 ```
 
@@ -1037,6 +1047,7 @@ dvs_col %>%
 ```{r}
 dvs_col %>% 
   bind_cols(d.nest$glance_cond_cv %>% bind_rows) %>% 
+  round_table(quos(dv_name), 2) %>% 
   kable_format
 ```
 
@@ -1054,6 +1065,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_treat_cv %>% bind_rows) %>% 
+  round_table(quos(dv_name, term), 2) %>% 
   kable_format
 ```
 
@@ -1079,6 +1091,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond_cv %>% bind_rows) %>% 
+  round_table(quos(dv_name, term), 2) %>% 
   kable_format
 ```
 
@@ -1103,6 +1116,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_ineq_treat_cv_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, treat_sc), 2) %>% 
   kable_format
 ```
 
@@ -1117,6 +1131,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_treat_cv_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, adv_minority_sc), 2) %>% 
   kable_format
 ```
 
@@ -1132,6 +1147,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_ineq_cond_cv_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, cond_sc), 2) %>% 
   kable_format
 ```
 
@@ -1146,6 +1162,7 @@ dvs_col_rep <- dvs_col$dv_name %>%
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_cond_cv_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, adv_minority_sc), 2) %>% 
   kable_format
 ```
 
