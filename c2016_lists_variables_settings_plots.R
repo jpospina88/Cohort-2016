@@ -152,7 +152,7 @@ vars_cont <-
     pol_conslib,
     next_excited, 
     next_diffatfirst, 
-    donate_srgifttot, 
+    # donate_srgifttot, 
     donate_srgiftplan, 
     donate_srgift,
     
@@ -265,7 +265,7 @@ tribble_dv <- tribble(
   "pol_conslib",                             "Politics:\nConservative-Liberal",                     seq(1, 7, 1),       c(1, 6),        2,                    "(Senior Year Survey)",                               3,
   "next_excited",                            "Excitement for Post-college Plans",                   seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
   "next_diffatfirst",                        "Next Plans: Difficult at First",                      seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3,
-  "donate_srgifttot",                        "Amount of Money Donated",                             seq(0, 550, 25),   c(0, 550),       45,                   "(Senior Year Survey)",                               1,
+  # "donate_srgifttot",                        "Amount of Money Donated",                             seq(0, 550, 25),   c(0, 550),       45,                   "(Senior Year Survey)",                               1,
   "donate_srgiftplan",                       "Plan to Donate",                                      seq(0, 150, 25),   c(0, 150),       15,                   "(Senior Year Survey)",                               1,
   "donate_srgift",                           "Amount of Money Donated",                             seq(0, 150, 25),   c(0, 150),       15,                   "(Senior Year Survey)",                               4, 
  
