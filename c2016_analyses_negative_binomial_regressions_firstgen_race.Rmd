@@ -324,6 +324,14 @@ minority_adv_names <-
     'white first-gen' = "White FG")
 
 group_levels_disadv <- c('adv','disadv')
+
+firstgen_race_names <- 
+  c('white CG' = "White CG",
+    'white FG' = "White FG",
+    'asian CG' = "Asian CG",
+    'asian FG' = "Asian FG",
+    'minority CG' = "Minority CG",
+    'minority FG' = "Minority FG")
 ```
 
 ```{r custom functions describe sample}
@@ -390,7 +398,7 @@ d %>%
 ## By Treatment and Disadvatanged Status
 
 ```{r}
-treat_adv <- list(d$treat_sc, d$adv_minority_sc)
+treat_adv <- list(d$treat_sc, d$firstgen_race_sc)
 
 d %>% 
   select(!!!vars_count) %>% 
@@ -401,7 +409,7 @@ d %>%
 ## By Condition and Disadvatanged Status
 
 ```{r}
-cond_adv <- list(d$cond_sc, d$adv_minority_sc)
+cond_adv <- list(d$cond_sc, d$firstgen_race_sc)
 
 d %>% 
   select(!!!vars_count) %>% 
@@ -413,7 +421,7 @@ d %>%
 
 ## Example
 ```{r}
-MASS::glm.nb(visits_per_day ~ treat_sc * adv_minority_sc, data = d) %>% 
+MASS::glm.nb(visits_per_day ~ treat_sc * firstgen_race_sc, data = d) %>% 
   summary
 ```
 
@@ -462,7 +470,7 @@ ratio_est %>%
 ```
 
 ```{r}
-vars_ivs <- quos(idnum, adv_minority_sc, treat_sc, cond_sc,
+vars_ivs <- quos(idnum, firstgen_race_sc, treat_sc, cond_sc,
                  sattoact, hsrank, hsrank_no, gender)
 
 d.gather <- d %>%
@@ -479,11 +487,11 @@ d.nest <-
 # d.nest$glance[[1]]
 
 glm_model <- function(data){
-  MASS::glm.nb(dv_value ~ treat_sc * adv_minority_sc, data = data)
+  MASS::glm.nb(dv_value ~ treat_sc * firstgen_race_sc, data = data)
 }
 
 glm_model_cond <- function(data){
-  MASS::glm.nb(dv_value ~ cond_sc * adv_minority_sc, data = data)
+  MASS::glm.nb(dv_value ~ cond_sc * firstgen_race_sc, data = data)
 }
 
 d.nest %<>% mutate(glm_model = map(.x = data, .f = glm_model),
@@ -507,7 +515,7 @@ d.nest %<>%
       .l = list(
         object = glm_model, 
         specs = "treat_sc", 
-        by = "adv_minority_sc"
+        by = "firstgen_race_sc"
       ),
       .f = emmeans,
       type = "response"
@@ -528,7 +536,7 @@ d.nest %<>%
     emmean_ineq_treat = pmap( # Disadvantaged Inequality by Treatment
       .l = list(
         object = glm_model, 
-        specs = "adv_minority_sc", 
+        specs = "firstgen_race_sc", 
         by = "treat_sc"
       ),
       .f = emmeans,
@@ -551,7 +559,7 @@ d.nest %<>%
       .l = list(
         object = glm_model_cond, 
         specs = "cond_sc", 
-        by = "adv_minority_sc"
+        by = "firstgen_race_sc"
       ),
       .f = emmeans,
       type = "response"
@@ -572,7 +580,7 @@ d.nest %<>%
     emmean_ineq_cond = pmap( # Disadvantaged Inequality by Condition
       .l = list(
         object = glm_model_cond, 
-        specs = "adv_minority_sc", 
+        specs = "firstgen_race_sc", 
         by = "cond_sc"
       ),
       .f = emmeans,
@@ -605,7 +613,6 @@ dvs_col <-
 
 dvs_col %>% 
   bind_cols(d.nest$glance %>% bind_rows) %>% 
-  round_table(quos(dv_name), 2) %>% 
   kable_format
 ```
 
@@ -614,7 +621,6 @@ dvs_col %>%
 ```{r}
 dvs_col %>% 
   bind_cols(d.nest$glance_cond %>% bind_rows) %>% 
-  round_table(quos(dv_name), 2) %>% 
   kable_format
 ```
 
@@ -627,7 +633,7 @@ dvs_col %>%
 # d.nest$tidy[[1]]
 
 dvs_col_rep <- dvs_col$dv_name %>% 
-  rep(each = 10) %>% # change this number depending on the number of rows of your tidy datasets
+  rep(each = 12) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
 
@@ -653,7 +659,7 @@ dvs_col_rep %>%
 # d.nest$tidy_cond[[1]]
 
 dvs_col_rep <- dvs_col$dv_name %>% 
-  rep(each = 20) %>% # change this number depending on the number of rows of your tidy datasets
+  rep(each = 22) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
 
@@ -667,6 +673,12 @@ dvs_col_rep %>%
 
 ```{r}
 # d.nest$tidy_cond_irr[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 24) %>% # change this number depending on the number of rows of your tidy datasets
+  as.tibble %>% 
+  rename(dv_name = value)
+
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond_irr %>% bind_rows) %>% 
   kable_format
@@ -679,7 +691,7 @@ dvs_col_rep %>%
 # d.nest$emmean_ineq_treat_sc_df[[1]]
 
 dvs_col_rep <- dvs_col$dv_name %>% 
-  rep(each = 20) %>% # change this number depending on the number of rows of your tidy datasets
+  rep(each = 30) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
 
@@ -695,13 +707,13 @@ dvs_col_rep %>%
 # d.nest$emmean_treat_sc_df[[1]]
 
 dvs_col_rep <- dvs_col$dv_name %>% 
-  rep(each = 5) %>% # change this number depending on the number of rows of your tidy datasets
+  rep(each = 6) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_treat_sc_df %>% bind_rows) %>% 
-  round_table(quos(dv_name, contrast, adv_minority_sc), 2) %>% 
+  round_table(quos(dv_name, contrast, firstgen_race_sc), 2) %>% 
   kable_format
 ```
 
@@ -711,7 +723,7 @@ dvs_col_rep %>%
 # d.nest$emmean_ineq_cond_sc_df[[1]]
 
 dvs_col_rep <- dvs_col$dv_name %>% 
-  rep(each = 40) %>% # change this number depending on the number of rows of your tidy datasets
+  rep(each = 60) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
 
@@ -726,13 +738,13 @@ dvs_col_rep %>%
 ```{r}
 # d.nest$emmean_cond_sc_df[[1]]
 dvs_col_rep <- dvs_col$dv_name %>% 
-  rep(each = 30) %>% # change this number depending on the number of rows of your tidy datasets
+  rep(each = 36) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_cond_sc_df %>% bind_rows) %>% 
-  round_table(quos(dv_name, contrast, adv_minority_sc), 2) %>% 
+  round_table(quos(dv_name, contrast, firstgen_race_sc), 2) %>% 
   kable_format
 ```
 
@@ -762,11 +774,11 @@ theme <-
       element_text(
         size = 
           # 20
-          18
+          14
         , 
         family = "Helvetica"),
     axis.title = element_text(size = 22, family = "Helvetica"), 
-    strip.text.x = element_text(size = 14, colour = "white", family = "Helvetica"),
+    strip.text.x = element_text(size = 12, colour = "white", family = "Helvetica"),
     plot.title = element_text(size = 22, hjust = 0.5),
     plot.subtitle = element_text(size = 16, hjust = 0.5),
     panel.grid.major = element_blank(), 
@@ -793,7 +805,7 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit,
   filter(!is.na(get(var))) %>% 
   ggplot(aes(x = get(ftr), y = get(var), color = get(ftr), group = get(ftr))) + # Remember to add get()
   # geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), size = 42, color = "black") +
-  geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), size = 17) +
+  geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), size = 14) +
   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
   theme1 +
   # geom_text(aes(label = format(get(var)*100, digits = 4), y = 10), size = 8, color = "black") +
@@ -801,7 +813,7 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit,
             size = 5, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
-  facet_grid(, vars(adv_minority_sc), labeller = as_labeller(minority_adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  facet_grid(, vars(firstgen_race_sc), labeller = as_labeller(firstgen_race_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
   ylab("") + ggtitle(y_lab) + xlab("") + theme + guides_no +
   labs(subtitle = subheader) +
   labels_treat + color_treat + legend_treat
@@ -842,11 +854,11 @@ theme_cond <-
       element_text(
         size = 
           # 12
-          18
+          12
         , 
         family = "Helvetica"),    
     axis.title = element_text(size = 18, family = "Helvetica"), 
-    strip.text.x = element_text(size = 14, colour = "white", family = "Helvetica"), # change size of factor labels 
+    strip.text.x = element_text(size = 12, colour = "white", family = "Helvetica"), # change size of factor labels 
     plot.title = element_text(size = 18, hjust = 0.5),
     plot.subtitle = element_text(size = 14, hjust = 0.5),
     panel.grid.major = element_blank(), 
@@ -875,15 +887,15 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit,
   filter(!is.na(get(var))) %>% 
   ggplot(aes(x = get(ftr), y = get(var), color = get(ftr), group = get(ftr))) + # Remember to add get()
   # geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), size = 42, color = "black") +
-  geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), size = 9) +
+  geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), size = 7.5) +
   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
   theme1 +
   # geom_text(aes(label = format(get(var)*100, digits = 4), y = 10), size = 8, color = "black") +
   geom_text(aes(label = format(paste0(round(get(var), digits = 1)), digits = 1), y = position), 
-            size = 3, color = "black") +
+            size = 2.8, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
-  facet_grid(, vars(adv_minority_sc), labeller = as_labeller(minority_adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  facet_grid(, vars(firstgen_race_sc), labeller = as_labeller(firstgen_race_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
   ylab("") + ggtitle(y_lab) + xlab("") + theme_cond + guides_no +
   labs(subtitle = subheader) +
   labels_cond + color_cond + legend_cond
@@ -906,17 +918,17 @@ plots
 
 ## Example
 ```{r}
-MASS::glm.nb(visits_per_day ~ treat_sc * adv_minority_sc + gender + sattoact + hsrank + hsrank_no, data = d) %>% 
+MASS::glm.nb(visits_per_day ~ treat_sc * firstgen_race_sc + gender + sattoact + hsrank + hsrank_no, data = d) %>% 
   summary
 ```
 
 ```{r}
 glm_model_treat_cv <- function(data){
-  MASS::glm.nb(dv_value ~ treat_sc * adv_minority_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+  MASS::glm.nb(dv_value ~ treat_sc * firstgen_race_sc + gender + sattoact + hsrank + hsrank_no, data = data)
 }
 
 glm_model_cond_cv <- function(data){
-  MASS::glm.nb(dv_value ~ cond_sc * adv_minority_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+  MASS::glm.nb(dv_value ~ cond_sc * firstgen_race_sc + gender + sattoact + hsrank + hsrank_no, data = data)
 }
 
 d.nest %<>% mutate(glm_model_treat_cv = map(.x = data, .f = glm_model_treat_cv),
@@ -940,7 +952,7 @@ d.nest %<>%
       .l = list(
         object = glm_model_treat_cv, 
         specs = "treat_sc", 
-        by = "adv_minority_sc"
+        by = "firstgen_race_sc"
       ),
       .f = emmeans,
       type = "response"
@@ -961,7 +973,7 @@ d.nest %<>%
     emmean_ineq_treat_cv = pmap( # Disadvantaged Inequality by treat_cvment
       .l = list(
         object = glm_model_treat_cv, 
-        specs = "adv_minority_sc", 
+        specs = "firstgen_race_sc", 
         by = "treat_sc"
       ),
       .f = emmeans,
@@ -984,7 +996,7 @@ d.nest %<>%
       .l = list(
         object = glm_model_cond_cv, 
         specs = "cond_sc", 
-        by = "adv_minority_sc"
+        by = "firstgen_race_sc"
       ),
       .f = emmeans,
       type = "response"
@@ -1005,7 +1017,7 @@ d.nest %<>%
     emmean_ineq_cond_cv = pmap( # Disadvantaged Inequality by cond_cvition
       .l = list(
         object = glm_model_cond_cv, 
-        specs = "adv_minority_sc", 
+        specs = "firstgen_race_sc", 
         by = "cond_sc"
       ),
       .f = emmeans,
@@ -1038,7 +1050,6 @@ dvs_col <-
 
 dvs_col %>% 
   bind_cols(d.nest$glance_treat_cv %>% bind_rows) %>% 
-  round_table(quos(dv_name), 2) %>% 
   kable_format
 ```
 
@@ -1047,7 +1058,6 @@ dvs_col %>%
 ```{r}
 dvs_col %>% 
   bind_cols(d.nest$glance_cond_cv %>% bind_rows) %>% 
-  round_table(quos(dv_name), 2) %>% 
   kable_format
 ```
 
@@ -1059,13 +1069,12 @@ dvs_col %>%
 ```{r}
 # d.nest$tidy_treat_cv[[1]]
 dvs_col_rep <- dvs_col$dv_name %>% 
-  rep(each = 14) %>% # change this number depending on the number of rows of your tidy datasets
+  rep(each = 16) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_treat_cv %>% bind_rows) %>% 
-  round_table(quos(dv_name, term), 2) %>% 
   kable_format
 ```
 
@@ -1085,7 +1094,7 @@ dvs_col_rep %>%
 # d.nest$tidy_cond_cv[[1]]
 
 dvs_col_rep <- dvs_col$dv_name %>% 
-  rep(each = 24) %>% # change this number depending on the number of rows of your tidy datasets
+  rep(each = 26) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
 
@@ -1098,6 +1107,13 @@ dvs_col_rep %>%
 #### Incidence Rate Ratio Summary of Models
 
 ```{r}
+# d.nest$tidy_cond_cv_irr[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 28) %>% # change this number depending on the number of rows of your tidy datasets
+  as.tibble %>% 
+  rename(dv_name = value)
+
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond_cv_irr %>% bind_rows) %>% 
   kable_format
@@ -1110,7 +1126,7 @@ dvs_col_rep %>%
 ```{r}
 # d.nest$emmean_ineq_treat_cv_sc_df[[1]]
 dvs_col_rep <- dvs_col$dv_name %>% 
-  rep(each = 20) %>% # change this number depending on the number of rows of your tidy datasets
+  rep(each = 30) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
 
@@ -1125,13 +1141,13 @@ dvs_col_rep %>%
 ```{r}
 # d.nest$emmean_treat_cv_sc_df[[1]]
 dvs_col_rep <- dvs_col$dv_name %>% 
-  rep(each = 5) %>% # change this number depending on the number of rows of your tidy datasets
+  rep(each = 6) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_treat_cv_sc_df %>% bind_rows) %>% 
-  round_table(quos(dv_name, contrast, adv_minority_sc), 2) %>% 
+  round_table(quos(dv_name, contrast, firstgen_race_sc), 2) %>% 
   kable_format
 ```
 
@@ -1141,7 +1157,7 @@ dvs_col_rep %>%
 # d.nest$emmean_ineq_cond_cv_sc_df[[1]]
 
 dvs_col_rep <- dvs_col$dv_name %>% 
-  rep(each = 40) %>% # change this number depending on the number of rows of your tidy datasets
+  rep(each = 60) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
 
@@ -1156,13 +1172,13 @@ dvs_col_rep %>%
 ```{r}
 # d.nest$emmean_cond_cv_sc_df[[1]]
 dvs_col_rep <- dvs_col$dv_name %>% 
-  rep(each = 30) %>% # change this number depending on the number of rows of your tidy datasets
+  rep(each = 36) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_cond_cv_sc_df %>% bind_rows) %>% 
-  round_table(quos(dv_name, contrast, adv_minority_sc), 2) %>% 
+  round_table(quos(dv_name, contrast, firstgen_race_sc), 2) %>% 
   kable_format
 ```
 

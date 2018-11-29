@@ -397,8 +397,8 @@ tribble_dv <- tribble(
   ~dv,                          ~dv_name,                                                  ~scale,             ~limit,     ~position,   ~subheader,
   #----------------------------|----------------------------------------------------------|-------------------|-----------|-------------|-----------------------------
   "visits_per_day",             "# of Days Visited Health Center",                         seq(0, 32, 4),      c(0, 32),   4,            "(5 Years; Medical Records)",
-  "visits_per_day_mh",          "# of Days Visited Related to\nMental Health",             seq(0, 12, 3),      c(0, 12),   2,          "(5 Years; Medical Records)",
-  "visits_per_day_resp",        "# of Days Visited Related to\nRespiratory Illness",       seq(0, 5, 1),     c(0, 5),      1,          "(5 Years; Medical Records)",
+  "visits_per_day_mh",          "# of Days Visited Related to\nMental Health",             seq(0, 12, 3),      c(0, 12),   2,            "(5 Years; Medical Records)",
+  "visits_per_day_resp",        "# of Days Visited Related to\nRespiratory Illness",       seq(0, 5, 1),       c(0, 5),    1,            "(5 Years; Medical Records)",
   "visits_per_day_no_resp",     "# of Days Visited Related to\n Non-respiratory Illness",  seq(0, 32, 4),      c(0, 32),   4,            "(5 Years; Medical Records)"
 )
 

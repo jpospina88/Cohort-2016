@@ -1,0 +1,65 @@
+---
+title: "Knit analyses"
+author: "Juan Ospina"
+date: "11/28/2018"
+output: html_document
+---
+
+```{r}
+# library(knitr)
+# with tangle = TRUE, you transform the Markdown into an script
+# knit(
+#   'c2016_analyses_negative_binomial_regressions_adv_minorities.Rmd'
+#   # tangle = TRUE
+#   )
+
+# knit2html(
+#   "c2016_analyses_negative_binomial_regressions_adv_minorities.Rmd"
+#   )
+
+rmarkdown::render(
+  "c2016_analyses_linear_regressions_adv_disadv.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
+  "c2016_analyses_logistic_regressions_adv_disadv.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
+  "c2016_analyses_negative_binomial_regressions_adv_disadv.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
+  "c2016_analyses_linear_regressions_adv_minorities.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
+  "c2016_analyses_logistic_regressions_adv_minorities.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
+  "c2016_analyses_negative_binomial_regressions_adv_minorities.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
+  "c2016_analyses_linear_regressions_firstgen_race.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
+  "c2016_analyses_logistic_regressions_firstgen_race.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
+  "c2016_analyses_negative_binomial_regressions_firstgen_race.Rmd", 
+  "html_document"
+  )
+```
+

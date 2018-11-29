@@ -45,10 +45,10 @@ library(gridExtra) # For iterative plots
 
 ```{r data files}
 # For Juan
-# d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 # For RAs
-d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+# d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 options(contrasts = c("contr.helmert", "contr.poly")) # ANOVA contrasts
 ```
