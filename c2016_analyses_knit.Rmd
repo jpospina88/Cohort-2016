@@ -23,27 +23,7 @@ rmarkdown::render(
   )
 
 rmarkdown::render(
-  "c2016_analyses_logistic_regressions_adv_disadv.Rmd", 
-  "html_document"
-  )
-
-rmarkdown::render(
-  "c2016_analyses_negative_binomial_regressions_adv_disadv.Rmd", 
-  "html_document"
-  )
-
-rmarkdown::render(
   "c2016_analyses_linear_regressions_adv_minorities.Rmd", 
-  "html_document"
-  )
-
-rmarkdown::render(
-  "c2016_analyses_logistic_regressions_adv_minorities.Rmd", 
-  "html_document"
-  )
-
-rmarkdown::render(
-  "c2016_analyses_negative_binomial_regressions_adv_minorities.Rmd", 
   "html_document"
   )
 
@@ -53,7 +33,27 @@ rmarkdown::render(
   )
 
 rmarkdown::render(
+  "c2016_analyses_logistic_regressions_adv_disadv.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
+  "c2016_analyses_logistic_regressions_adv_minorities.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
   "c2016_analyses_logistic_regressions_firstgen_race.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
+  "c2016_analyses_negative_binomial_regressions_adv_disadv.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
+  "c2016_analyses_negative_binomial_regressions_adv_minorities.Rmd", 
   "html_document"
   )
 
