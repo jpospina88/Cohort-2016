@@ -1,5 +1,5 @@
 ---
-title: "C2016 Linear Regression Analyses: Advantaged vs Minorities"
+title: "C2016 Linear Regression Analyses: First-Generation Status and Race"
 author: "Juan Ospina"
 date: "2018/9/12"
 output: 
@@ -317,12 +317,21 @@ race_names <-
 
 group_levels_disadv <- c('adv','disadv')
 
-minority_adv_names <- 
+firstgen_race_names <- 
   c('adv' = "Advantaged",
     'black' = "Black",
     'hispanic' = "Hispanic",
     'pi.native' = "Pacific/Native",
     'white first-gen' = "White FG")
+
+firstgen_race_names <- 
+  c('white CG' = "White CG",
+    'white FG' = "White FG",
+    'asian CG' = "Asian CG",
+    'asian FG' = "Asian FG",
+    'minority CG' = "Minority CG",
+    'minority FG' = "Minority FG")
+
 ```
 
 ```{r custom functions describe sample}
@@ -339,7 +348,7 @@ source("R/custom_functions.R")
 
 ```{r}
 d %>% 
-  count(adv_minority_sc, adv_minority_num) %>% 
+  count(firstgen_race_sc, firstgen_race_num) %>% 
   kable_format
 ```
 
@@ -378,7 +387,7 @@ d %>%
 
 ```{r}
 treat_adv <- list(d$treat_sc, 
-                  d$adv_minority_sc
+                  d$firstgen_race_sc
                   # d$adv_hispanic_sc
                   )
 
@@ -392,7 +401,7 @@ d %>%
 
 ```{r}
 cond_adv <- list(d$cond_sc, 
-                 d$adv_minority_sc
+                 d$firstgen_race_sc
                  # d$adv_hispanic_sc
                  )
 
@@ -419,11 +428,11 @@ theme <-
       element_text(
         size = 
           # 20
-          10
+          14
         , 
         family = "Helvetica"),
     axis.title = element_text(size = 22, family = "Helvetica"), 
-    strip.text.x = element_text(size = 14, colour = "white", family = "Helvetica"),
+    strip.text.x = element_text(size = 12, colour = "white", family = "Helvetica"),
     plot.title = element_text(size = 22, hjust = 0.5),
     plot.subtitle = element_text(size = 16, hjust = 0.5),
     panel.grid.major = element_blank(), 
@@ -447,7 +456,7 @@ plot_raincloud_map_treat_adv <- function(ftr, var, y_lab, scales, limit, subhead
   # ylab(y_lab) + xlab("") + 
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
-  facet_grid(, vars(adv_minority_sc), labeller = as_labeller(minority_adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  facet_grid(, vars(firstgen_race_sc), labeller = as_labeller(firstgen_race_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
   # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) + 
   ylab("") + ggtitle(y_lab) + xlab("") + theme + guides_no +
   labs(subtitle = subheader)
@@ -459,11 +468,6 @@ plots <- mapply(plot_raincloud_map_treat_adv, # function
        SIMPLIFY = FALSE
        )
 
-# plots[[41]]
-# plots[[42]]
-# plots[[43]]
-# plots[[44]]
-# plots[[45]]
 plots
 ```
 
@@ -486,7 +490,7 @@ theme_cond <-
         family = "Helvetica"),
     axis.title = element_text(size = 18, family = "Helvetica"), 
     strip.text.x = 
-      element_text(size = 14, colour = "white", family = "Helvetica"), # change size of factor labels 
+      element_text(size = 12, colour = "white", family = "Helvetica"), # change size of factor labels 
     plot.title = element_text(size = 18, hjust = 0.5),
     plot.subtitle = element_text(size = 14, hjust = 0.5),
     panel.grid.major = element_blank(), 
@@ -511,7 +515,7 @@ plot_raincloud_map_cond_adv <- function(ftr, var, y_lab, scales, limit, subheade
   # ylab(y_lab) + xlab("") + 
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
-  facet_grid(, vars(adv_minority_sc), labeller = as_labeller(minority_adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  facet_grid(, vars(firstgen_race_sc), labeller = as_labeller(firstgen_race_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
   # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) + 
   ylab("") + ggtitle(y_lab) + xlab("") + theme_cond + guides_no +
   labs(subtitle = subheader)
@@ -540,10 +544,10 @@ Effect sizes (Cohen's *d*) between advantaged and advantaged and minority studen
 cohend_ineq <- 
   cohen.d.by(x = d %>% 
                select(treat_num, 
-                      adv_minority_num,
+                      firstgen_race_num,
                       # adv_hispanic_num,
                       !!!vars_cont), 
-             group = "adv_minority_num",
+             group = "firstgen_race_num",
              # group = "adv_hispanic_num",
              group2 = "treat_num", 
              alpha = .05) 
@@ -553,7 +557,7 @@ cohend_ineq
 # cohend_ineq <- 
 #   cohend_ineq %>%
 #   rownames_to_column() %>% 
-#   filter(rowname == "adv_minority_numfortreat_num0") %>%
+#   filter(rowname == "firstgen_race_numfortreat_num0") %>%
 #   select(-rowname) %>%
 #   round(., digits = 2)
 ```
@@ -566,11 +570,11 @@ cohend_ineq
 cohend_disadv_all <- 
   cohen.d(d %>% 
             select(
-              adv_minority_num,
+              firstgen_race_num,
               # adv_hispanic_num,
               !!!vars_cont), 
           group = 
-            "adv_minority_num",
+            "firstgen_race_num",
             # "adv_hispanic_num",
           alpha = .05)
 
@@ -632,20 +636,20 @@ cohend_wf_all
 
 Effect sizes (Cohen's *d*) between control and any treatment for advantaged and advantaged and minority students :
 
-```{r}
-# d %>% count(disadv, adv_minority_num) %>% select(-n)
+```{r eval=FALSE, include=FALSE}
+# d %>% count(disadv, firstgen_race_num) %>% select(-n)
 
 cohend_treat <- 
   cohen.d.by(
     x = d %>% 
       select(
         treat_num, 
-        adv_minority_num,
+        firstgen_race_num,
         # adv_hispanic_num,
         !!!vars_cont), 
     group = "treat_num", 
     group2 = 
-      "adv_minority_num",
+      "firstgen_race_num",
       # "adv_hispanic_num",
     alpha = .05)
 
@@ -653,7 +657,7 @@ cohend_treat <-
 
 # cohend_treat %<>% 
 #   rownames_to_column() %>% 
-#   # filter(rowname == "treat_numforadv_minority_num1") %>% 
+#   # filter(rowname == "treat_numforfirstgen_race_num1") %>% 
 #   select(-rowname) %>%
 #   round(., digits = 2)
 
@@ -664,19 +668,19 @@ cohend_treat
 
 #### Belonging
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 cohend_bel <- 
   cohen.d.by(
     x = d %>% 
       select(
         cd_bel_num,
-        adv_minority_num,
+        firstgen_race_num,
         # adv_hispanic_num,
         !!!vars_cont
         ), 
     group = "cd_bel_num", 
     group2 = 
-      "adv_minority_num",
+      "firstgen_race_num",
       # "adv_hispanic_num",
     alpha = .05
     )
@@ -685,7 +689,7 @@ cohend_bel <-
 
 # cohend_bel %<>% 
 #   rownames_to_column() %>% 
-#   # filter(rowname == "cd_bel_numforadv_minority_num1") %>% 
+#   # filter(rowname == "cd_bel_numforfirstgen_race_num1") %>% 
 #   select(-rowname) %>% 
 #   round(., digits = 2)
 
@@ -693,19 +697,19 @@ cohend_bel
 ```
 
 #### Culture
-```{r}
+```{r eval=FALSE, include=FALSE}
 cohend_cul <- 
   cohen.d.by(
     x = d %>% 
       select(
         cd_cul_num, 
-        adv_minority_num,
+        firstgen_race_num,
         # adv_hispanic_num,
         !!!vars_cont
         ), 
     group = "cd_cul_num", 
     group2 = 
-      "adv_minority_num",
+      "firstgen_race_num",
       # "adv_hispanic_num",
     alpha = .05
     ) 
@@ -714,7 +718,7 @@ cohend_cul <-
 
 # cohend_cul %<>% 
 #   rownames_to_column() %>% 
-#   # filter(rowname == "cd_cul_numforadv_minority_num1") %>% 
+#   # filter(rowname == "cd_cul_numforfirstgen_race_num1") %>% 
 #   select(-rowname) %>% 
 #   round(., digits = 2)
 
@@ -722,19 +726,19 @@ cohend_cul
 ```
 
 #### Wise Feedback
-```{r}
+```{r eval=FALSE, include=FALSE}
 cohend_wf <- 
   cohen.d.by(
     x = d %>% 
       select(
         cd_wf_num, 
-        adv_minority_num,
+        firstgen_race_num,
         # adv_hispanic_sc,
         !!!vars_cont
         ), 
     group = "cd_wf_num", 
     group2 = 
-      "adv_minority_num",
+      "firstgen_race_num",
       # "adv_hispanic_sc",
     alpha = .05) 
 
@@ -742,7 +746,7 @@ cohend_wf <-
 
 # cohend_wf %<>% 
 #   rownames_to_column() %>% 
-#   # filter(rowname == "cd_wf_numforadv_minority_num1") %>% 
+#   # filter(rowname == "cd_wf_numforfirstgen_race_num1") %>% 
 #   select(-rowname) %>% 
 #   round(., digits = 2)
 
@@ -754,24 +758,24 @@ cohend_wf
 ## Example
 ```{r}
 lm(cum_gpa_y4_spring ~ 
-     treat_sc*adv_minority_sc,
+     treat_sc*firstgen_race_sc,
    # treat_sc*adv_hispanic_sc,
    data = d
    ) %>% summary
 ```
 
 ```{r}
-# d.model <- d %>% select(treat_sc, adv_minority_sc, !!!vars_cont)
+# d.model <- d %>% select(treat_sc, firstgen_race_sc, !!!vars_cont)
 # 
-# models_lm <- d.model %>% select(-c(treat_sc, adv_minority_sc)) %>%
-#   map(function(dv) lm(dv ~ d$treat_sc*d$adv_minority_sc, data = .)) 
+# models_lm <- d.model %>% select(-c(treat_sc, firstgen_race_sc)) %>%
+#   map(function(dv) lm(dv ~ d$treat_sc*d$firstgen_race_sc, data = .)) 
 ```
 
 ```{r}
 vars_ivs <- 
   quos(
     idnum, # IDs
-    adv_minority_sc, # groups
+    firstgen_race_sc, # groups
     treat_sc, cond_sc, # conditions
     sattoact, hsrank, hsrank_no, gender # covariates
   )
@@ -790,12 +794,12 @@ d.nest <-
 # d.nest$data[[1]]
 
 lm_model <- function(data){
-  lm(dv_value ~ treat_sc*adv_minority_sc, data = data)
+  lm(dv_value ~ treat_sc*firstgen_race_sc, data = data)
   # lm(dv_value ~ treat_sc*adv_hispanic_sc, data = data)
 }
 
 lm_model_cond <- function(data){
-  lm(dv_value ~ cond_sc*adv_minority_sc, data = data)
+  lm(dv_value ~ cond_sc*firstgen_race_sc, data = data)
   # lm(dv_value ~ cond_sc*adv_hispanic_sc, data = data)
 }
 
@@ -821,7 +825,7 @@ d.nest %<>%
         object = lm_model, 
         specs = "treat_sc", 
         by = 
-          "adv_minority_sc"
+          "firstgen_race_sc"
           # "adv_hispanic_sc"
       ),
       .f = emmeans
@@ -843,7 +847,7 @@ d.nest %<>%
       .l = list(
         object = lm_model, 
         specs = 
-          "adv_minority_sc"
+          "firstgen_race_sc"
           # "adv_hispanic_sc"
         , 
         by = "treat_sc"
@@ -868,7 +872,7 @@ d.nest %<>%
         object = lm_model_cond, 
         specs = "cond_sc", 
         by = 
-          "adv_minority_sc"
+          "firstgen_race_sc"
           # "adv_hispanic_sc"
       ),
       .f = emmeans
@@ -890,7 +894,7 @@ d.nest %<>%
       .l = list(
         object = lm_model_cond, 
         specs = 
-          "adv_minority_sc"
+          "firstgen_race_sc"
           # "adv_hispanic_sc"
         , 
         by = "cond_sc"
@@ -946,11 +950,15 @@ dvs_col %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        10 # change this number depending on the number of rows of your tidy datasets
-        # 6
+        12 # change this number depending on the number of rows of your tidy datasets
       ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
+
+# The variable "donate_srgifttot" is the one that has less rows. Right now it is row 99.
+# check error from variable below
+# bind_cols(d.nest$tidy)
+# d.nest$tidy[[99]]
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy %>% bind_rows) %>% 
@@ -962,29 +970,44 @@ dvs_col_rep %>%
 ```{r}
 # d.nest$tidy_cond[[1]]
 
+repetitions <- 
+  bind_rows(d.nest$tidy_cond) %>% 
+  rownames_to_column %>% 
+  filter(term == "(Intercept)") %>% 
+  bind_cols(dvs_col) %>% 
+  select(rowname, dv_name) %>% 
+  mutate(
+    rowname_num = as.numeric(rowname),
+    repetitions = lead(rowname_num) - rowname_num
+    ) %>% 
+  select(-rowname) %>% 
+  rownames_to_column %>% 
+  mutate(
+    repetitions = ifelse(dv_name == "activism_engaged", 24, repetitions) # remember to change the last variable and the times
+  )
+
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(
-    each = 
-      20 # change this number depending on the number of rows of your tidy datasets
+    times = 
+      repetitions$repetitions # change this number depending on the number of rows of your tidy datasets
       # 12
     ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
 
-# The variable "donate_srgifttot" is the one that has less rows. Right now it is row 99.
-# d.nest %>% select(dv_name) %>% View
-# dvs_col_rep
-# d.nest %>% head
-# d.nest$tidy_cond_cv[[99]]
-# d.nest[99,]$tidy_cond_cv
-# 20*99
-# dvs_col_rep <- dvs_col_rep[-c(1980), ] # Remember to change this as we add more variables
+# dvs_col_rep <- dvs_col$dv_name %>% 
+#   rep(
+#     times = 
+#       24 # change this number depending on the number of rows of your tidy datasets
+#       # 12
+#     ) %>% 
+#   as.tibble %>% 
+#   rename(dv_name = value)
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond %>% bind_rows) %>% 
   round_table(quos(dv_name, term), 2) %>% 
   kable_format
-
 ```
 
 ## Simple Effects
@@ -994,10 +1017,10 @@ dvs_col_rep %>%
 ```{r}
 # d.nest$emmean_ineq_treat_sc_df[[1]]
 
-dvs_col_rep <- dvs_col$dv_name %>% 
+dvs_col_rep <- dvs_col$dv_name %>%
   rep(
     each = 
-      20 # change this number depending on the number of rows of your tidy datasets
+      30 # change this number depending on the number of rows of your tidy datasets
       # 6
     ) %>% 
   as.tibble %>% 
@@ -1012,13 +1035,12 @@ dvs_col_rep %>%
 ### Treatment Effects by Advantaged and Minority Students
 
 ```{r}
-# d.nest$emmean_treat_sc_df[[1]]
+d.nest$emmean_treat_sc_df[[1]]
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(
     each = 
-      5 # change this number depending on the number of rows of your tidy datasets
-      # 3
+      6 # change this number depending on the number of rows of your tidy datasets
     ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
@@ -1029,7 +1051,7 @@ dvs_col_rep %>%
     quos(
       dv_name, 
       contrast, 
-      adv_minority_sc
+      firstgen_race_sc
       # adv_hispanic_sc
     ), 2) %>% 
   kable_format
@@ -1039,9 +1061,9 @@ dvs_col_rep %>%
 ```{r}
 # d.nest$emmean_ineq_cond_sc_df[[1]]
 
-dvs_col_rep <- dvs_col$dv_name %>% 
+dvs_col_rep <- dvs_col$dv_name %>%
   rep(each = 
-        40 # change this number depending on the number of rows of your tidy datasets
+        60 # change this number depending on the number of rows of your tidy datasets
         # 12
       ) %>% 
   as.tibble %>% 
@@ -1060,7 +1082,7 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        30 # change this number depending on the number of rows of your tidy datasets
+        36 # change this number depending on the number of rows of your tidy datasets
         # 18
       ) %>% 
   as.tibble %>% 
@@ -1072,7 +1094,7 @@ dvs_col_rep %>%
     quos(
       dv_name, 
       contrast, 
-      adv_minority_sc
+      firstgen_race_sc
       # adv_hispanic_sc
       ), 
     2) %>% 
@@ -1100,14 +1122,14 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit, positio
   geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), 
                size = 
                  # 41
-                 17
+                 14
                ) +
   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
   theme1 +
   geom_text(aes(label = format(get(var), digits = decimal), y = position), size = 5, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
-  facet_grid(, vars(adv_minority_sc), labeller = as_labeller(minority_adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  facet_grid(, vars(firstgen_race_sc), labeller = as_labeller(firstgen_race_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
   # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) +
   ylab("") + ggtitle(y_lab) + xlab("") + theme + guides_no +
   labs(subtitle = subheader) + 
@@ -1141,20 +1163,18 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit, position
     aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), 
     size = 
       # 24 # change from disadvantaged to other groups
-      9
+      7.5
     ) +
   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
   theme1 +
-  geom_text(aes(label = format(get(var), digits = decimal), y = position), size = 3.5, color = "black") +
+  geom_text(aes(label = format(get(var), digits = decimal), y = position), size = 2.8, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
-  facet_grid(, vars(adv_minority_sc), labeller = as_labeller(minority_adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  facet_grid(, vars(firstgen_race_sc), labeller = as_labeller(firstgen_race_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
   # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) +
   ylab("") + ggtitle(y_lab) + xlab("") + theme_cond + guides_no +
   labs(subtitle = subheader) + 
   labels_cond + color_cond + legend_cond
-
-
 
 plots <- mapply(plot_bar_x_y_group_cond_adv, # function
        tribble_cont[,"cond_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
@@ -1166,50 +1186,24 @@ plots <- mapply(plot_bar_x_y_group_cond_adv, # function
 plots
 ```
 
-```{r eval=FALSE, include=FALSE}
-# plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit) d.unnest_cond %>% 
-#   filter(!is.na(get(var))) %>% 
-#   ggplot(aes(x = get(ftr), y = get(var), fill = get(ftr), group = get(ftr))) + # Remember to add get()
-#   geom_bar(position = pd1, stat = "identity") + 
-#   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .2, position = pd2) +
-#   theme1 + guides_no + 
-#   geom_text(aes(label = format(get(var), digits = 3), y = 1)) +
-#   coord_cartesian(ylim = limit) +
-#   scale_y_continuous(breaks = scales) +
-#   facet_grid(, vars(adv_minority_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
-#   labels_cond + color_cond + ylab(y_lab) + xlab("") + theme.cond
-# 
-# # [3,] factor
-# # [1,] var or dv
-# # [2,] names of dv (y_lab)
-# # mapply(plot_bar_x_y_group_treat_adv, matrix_comb[3,], matrix_comb[1,], matrix_comb[2,], SIMPLIFY = F)
-# 
-# plots <- mapply(plot_bar_x_y_group_cond_adv, # function
-#        tribble_cont[,"cond_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
-#        tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
-#        tribble_cont[,"limit"] %>% t, SIMPLIFY = F)
-# 
-# plots[[2]]
-```
-
 # Models with covariates
 
 ## Example
 ```{r}
 lm(cum_gpa_y4_spring ~ 
-     treat_sc*adv_minority_sc +
+     treat_sc*firstgen_race_sc +
      # treat_sc*adv_hispanic_sc +
      gender + sattoact + hsrank + hsrank_no, data = d) %>% summary
 ```
 
 ```{r}
 lm_model_treat_cv <- function(data){
-  lm(dv_value ~ treat_sc*adv_minority_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+  lm(dv_value ~ treat_sc*firstgen_race_sc + gender + sattoact + hsrank + hsrank_no, data = data)
   # lm(dv_value ~ treat_sc*adv_hispanic_sc + gender + sattoact + hsrank + hsrank_no, data = data)
 }
 
 lm_model_cond_cv <- function(data){
-  lm(dv_value ~ cond_sc*adv_minority_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+  lm(dv_value ~ cond_sc*firstgen_race_sc + gender + sattoact + hsrank + hsrank_no, data = data)
   # lm(dv_value ~ cond_sc*adv_hispanic_sc + gender + sattoact + hsrank + hsrank_no, data = data)
 }
 
@@ -1235,7 +1229,7 @@ d.nest %<>%
         object = lm_model_treat_cv, 
         specs = "treat_sc", 
         by = 
-          "adv_minority_sc"
+          "firstgen_race_sc"
           # "adv_hispanic_sc"
       ),
       .f = emmeans
@@ -1257,7 +1251,7 @@ d.nest %<>%
       .l = list(
         object = lm_model_treat_cv, 
         specs = 
-          "adv_minority_sc"
+          "firstgen_race_sc"
           # "adv_hispanic_sc"
         , 
         by = "treat_sc"
@@ -1282,7 +1276,7 @@ d.nest %<>%
         object = lm_model_cond_cv, 
         specs = "cond_sc", 
         by = 
-          "adv_minority_sc"
+          "firstgen_race_sc"
           # "adv_hispanic_sc"
       ),
       .f = emmeans
@@ -1304,7 +1298,7 @@ d.nest %<>%
       .l = list(
         object = lm_model_cond_cv, 
         specs = 
-          "adv_minority_sc"
+          "firstgen_race_sc"
           # "adv_hispanic_sc"
         , 
         by = "cond_sc"
@@ -1363,7 +1357,7 @@ dvs_col %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        14 # change this number depending on the number of rows of your tidy datasets
+        16 # change this number depending on the number of rows of your tidy datasets
         # 10
       ) %>% 
   as.tibble %>% 
@@ -1381,27 +1375,41 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        24 # change this number depending on the number of rows of your tidy datasets
+        28 # change this number depending on the number of rows of your tidy datasets
         # 16
       ) %>% 
   as.tibble %>% 
   rename(dv_name = value)
 
-# The variable "donate_srgifttot" is the one that has less rows. Right now it is row 99.
-# d.nest %>% select(dv_name) %>% View
-# dvs_col_rep
-# d.nest %>% head
-# d.nest$tidy_cond_cv[[99]]
-# d.nest[99,]$tidy_cond_cv
-# 24*99
-# dvs_col_rep <- dvs_col_rep[-c(2376), ] # Remember to change this as we add more variables
+repetitions <- 
+  bind_rows(d.nest$tidy_cond_cv) %>% # change the column of the nested dataset
+  rownames_to_column %>% 
+  filter(term == "(Intercept)") %>% 
+  bind_cols(dvs_col) %>% 
+  select(rowname, dv_name) %>% 
+  mutate(
+    rowname_num = as.numeric(rowname),
+    repetitions = lead(rowname_num) - rowname_num
+    ) %>% 
+  select(-rowname) %>% 
+  rownames_to_column %>% 
+  mutate(
+    repetitions = ifelse(dv_name == "activism_engaged", 28, repetitions) # remember to change the last variable and the times
+  )
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(
+    times = 
+      repetitions$repetitions # change this number depending on the number of rows of your tidy datasets
+      # 12
+    ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
 
 dvs_col_rep %>% 
   bind_cols(d.nest$tidy_cond_cv %>% bind_rows) %>% 
   round_table(quos(dv_name, term), 2) %>% 
   kable_format
-
-
 ```
 
 ## Simple Effects
@@ -1413,7 +1421,7 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        20  # change this number depending on the number of rows of your tidy datasets
+        30  # change this number depending on the number of rows of your tidy datasets
         # 6
       ) %>%
   as.tibble %>% 
@@ -1432,7 +1440,7 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        5 # change this number depending on the number of rows of your tidy datasets
+        6 # change this number depending on the number of rows of your tidy datasets
         # 3
       ) %>% 
   as.tibble %>% 
@@ -1444,7 +1452,7 @@ dvs_col_rep %>%
     quos(
       dv_name, 
       contrast, 
-      adv_minority_sc
+      firstgen_race_sc
       # adv_hispanic_sc
       ), 
     2) %>% 
@@ -1458,7 +1466,7 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        40 # change this number depending on the number of rows of your tidy datasets
+        60 # change this number depending on the number of rows of your tidy datasets
         # 12
       ) %>% 
   as.tibble %>% 
@@ -1483,7 +1491,7 @@ dvs_col_rep %>%
 
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 
-        30 # change this number depending on the number of rows of your tidy datasets
+        36 # change this number depending on the number of rows of your tidy datasets
         # 18
       ) %>% 
   as.tibble %>% 
@@ -1495,7 +1503,7 @@ dvs_col_rep %>%
     quos(
       dv_name, 
       contrast, 
-      adv_minority_sc
+      firstgen_race_sc
       # adv_hispanic_sc
       ),
     2) %>% 
