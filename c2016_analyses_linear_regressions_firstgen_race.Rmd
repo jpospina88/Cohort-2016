@@ -636,7 +636,7 @@ cohend_wf_all
 
 Effect sizes (Cohen's *d*) between control and any treatment for advantaged and advantaged and minority students :
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # d %>% count(disadv, firstgen_race_num) %>% select(-n)
 
 cohend_treat <- 
@@ -668,7 +668,7 @@ cohend_treat
 
 #### Belonging
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 cohend_bel <- 
   cohen.d.by(
     x = d %>% 
@@ -697,7 +697,7 @@ cohend_bel
 ```
 
 #### Culture
-```{r}
+```{r eval=FALSE, include=FALSE}
 cohend_cul <- 
   cohen.d.by(
     x = d %>% 
@@ -726,7 +726,7 @@ cohend_cul
 ```
 
 #### Wise Feedback
-```{r}
+```{r eval=FALSE, include=FALSE}
 cohend_wf <- 
   cohen.d.by(
     x = d %>% 
