@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 ```{r}
 # install.packages(c("corrplot", "effsize", "formattable", "googlesheets"))
 library(magrittr)
-library(Hmisc)
+# library(Hmisc)
 library(RColorBrewer)
 library(reshape2)
 library(corrplot)
@@ -398,43 +398,89 @@ d_intv %>% count(weight_happy, weight_happy_rc)
 
 vector_weight <- quos(weight_happy_rc, weight_feelbad, weight_trylose)
 
-d_intv %>% select(!!!vector_weight) %>% as.matrix() %>% rcorr()
+d_intv %>% select(!!!vector_weight) %>% as.matrix() %>% Hmisc::rcorr()
 
 alphatize_2(d_intv, vector_weight)
 
 d_intv <- cv_compute(data = d_intv, cv_name = weight_comp3, cv_vector = vector_weight)
 ```
+
 ```{r variables premat intv}
-vars_iData <- quos(
-  iCohort_numeric, t1startsmodule, 
-  t1quotesstart, t1essaycomplete, t1measuresstart, t1measuresfinish, t1allcomplete, t1howcomplete, 
-  t1text_assent1, t1text_consent, t1timecomp_writingessay, t1timecomp_readingexpmaterials, 
-  iHSGpa, iHSPostal, iHSCity, iHSState, iHSCountry, t1finished, t1essay, t1culture_essay, t1belonging_essay1, t1belonging_essay2, t1feedback_essay, t1ECreasonableMNC, t1ECreasonableKBL, t1ECpersonalMNC, t1ECpersonalKBL,
-  t1manipcheck,
-  t1opportunity_joincommunities, t1opportunity_joincommunities, t1opportunity_giveback, t1opportunity_exploreinterests, t1opportunity_becomeindepthinker, t1thinkahead_text,
-  t1fall_fitin,t1fall_belong,t1fall_feelathome,
-  t1critfeedback_improvegrow,t1critfeedback_distinguishbtwnSs,t1excited,t1enjoy,t1fun ,t1transitiondifficultatfirst,t1experiencedifficultiesatfirst,t1fitin_sophomore,t1belong_sophomore                                ,t1athome_sophomore                                
- ,t1posfeelings_profsTAs                            
- ,t1posfeelings_gettingtoknowotherSs                
- ,t1posfeelings_beingawayfromhome                   
- ,t1posfeelings_receivingfeedback                   
- ,t1negfeelings_profsTAs                            
-,t1negfeelings_gettingtoknowotherSs                
- ,t1negfeelings_beingawayfromhome                   
- ,t1negfeelings_receivingfeedback                   
-, t1handleit_profsTAs                               
-, t1handleit_gettingtoknowotherSs                   
-, t1handleit_beingawayfromhome                      
-,t1handleit_receivingfeedback                      
-, t1mostlookingforwardto                            
-, t1mostlookfwd_timing                              
-, t1learnanything                                   
-, t1learnanything_yeswhat                           
-, t1learnanything_timing)
+vars_iData <- 
+  quos(
+    iCohort_numeric, 
+    Y1_Spring_CumGPA, 
+    Y2_Sp_CumGPA,
+    t1startsmodule, 
+    t1quotesstart,
+    t1essaycomplete, 
+    t1measuresstart, 
+    t1measuresfinish, 
+    t1allcomplete, 
+    t1howcomplete, 
+    t1text_assent1, 
+    t1text_consent, 
+    t1timecomp_writingessay, 
+    t1timecomp_readingexpmaterials, 
+    iHSGpa, 
+    iHSPostal, 
+    iHSCity, 
+    iHSState, 
+    iHSCountry, 
+    t1finished, 
+    t1essay, 
+    t1culture_essay, 
+    t1belonging_essay1, 
+    t1belonging_essay2, 
+    t1feedback_essay, 
+    t1ECreasonableMNC, 
+    t1ECreasonableKBL, 
+    t1ECpersonalMNC, 
+    t1ECpersonalKBL,
+    t1manipcheck,
+    t1opportunity_joincommunities, 
+    t1opportunity_joincommunities, 
+    t1opportunity_giveback, 
+    t1opportunity_exploreinterests, 
+    t1opportunity_becomeindepthinker, 
+    t1thinkahead_text,
+    t1fall_fitin,
+    t1fall_belong,
+    t1fall_feelathome,
+    t1critfeedback_improvegrow,
+    t1critfeedback_distinguishbtwnSs,
+    t1excited,
+    t1enjoy,
+    t1fun,
+    t1transitiondifficultatfirst,
+    t1experiencedifficultiesatfirst,
+    t1fitin_sophomore,
+    t1belong_sophomore,
+    t1athome_sophomore,
+    t1posfeelings_profsTAs,
+    t1posfeelings_gettingtoknowotherSs,
+    t1posfeelings_beingawayfromhome,
+    t1posfeelings_receivingfeedback,
+    t1negfeelings_profsTAs,
+    t1negfeelings_gettingtoknowotherSs,
+    t1negfeelings_beingawayfromhome,
+    t1negfeelings_receivingfeedback, 
+    t1handleit_profsTAs, 
+    t1handleit_gettingtoknowotherSs,
+    t1handleit_beingawayfromhome,
+    t1handleit_receivingfeedback, 
+    t1mostlookingforwardto,
+    t1mostlookfwd_timing,
+    t1learnanything,
+    t1learnanything_yeswhat,
+    t1learnanything_timing
+  )
 
-
-
-# iData %>% select(!!!vars_iData)
+# d_intv %>% 
+#   select(
+#     Y1_Spring_CumGPA, 
+#     Y2_Sp_CumGPA
+#   )
 ```
 
 
