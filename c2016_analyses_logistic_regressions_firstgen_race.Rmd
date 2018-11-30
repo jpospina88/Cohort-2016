@@ -556,7 +556,7 @@ d.nest %<>%
       .x = emmean_treat_b_sc, 
       .f = data.frame),
     
-    emmean_ineq_treat = pmap( # Disadvantaged Inequality by Treatment
+    emmean_ineq_treat = pmap( # Inequality by Treatment
       .l = list(
         object = glm_model, 
         specs = "firstgen_race_sc", 
@@ -578,7 +578,7 @@ d.nest %<>%
       .x = emmean_ineq_treat_sc, 
       .f = data.frame),
     
-    emmean_ineq_treat_b = pmap( # Disadvantaged Inequality by Treatment
+    emmean_ineq_treat_b = pmap( # Inequality by Treatment
       .l = list(
         object = glm_model, 
         specs = "firstgen_race_sc", 
@@ -644,7 +644,7 @@ d.nest %<>%
       .x = emmean_cond_b_sc, 
       .f = data.frame),
     
-    emmean_ineq_cond = pmap( # Disadvantaged Inequality by Condition
+    emmean_ineq_cond = pmap( # Inequality by Condition
       .l = list(
         object = glm_model_cond, 
         specs = "firstgen_race_sc", 
@@ -666,7 +666,7 @@ d.nest %<>%
       .x = emmean_ineq_cond_sc, 
       .f = data.frame),
     
-    emmean_ineq_cond_b = pmap( # Disadvantaged Inequality by Condition (beta)
+    emmean_ineq_cond_b = pmap( # Inequality by Condition (beta)
       .l = list(
         object = glm_model_cond, 
         specs = "firstgen_race_sc", 
@@ -1135,7 +1135,7 @@ d.nest %<>%
       .x = emmean_treat_cv_b_sc, 
       .f = data.frame),
     
-    emmean_ineq_treat_cv = pmap( # Disadvantaged Inequality by treatment
+    emmean_ineq_treat_cv = pmap( # Inequality by treatment
       .l = list(
         object = glm_model_treat_cv, 
         specs = "firstgen_race_sc", 
@@ -1157,7 +1157,7 @@ d.nest %<>%
       .x = emmean_ineq_treat_cv_sc, 
       .f = data.frame),
     
-    emmean_ineq_treat_cv_b = pmap( # Disadvantaged Inequality by treatment (beta)
+    emmean_ineq_treat_cv_b = pmap( # Inequality by treatment (beta)
       .l = list(
         object = glm_model_treat_cv, 
         specs = "firstgen_race_sc", 
@@ -1223,7 +1223,7 @@ d.nest %<>%
       .x = emmean_cond_cv_b_sc, 
       .f = data.frame),
     
-    emmean_ineq_cond_cv = pmap( # Disadvantaged Inequality by condition
+    emmean_ineq_cond_cv = pmap( # Inequality by condition
       .l = list(
         object = glm_model_cond_cv, 
         specs = "firstgen_race_sc", 
@@ -1245,7 +1245,7 @@ d.nest %<>%
       .x = emmean_ineq_cond_cv_sc, 
       .f = data.frame),
     
-    emmean_ineq_cond_cv_b = pmap( # Disadvantaged Inequality by condition (beta)
+    emmean_ineq_cond_cv_b = pmap( # Inequality by condition (beta)
       .l = list(
         object = glm_model_cond_cv, 
         specs = "firstgen_race_sc", 
