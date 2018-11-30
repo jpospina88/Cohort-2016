@@ -511,7 +511,7 @@ d.nest %<>%
 
 d.nest %<>% 
   mutate(
-    emmean_treat = pmap(
+    emmean_treat = pmap( # Treatment effect
       .l = list(
         object = glm_model, 
         specs = "treat_sc", 
@@ -533,7 +533,29 @@ d.nest %<>%
       .x = emmean_treat_sc, 
       .f = data.frame),
     
-    emmean_ineq_treat = pmap( # Disadvantaged Inequality by Treatment
+    emmean_treat_b = pmap( # Treatment effect (beta)
+      .l = list(
+        object = glm_model, 
+        specs = "treat_sc", 
+        by = "firstgen_race_sc"
+      ),
+      .f = emmeans
+      # type = "response"
+    ),
+    emmean_treat_b_df = map(
+      .x = emmean_treat_b, 
+      .f = data.frame),
+    emmean_treat_b_sc = map(
+      .x = emmean_treat_b,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_treat_b_sc_df = map(
+      .x = emmean_treat_b_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_treat = pmap( # Inequality by Treatment
       .l = list(
         object = glm_model, 
         specs = "firstgen_race_sc", 
@@ -553,6 +575,28 @@ d.nest %<>%
     ),
     emmean_ineq_treat_sc_df = map(
       .x = emmean_ineq_treat_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_treat_b = pmap( # Inequality by Treatment
+      .l = list(
+        object = glm_model, 
+        specs = "firstgen_race_sc", 
+        by = "treat_sc"
+      ),
+      .f = emmeans
+      # type = "response" 
+    ),
+    emmean_ineq_treat_b_df = map(
+      .x = emmean_ineq_treat_b, 
+      .f = data.frame),
+    emmean_ineq_treat_b_sc = map(
+      .x = emmean_ineq_treat_b,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_ineq_treat_b_sc_df = map(
+      .x = emmean_ineq_treat_b_sc, 
       .f = data.frame),
     
     emmean_cond = pmap( # Condition effects
@@ -577,7 +621,29 @@ d.nest %<>%
       .x = emmean_cond_sc, 
       .f = data.frame),
     
-    emmean_ineq_cond = pmap( # Disadvantaged Inequality by Condition
+    emmean_cond_b = pmap( # Condition effects (beta)
+      .l = list(
+        object = glm_model_cond, 
+        specs = "cond_sc", 
+        by = "firstgen_race_sc"
+      ),
+      .f = emmeans
+      # type = "response"
+    ),
+    emmean_cond_b_df = map(
+      .x = emmean_cond_b, 
+      .f = data.frame),
+    emmean_cond_b_sc = map(
+      .x = emmean_cond_b,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_cond_b_sc_df = map(
+      .x = emmean_cond_b_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_cond = pmap( # Inequality by Condition
       .l = list(
         object = glm_model_cond, 
         specs = "firstgen_race_sc", 
@@ -597,6 +663,28 @@ d.nest %<>%
     ),
     emmean_ineq_cond_sc_df = map(
       .x = emmean_ineq_cond_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_cond_b = pmap( # Inequality by Condition (beta)
+      .l = list(
+        object = glm_model_cond, 
+        specs = "firstgen_race_sc", 
+        by = "cond_sc"
+      ),
+      .f = emmeans
+      # type = "response"
+    ),
+    emmean_ineq_cond_b_df = map(
+      .x = emmean_ineq_cond_b, 
+      .f = data.frame),
+    emmean_ineq_cond_b_sc = map(
+      .x = emmean_ineq_cond_b,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_ineq_cond_b_sc_df = map(
+      .x = emmean_ineq_cond_b_sc, 
       .f = data.frame)
   )
 ```
@@ -629,6 +717,7 @@ dvs_col %>%
 
 ### By Treatment and Disadvantaged Status
 #### Regular Summary of Models
+
 ```{r}
 # d.nest$tidy[[1]]
 
@@ -687,6 +776,8 @@ dvs_col_rep %>%
 
 ### Disadvantaged Inequality By Any Treatment
 
+#### Regular Summary of Models
+
 ```{r}
 # d.nest$emmean_ineq_treat_sc_df[[1]]
 
@@ -696,12 +787,25 @@ dvs_col_rep <- dvs_col$dv_name %>%
   rename(dv_name = value)
 
 dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_ineq_treat_b_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, treat_sc), 2) %>% 
+  kable_format
+```
+
+#### Incidence Rate Ratio Summary of Models
+
+```{r}
+# d.nest$emmean_ineq_treat_sc_df[[1]]
+
+dvs_col_rep %>% 
   bind_cols(d.nest$emmean_ineq_treat_sc_df %>% bind_rows) %>% 
   round_table(quos(dv_name, contrast, treat_sc), 2) %>% 
   kable_format
 ```
 
 ### Treatment Effects
+
+#### Regular Summary of Models
 
 ```{r}
 # d.nest$emmean_treat_sc_df[[1]]
@@ -712,12 +816,25 @@ dvs_col_rep <- dvs_col$dv_name %>%
   rename(dv_name = value)
 
 dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_treat_b_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, firstgen_race_sc), 2) %>% 
+  kable_format
+```
+
+#### Incidence Rate Ratio Summary of Models
+
+```{r}
+# d.nest$emmean_treat_sc_df[[1]]
+
+dvs_col_rep %>% 
   bind_cols(d.nest$emmean_treat_sc_df %>% bind_rows) %>% 
   round_table(quos(dv_name, contrast, firstgen_race_sc), 2) %>% 
   kable_format
 ```
 
 ### Disadvantaged Inequality By Each Condition
+
+#### Regular Summary of Models
 
 ```{r}
 # d.nest$emmean_ineq_cond_sc_df[[1]]
@@ -728,6 +845,17 @@ dvs_col_rep <- dvs_col$dv_name %>%
   rename(dv_name = value)
 
 dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_ineq_cond_b_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, cond_sc), 2) %>% 
+  kable_format
+```
+
+#### Incidence Rate Ratio Summary of Models
+
+```{r}
+# d.nest$emmean_ineq_cond_sc_df[[1]]
+
+dvs_col_rep %>% 
   bind_cols(d.nest$emmean_ineq_cond_sc_df %>% bind_rows) %>% 
   round_table(quos(dv_name, contrast, cond_sc), 2) %>% 
   kable_format
@@ -735,12 +863,25 @@ dvs_col_rep %>%
 
 ### Condition Effects
 
+#### Regular Summary of Models
+
 ```{r}
 # d.nest$emmean_cond_sc_df[[1]]
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 36) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_cond_b_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, firstgen_race_sc), 2) %>% 
+  kable_format
+```
+
+#### Incidence Rate Ratio Summary of Models
+
+```{r}
+# d.nest$emmean_cond_sc_df[[1]]
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_cond_sc_df %>% bind_rows) %>% 
@@ -946,6 +1087,7 @@ d.nest %<>%
     augment_cond_cv = glm_model_cond_cv %>% map(broom::augment)
   )
 
+
 d.nest %<>% 
   mutate(
     emmean_treat_cv = pmap( # Treatment effects
@@ -970,7 +1112,29 @@ d.nest %<>%
       .x = emmean_treat_cv_sc, 
       .f = data.frame),
     
-    emmean_ineq_treat_cv = pmap( # Disadvantaged Inequality by treat_cvment
+    emmean_treat_cv_b = pmap( # Treatment effects (beta)
+      .l = list(
+        object = glm_model_treat_cv, 
+        specs = "treat_sc", 
+        by = "firstgen_race_sc"
+      ),
+      .f = emmeans
+      # type = "response"
+    ),
+    emmean_treat_cv_b_df = map(
+      .x = emmean_treat_cv_b, 
+      .f = data.frame),
+    emmean_treat_cv_b_sc = map(
+      .x = emmean_treat_cv_b,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_treat_cv_b_sc_df = map(
+      .x = emmean_treat_cv_b_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_treat_cv = pmap( # Inequality by treatment
       .l = list(
         object = glm_model_treat_cv, 
         specs = "firstgen_race_sc", 
@@ -990,6 +1154,28 @@ d.nest %<>%
     ),
     emmean_ineq_treat_cv_sc_df = map(
       .x = emmean_ineq_treat_cv_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_treat_cv_b = pmap( # Inequality by treatment (beta)
+      .l = list(
+        object = glm_model_treat_cv, 
+        specs = "firstgen_race_sc", 
+        by = "treat_sc"
+      ),
+      .f = emmeans
+      # type = "response"
+    ),
+    emmean_ineq_treat_cv_b_df = map(
+      .x = emmean_ineq_treat_cv_b, 
+      .f = data.frame),
+    emmean_ineq_treat_cv_b_sc = map(
+      .x = emmean_ineq_treat_cv_b,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_ineq_treat_cv_b_sc_df = map(
+      .x = emmean_ineq_treat_cv_b_sc, 
       .f = data.frame),
     
     emmean_cond_cv = pmap( # condition effects
@@ -1014,7 +1200,29 @@ d.nest %<>%
       .x = emmean_cond_cv_sc, 
       .f = data.frame),
     
-    emmean_ineq_cond_cv = pmap( # Disadvantaged Inequality by cond_cvition
+    emmean_cond_cv_b = pmap( # condition effects (beta)
+      .l = list(
+        object = glm_model_cond_cv, 
+        specs = "cond_sc", 
+        by = "firstgen_race_sc"
+      ),
+      .f = emmeans
+      # type = "response"
+    ),
+    emmean_cond_cv_b_df = map(
+      .x = emmean_cond_cv_b, 
+      .f = data.frame),
+    emmean_cond_cv_b_sc = map(
+      .x = emmean_cond_cv_b,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_cond_cv_b_sc_df = map(
+      .x = emmean_cond_cv_b_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_cond_cv = pmap( # Inequality by condition
       .l = list(
         object = glm_model_cond_cv, 
         specs = "firstgen_race_sc", 
@@ -1034,6 +1242,28 @@ d.nest %<>%
     ),
     emmean_ineq_cond_cv_sc_df = map(
       .x = emmean_ineq_cond_cv_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_cond_cv_b = pmap( # Inequality by condition (beta)
+      .l = list(
+        object = glm_model_cond_cv, 
+        specs = "firstgen_race_sc", 
+        by = "cond_sc"
+      ),
+      .f = emmeans
+      # type = "response"
+    ),
+    emmean_ineq_cond_cv_b_df = map(
+      .x = emmean_ineq_cond_cv_b, 
+      .f = data.frame),
+    emmean_ineq_cond_cv_b_sc = map(
+      .x = emmean_ineq_cond_cv_b,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_ineq_cond_cv_b_sc_df = map(
+      .x = emmean_ineq_cond_cv_b_sc, 
       .f = data.frame)
   ) 
 ```
@@ -1123,12 +1353,25 @@ dvs_col_rep %>%
 
 ### Disadvantaged Inequality By Any Treatment
 
+#### Regular Summary of Models
+
 ```{r}
 # d.nest$emmean_ineq_treat_cv_sc_df[[1]]
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 30) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_ineq_treat_cv_b_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, treat_sc), 2) %>% 
+  kable_format
+```
+
+#### Incidence Rate Ratio Summary of Models
+
+```{r}
+# d.nest$emmean_ineq_treat_cv_sc_df[[1]]
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_ineq_treat_cv_sc_df %>% bind_rows) %>% 
@@ -1138,6 +1381,8 @@ dvs_col_rep %>%
 
 ### Treatment Effects
 
+#### Regular Summary of Models
+
 ```{r}
 # d.nest$emmean_treat_cv_sc_df[[1]]
 dvs_col_rep <- dvs_col$dv_name %>% 
@@ -1146,12 +1391,25 @@ dvs_col_rep <- dvs_col$dv_name %>%
   rename(dv_name = value)
 
 dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_treat_cv_b_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, firstgen_race_sc), 2) %>% 
+  kable_format
+```
+
+#### Incidence Rate Ratio Summary of Models
+
+```{r}
+# d.nest$emmean_treat_cv_sc_df[[1]]
+
+dvs_col_rep %>% 
   bind_cols(d.nest$emmean_treat_cv_sc_df %>% bind_rows) %>% 
   round_table(quos(dv_name, contrast, firstgen_race_sc), 2) %>% 
   kable_format
 ```
 
 ### Disadvantaged Inequality By Each Condition
+
+#### Regular Summary of Models
 
 ```{r}
 # d.nest$emmean_ineq_cond_cv_sc_df[[1]]
@@ -1162,6 +1420,17 @@ dvs_col_rep <- dvs_col$dv_name %>%
   rename(dv_name = value)
 
 dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_ineq_cond_cv_b_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, cond_sc), 2) %>% 
+  kable_format
+```
+
+#### Incidence Rate Ratio Summary of Models
+
+```{r}
+# d.nest$emmean_ineq_cond_cv_sc_df[[1]]
+
+dvs_col_rep %>% 
   bind_cols(d.nest$emmean_ineq_cond_cv_sc_df %>% bind_rows) %>% 
   round_table(quos(dv_name, contrast, cond_sc), 2) %>% 
   kable_format
@@ -1169,12 +1438,25 @@ dvs_col_rep %>%
 
 ### Condition Effects
 
+#### Regular Summary of Models
+
 ```{r}
 # d.nest$emmean_cond_cv_sc_df[[1]]
 dvs_col_rep <- dvs_col$dv_name %>% 
   rep(each = 36) %>% # change this number depending on the number of rows of your tidy datasets
   as.tibble %>% 
   rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_cond_cv_b_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, firstgen_race_sc), 2) %>% 
+  kable_format
+```
+
+#### Incidence Rate Ratio Summary of Models
+
+```{r}
+# d.nest$emmean_cond_cv_sc_df[[1]]
 
 dvs_col_rep %>% 
   bind_cols(d.nest$emmean_cond_cv_sc_df %>% bind_rows) %>% 
