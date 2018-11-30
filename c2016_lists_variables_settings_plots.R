@@ -33,7 +33,7 @@ vars_cont <-
     cumgpa1y,
     Y1_Spring_CumGPA, 
     cum_gpa_y1_spring,
-    Y2_Sp_CumGPA,                  # check that we have this variable in the dataset
+    Y2_Sp_CumGPA,                
     cum_gpa_y2_spring,
     cum_gpa_y3_spring,
     cum_gpa_y4_spring,
