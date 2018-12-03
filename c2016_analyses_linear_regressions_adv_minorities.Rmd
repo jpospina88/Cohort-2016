@@ -635,19 +635,19 @@ Effect sizes (Cohen's *d*) between control and any treatment for advantaged and 
 ```{r}
 # d %>% count(disadv, adv_minority_num) %>% select(-n)
 
-cohend_treat <- 
-  cohen.d.by(
-    x = d %>% 
-      select(
-        treat_num, 
-        adv_minority_num,
-        # adv_hispanic_num,
-        !!!vars_cont), 
-    group = "treat_num", 
-    group2 = 
-      "adv_minority_num",
-      # "adv_hispanic_num",
-    alpha = .05)
+# cohend_treat <- 
+#   cohen.d.by(
+#     x = d %>% 
+#       select(
+#         treat_num, 
+#         adv_minority_num,
+#         # adv_hispanic_num,
+#         !!!vars_cont), 
+#     group = "treat_num", 
+#     group2 = 
+#       "adv_minority_num",
+#       # "adv_hispanic_num",
+#     alpha = .05)
 
 # %>% summary
 
@@ -657,7 +657,7 @@ cohend_treat <-
 #   select(-rowname) %>%
 #   round(., digits = 2)
 
-cohend_treat
+# cohend_treat
 ```
 
 ### Differences between control and each condition for advantaged and advantaged and minority students 
