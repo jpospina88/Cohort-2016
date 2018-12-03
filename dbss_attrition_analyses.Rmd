@@ -1,0 +1,163 @@
+---
+title: "DBSS Attrition Analyses"
+author: "Juan Ospina"
+date: "6/18/2018"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+---
+
+```{r clean system, message=TRUE, warning=TRUE, include=FALSE}
+rm(list = ls()) # clean environment
+```
+
+```{r global options, echo=FALSE}
+knitr::opts_chunk$set(
+  # fig.path = 'figs/', fig.show = 'asis', dpi = 300, 
+  # include = FALSE, 
+  echo = FALSE, # run the code, show me only the graphs
+  warning = FALSE, message = FALSE, cache = FALSE
+) 
+```
+
+```{r}
+library(magrittr)
+library(Hmisc)
+library(reshape2)
+library(tidyverse)
+library(broman)
+
+library(kableExtra)
+# library(nnet) # multinomial logistic regression
+library(car) # to generate correct output from models
+library(psych)
+```
+
+```{r}
+file_master_data <- "../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds"
+
+d_all <- read_rds(file_master_data)
+```
+
+```{r}
+d.att <- d_all %>% filter(recruitedSYFUS == 1)
+```
+
+```{r}
+variables <- quos(gender, disadvantaged, firstgen, race_amaj, race.w, race.a, race.b, race.h, race.n.pi, tobaccouse_yes, bingedrink_yes, bmi, age_4y)
+```
+
+# Summary statistics
+
+Summary statistics (*M* or *%*) of students who were recruited for the follow-up study but **did not** gave useful DBSS (usefulDBSS == 0) and students who gave useful (analyzable) DBSS (usefulDBSS == 1):
+
+```{r}
+# d.att %>% filter(usefulDBSS == 1) %>% select(!!!variables) %>% describe %>% round(., digits = 2) %>% kable
+```
+
+```{r}
+# d.att %>% filter(usefulDBSS == 0) %>%  select(!!!variables) %>% describe %>% round(., digits = 2) %>% kable
+```
+
+```{r}
+with(d.att, table(usefulDBSS, race))
+```
+
+```{r}
+with(d.att, table(usefulDBSS, hsrank_no))
+
+d.att %>% 
+  group_by(usefulDBSS) %>% 
+  summarise(hsrank = round(mean(hsrank, na.rm = T), 2),
+            hsrank_no = round(mean(hsrank_no, na.rm = T)*100, 2),
+            gender_num = round(mean(gender_num, na.rm = T)*100, 2),
+            firstgen_num = round(mean(firstgen_num, na.rm = T)*100, 2),
+            race_amaj_num = round(mean(race_amaj_num, na.rm = T)*100, 2),
+            race.w_num = round(mean(race.w_num, na.rm = T)*100, 2),
+            race.a_num = round(mean(race.a_num, na.rm = T)*100, 2),
+            race.b_num = round(mean(race.b_num, na.rm = T)*100, 2),
+            race.h_num = round(mean(race.h_num, na.rm = T)*100, 2),
+            race.n.pi_num = round(mean(race.n.pi_num, na.rm = T)*100, 2)) %>% 
+  kable
+```
+
+```{r}
+d.att %>% filter(usefulDBSS == 1) %>% select(age_4y) %>% summary
+```
+
+
+# Attrition Analyses
+
+**Findings:** All results are non-significant except for High school rank (hsrank) and whether the high school ranked students or not (hsrank_no). 
+
+Thus, we did not find significant differences in gender, disadvantaged status, first-generation status, race (minorities vs majorities, each race (White, Asian, Black, Latino or Hispanic, and Native/Pacific Islander), tobacco use, binge drinking, BMI, age after four years of the intervention, and SAT/ACT scores between the students that we tried to recruit for the Senior Year Follow-Up Survey (SYFUS; *N* = 375) and those who gave us analyzable DBSS (*N* = 198).
+
+We found a *significant* difference in High School Rank such that students who gave analyzable DBSS tend to have lower High School Rank (better) compared to those that we tried to recruit for SYFUS. Also, we found a *significant* difference in whether the high school ranked students or not such that there were less students in high schools that did not rank their students who gave us analyzable DBSS compared to students in high schools that did not rank their students who we tried to recruit for SYFUS.
+
+
+## Significant Tests
+
+```{r}
+lm(hsrank ~ usefulDBSS, data = d.att) %>% summary
+glm(hsrank_no ~ usefulDBSS, data = d.att, family = binomial, na.action = na.omit) %>% summary
+```
+
+## Non-significant Tests
+
+```{r}
+glm(gender ~ usefulDBSS, data = d.att, family = binomial, na.action = na.omit) %>% summary
+glm(disadvantaged ~ usefulDBSS, data = d.att, family = binomial, na.action = na.omit) %>% summary
+glm(firstgen ~ usefulDBSS, data = d.att, family = binomial, na.action = na.omit) %>% summary
+
+glm(race_amaj ~ usefulDBSS, data = d.att, family = binomial, na.action = na.omit) %>% summary
+glm(race.w ~ usefulDBSS, data = d.att, family = binomial, na.action = na.omit) %>% summary
+glm(race.a ~ usefulDBSS, data = d.att, family = binomial, na.action = na.omit) %>% summary
+glm(race.b ~ usefulDBSS, data = d.att, family = binomial, na.action = na.omit) %>% summary
+glm(race.h ~ usefulDBSS, data = d.att, family = binomial, na.action = na.omit) %>% summary
+glm(race.n.pi ~ usefulDBSS, data = d.att, family = binomial, na.action = na.omit) %>% summary
+
+glm(tobaccouse_yes ~ usefulDBSS, data = d.att, family = binomial, na.action = na.omit) %>% summary
+glm(bingedrink_yes ~ usefulDBSS, data = d.att, family = binomial, na.action = na.omit) %>% summary
+lm(bmi ~ usefulDBSS, data = d.att) %>% summary
+lm(age_4y ~ usefulDBSS, data = d.att) %>% summary
+lm(sattoact ~ usefulDBSS, data = d.att) %>% summary
+```
+
+# Attrition Analyses by Condition
+
+```{r subset dataset}
+d.c <- d.att %>% filter(usefulDBSS == 1)
+```
+
+```{r}
+chisq.test(d.c$gender, d.c$cond)
+chisq.test(d.c$disadvantaged, d.c$cond)
+chisq.test(d.c$firstgen, d.c$cond)
+
+chisq.test(d.c$race_amaj, d.c$cond)
+chisq.test(d.c$race.w, d.c$cond)
+chisq.test(d.c$race.a, d.c$cond)
+chisq.test(d.c$race.b, d.c$cond)
+chisq.test(d.c$race.h, d.c$cond)
+chisq.test(d.c$race.n.pi, d.c$cond)
+
+chisq.test(d.c$tobaccouse_yes, d.c$cond)
+chisq.test(d.c$bingedrink_yes, d.c$cond)
+
+options(contrasts = c("contr.helmert", "contr.poly"))
+
+Anova(lm(bmi ~ cond, data = d.c))
+lm(bmi ~ cond, data = d.c) %>% summary
+Anova(lm(age_4y ~ cond, data = d.c))
+lm(age_4y ~ cond, data = d.c) %>% summary
+Anova(lm(sattoact ~ cond, data = d.c))
+lm(sattoact ~ cond, data = d.c) %>% summary
+```
+
+# Check Missing Covariates
+```{r}
+d.c %>% select(bmi, bmi_new, age_4y, tobaccouse_yes, bingedrink_yes) %>% psych::describe()
+```
+
