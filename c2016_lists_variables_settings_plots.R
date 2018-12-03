@@ -250,7 +250,7 @@ tribble_dv <- tribble(
   "stthreat_gender",                         "Stereotype Threat: Gender",                           seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
   "stthreat_race",                           "Stereotype Threat: Race",                             seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "stthreat_ses",                            "Stereotype Threat: Social Class",                     seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
-  "famrelate_comp2",                         "Home-School Disconnect:\nFamily-College Disconnect",  seq(1, 6, 1),       c(1, 6),        2,                    "(2 items; Senior Year Survey)",                      3,
+  "famrelate_comp2",                         "Composite:\nHome-School Disconnect",                  seq(1, 6, 1),       c(1, 6),        2,                    "(2 items; Senior Year Survey)",                      3,
   "integ_idgender",                          "College-Identity Friction:\nGender",                  seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               3,
   "integ_idrace",                            "College-Identity Friction:\nRace",                    seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
   "integ_idclass",                           "College-Identity Friction:\nSocial Class",            seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
