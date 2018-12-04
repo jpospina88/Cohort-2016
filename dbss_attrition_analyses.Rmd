@@ -129,7 +129,6 @@ Thus, we did not find significant differences in gender, disadvantaged status, f
 
 We found a *significant* difference in High School Rank such that students who gave analyzable DBSS tend to have lower High School Rank (better) compared to those that we tried to recruit for SYFUS. Also, we found a *significant* difference in whether the high school ranked students or not such that there were less students in high schools that did not rank their students who gave us analyzable DBSS compared to students in high schools that did not rank their students who we tried to recruit for SYFUS.
 
-
 ### Significant Tests
 
 ```{r}
