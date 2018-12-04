@@ -11,11 +11,18 @@ library(kableExtra)
 
 source("R/custom_functions.R")
 
-# d %>%
-#   check_vars_by_keywords(c("bmi"))
+d %>%
+  check_vars_by_keywords(c("anx"))
+
+
+# vars_check <-
+#   quos(
+#     anxscreener_comp2,
+#     depscreener_comp2
+#   )
 
 # d %>%
-#   select(!!!vars_cont) %>%
+#   select(!!!vars_check) %>%
 #   describe %>%
 #   as.data.frame() %>%
 #   rownames_to_column(var = "dv_name") %>%
@@ -211,13 +218,13 @@ tribble_dv <- tribble(
   "pss_comp4",                               "Composite:\nHow Overwhelmed by Stress",               seq(1, 5, 1),      c(1, 5),         1.5,                  "(4 items; Secondary Appraisal; Senior Year Survey)", 3,
   "health_behavrelax",                       "Time to Relax",                                       seq(1, 5, 1),      c(1, 5),         1.5,                  "(Senior Year Survey)",                               3,
   "mhealthgeneral",                          "Overall Mental Health",                               seq(1, 5, 1),      c(1, 5),         1.5,                  "(Single Item; Senior Year Survey)",                  3,
-  "anxscreener_comp2",                       "Composite:\nAnxiety Screener",                        seq(0, 3, 1),      c(0, 3),         0.5,                  "(2 items; Senior Year Survey)",                      3,
-  "depscreener_comp2",                       "Composite:\nDepression Screener",                     seq(0, 3, 1),      c(0, 3),         0.5,                  "(2 items; Senior Year Survey)",                      3,
+  "anxscreener_comp2",                       "Composite:\nAnxiety Screener",                        seq(1, 4, 1),      c(1, 4),         1.5,                  "(2 items; Senior Year Survey)",                      3,
+  "depscreener_comp2",                       "Composite:\nDepression Screener",                     seq(1, 4, 1),      c(1, 4),         1.5,                  "(2 items; Senior Year Survey)",                      3,
   "overallmentalhealth_comp5_z",             "Composite:\nOverall Mental Health",                   seq(-1, 1, 0.5),   c(-1, 1),       -0.75,                 "(5 items; Average Standardized Score; Senior Year Survey)",   1,
   "anxdepscreener_comp4",                    "Composite:\nAnxiety and Depression Screeners",        seq(0, 3, 1),      c(0, 3),         0.5,                  "(4 Items; Senior Year Survey)",                      3,
   "bmi_1y",                                  "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, First-Year Survey)",                           3,
   "bmi",                                     "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, Senior Year In-Lab Follow-Up)",                          3,
-  "bmi_chge_scr",                            "BMI Change Score",                                    seq(0, 4, 1),      c(0, 4),         0.5,                  "(Senior Year In-Lab Follow-Up)",                               3,
+  "bmi_chge_scr",                            "BMI Change Score",                                    seq(0, 4, 1),      c(0, 4),         0.5,                  "(Senior Year In-Lab Follow-Up)",                               2,
   "weight",                                  "4-Year Weight",                                       seq(0, 200, 50),   c(0, 200),       25,                   "(Senior Year In-Lab Follow-Up)",                          3,
   "weight_comp3",                            "Total Weight Satisfaction",                           seq(1, 7, 1),      c(1, 7),         2,                    "(3 items; Senior Year In-Lab Follow-Up)",                          3,
   "weight_happy_rc",                         "Happiness with Weight",                               seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year In-Lab Follow-Up)",                          3,
@@ -250,7 +257,7 @@ tribble_dv <- tribble(
   "stthreat_gender",                         "Stereotype Threat: Gender",                           seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
   "stthreat_race",                           "Stereotype Threat: Race",                             seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "stthreat_ses",                            "Stereotype Threat: Social Class",                     seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
-  "famrelate_comp2",                         "Composite:\nHome-School Disconnect",                  seq(1, 6, 1),       c(1, 6),        2,                    "(2 items; Senior Year Survey)",                      3,
+  "famrelate_comp2",                         "Home-School Disconnect:\nFamily-College Disconnect",  seq(1, 6, 1),       c(1, 6),        2,                    "(2 items; Senior Year Survey)",                      3,
   "integ_idgender",                          "College-Identity Friction:\nGender",                  seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               3,
   "integ_idrace",                            "College-Identity Friction:\nRace",                    seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
   "integ_idclass",                           "College-Identity Friction:\nSocial Class",            seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
