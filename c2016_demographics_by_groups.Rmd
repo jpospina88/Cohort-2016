@@ -1,30 +1,285 @@
 ---
-title: 'Cohort 2016: Students by Different Demographics'
+title: 'Cohort 2016: Range of Sample Size by Different Demographics'
 author: "Juan Ospina"
 date: "12/5/2018"
-output: html_document
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r global options, echo=FALSE}
+knitr::opts_chunk$set(
+  # fig.path = 'figs/', fig.show = 'asis', 
+  dpi = 75, 
+  # include = FALSE, 
+  echo = FALSE, # run the code, show me only the graphs
+  warning = FALSE, message = FALSE, cache = FALSE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r packages}
+library(magrittr)
+library(tidyverse)
+library(kableExtra)
+library(psych)
 ```
 
-## Including Plots
+```{r data files}
+# For Juan
+d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+# For RAs
+# getwd()
+# d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r load custom functions}
+source("R/custom_functions.R")
+```
+
+
+```{r list of variables}
+source("c2016_lists_variables_settings_plots.R")
+```
+
+```{r}
+tribble_cont2 <- 
+  tribble_cont
+
+tribble_cont %<>% 
+  select(-decimal)
+
+df_vars <- 
+  bind_rows(tribble_cont, tribble_categ, tribble_count)
+```
+
+```{r}
+
+# d %>% 
+#   select(!!!vars_inst) %>% 
+#   rename_at(vars(vars_dv), ~ vars_inst) %>% 
+#   describeBy(
+#     list(d$cond_sc, d$adv_minority_sc), 
+#     mat = TRUE, 
+#     digits = 2
+#     ) %>% 
+#   group_by(group1, group2) %>% 
+#   summarise(
+#     min = min(n),
+#     max = max(n)
+#   ) %>% 
+#   unite(range, c("min", "max"), sep = " - ") %>% 
+#   spread(key = group1, value = range) %>% 
+#   kable_format
+```
+
+# Disadvantaged Status
+
+## Institutional data
+
+```{r}
+vars_inst <- 
+  df_vars %>% 
+  filter(grepl('Institutional', subheader)) %>% 
+  select(dv)
+
+vars_inst %<>% as_vector
+
+vars_dv <- 
+  d %>% 
+  select(!!!vars_inst) %>% 
+  gather(key = dv1:dv30, value = value) %>% 
+  rename(dv = `dv1:dv30`) %>% 
+  select(dv) %>% 
+  unique %>% 
+  as_vector
+
+range_demog(d, d$cond_sc, d$disadv_sc, vars_inst, vars_dv)
+
+
+```
+
+## Senior Year Survey
+
+```{r}
+vars_syfus <- 
+  df_vars %>% 
+  filter(grepl('Senior Year', subheader)) %>% 
+  select(dv)
+
+vars_syfus %<>% as_vector
+
+vars_dv <- 
+  d %>% 
+  select(!!!vars_syfus) %>% 
+  gather(key = dv1:dv76, value = value) %>% 
+  rename(dv = `dv1:dv76`) %>% 
+  select(dv) %>% 
+  unique %>% 
+  as_vector
+
+range_demog(d, d$cond_sc, d$disadv_sc, vars_syfus, vars_dv)
+```
+
+## Medical Records
+
+```{r}
+vars_med <- 
+  df_vars %>% 
+  filter(grepl('Medical', subheader)) %>% 
+  select(dv)
+
+vars_med %<>% as_vector
+
+vars_dv <- 
+  d %>% 
+  select(!!!vars_med) %>% 
+  gather(key = dv1:dv4, value = value) %>% 
+  rename(dv = `dv1:dv4`) %>% 
+  select(dv) %>% 
+  unique %>% 
+  as_vector
+
+range_demog(d, d$cond_sc, d$disadv_sc, vars_med, vars_dv)
+```
+
+# Advantaged and Minorities
+
+## Institutional data
+
+```{r}
+vars_inst <- 
+  df_vars %>% 
+  filter(grepl('Institutional', subheader)) %>% 
+  select(dv)
+
+vars_inst %<>% as_vector
+
+vars_dv <- 
+  d %>% 
+  select(!!!vars_inst) %>% 
+  gather(key = dv1:dv30, value = value) %>% 
+  rename(dv = `dv1:dv30`) %>% 
+  select(dv) %>% 
+  unique %>% 
+  as_vector
+
+range_demog(d, d$cond_sc, d$adv_minority_sc, vars_inst, vars_dv)
+
+
+```
+
+## Senior Year Survey
+
+```{r}
+vars_syfus <- 
+  df_vars %>% 
+  filter(grepl('Senior Year', subheader)) %>% 
+  select(dv)
+
+vars_syfus %<>% as_vector
+
+vars_dv <- 
+  d %>% 
+  select(!!!vars_syfus) %>% 
+  gather(key = dv1:dv76, value = value) %>% 
+  rename(dv = `dv1:dv76`) %>% 
+  select(dv) %>% 
+  unique %>% 
+  as_vector
+
+range_demog(d, d$cond_sc, d$adv_minority_sc, vars_syfus, vars_dv)
+```
+
+## Medical Records
+
+```{r}
+vars_med <- 
+  df_vars %>% 
+  filter(grepl('Medical', subheader)) %>% 
+  select(dv)
+
+vars_med %<>% as_vector
+
+vars_dv <- 
+  d %>% 
+  select(!!!vars_med) %>% 
+  gather(key = dv1:dv4, value = value) %>% 
+  rename(dv = `dv1:dv4`) %>% 
+  select(dv) %>% 
+  unique %>% 
+  as_vector
+
+range_demog(d, d$cond_sc, d$adv_minority_sc, vars_med, vars_dv)
+```
+
+# First-Generation and Race
+
+## Institutional data
+
+```{r}
+vars_inst <- 
+  df_vars %>% 
+  filter(grepl('Institutional', subheader)) %>% 
+  select(dv)
+
+vars_inst %<>% as_vector
+
+vars_dv <- 
+  d %>% 
+  select(!!!vars_inst) %>% 
+  gather(key = dv1:dv30, value = value) %>% 
+  rename(dv = `dv1:dv30`) %>% 
+  select(dv) %>% 
+  unique %>% 
+  as_vector
+
+range_demog(d, d$cond_sc, d$firstgen_race_sc, vars_inst, vars_dv)
+
+
+```
+
+## Senior Year Survey
+
+```{r}
+vars_syfus <- 
+  df_vars %>% 
+  filter(grepl('Senior Year', subheader)) %>% 
+  select(dv)
+
+vars_syfus %<>% as_vector
+
+vars_dv <- 
+  d %>% 
+  select(!!!vars_syfus) %>% 
+  gather(key = dv1:dv76, value = value) %>% 
+  rename(dv = `dv1:dv76`) %>% 
+  select(dv) %>% 
+  unique %>% 
+  as_vector
+
+range_demog(d, d$cond_sc, d$firstgen_race_sc, vars_syfus, vars_dv)
+```
+
+## Medical Records
+
+```{r}
+vars_med <- 
+  df_vars %>% 
+  filter(grepl('Medical', subheader)) %>% 
+  select(dv)
+
+vars_med %<>% as_vector
+
+vars_dv <- 
+  d %>% 
+  select(!!!vars_med) %>% 
+  gather(key = dv1:dv4, value = value) %>% 
+  rename(dv = `dv1:dv4`) %>% 
+  select(dv) %>% 
+  unique %>% 
+  as_vector
+
+range_demog(d, d$cond_sc, d$firstgen_race_sc, vars_med, vars_dv)
+```

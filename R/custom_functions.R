@@ -145,6 +145,30 @@ summary_stats_by_factors <- function(data, factors, variables){
 # treat_adv <- list(d$treat_sc, d$disadv_sc)
 # summary_stats_by_factors(d, treat_adv, vars_count)
 
+#### Ranges by Groups ####
+
+range_demog <- function(data, group1, group2, new_names, old_names){
+  data %>% 
+    select(!!!new_names) %>% 
+    rename_at(vars(old_names), ~ new_names) %>% 
+    describeBy(
+      list(group1, group2), 
+      mat = TRUE, 
+      digits = 2
+    ) %>% 
+    group_by(group1, group2) %>% 
+    summarise(
+      min = min(n),
+      max = max(n)
+    ) %>% 
+    unite(range, c("min", "max"), sep = " - ") %>% 
+    spread(key = group1, value = range) %>% 
+    kable_format
+}
+
+# Example:
+# range_demog(d, d$cond_sc, d$adv_minority_sc, vars_inst, vars_dv)
+
 #### Round Summary Tables to Any Decimal ####
 round_table <- function(data, excluded_vars, decimal){
   data %>% 
