@@ -363,6 +363,17 @@ source("c2016_lists_variables_settings_plots.R")
 ## Overall
 
 ```{r}
+vars_cont <- 
+  quos(
+    overallmentalhealth_comp5_z,
+    bmi_chge_scr,
+    threat_nogen_comp8,
+    integ_idrace,
+    activism_engaged
+  ) 
+```
+
+```{r}
 # rownames_to_column(as.data.frame(describe(select(d, !!!vars_cont))), var = "dv_name")
 
 d %>% 
