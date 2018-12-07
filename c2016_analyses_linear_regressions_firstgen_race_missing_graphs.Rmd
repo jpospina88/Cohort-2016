@@ -374,6 +374,9 @@ source("c2016_lists_variables_settings_plots.R")
 ```{r}
 vars_cont <- 
   quos(
+    success_usethis_percent,
+    potential_usethis_percent,
+    famrelate_comp2,
     overallmentalhealth_comp5_z,
     bmi_chge_scr,
     threat_nogen_comp8,
@@ -429,7 +432,10 @@ d %>%
 ```{r}
 tribble_cont %<>% 
   filter(
-    dv == "overallmentalhealth_comp5_z" |
+    dv == "success_usethis_percent" |
+      dv == "potential_usethis_percent" |
+      dv == "famrelate_comp2" |
+      dv == "overallmentalhealth_comp5_z" |
       dv == "bmi_chge_scr" |
       dv == "threat_nogen_comp8" |
       dv == "integ_idrace" |
@@ -1150,7 +1156,7 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit, positio
   theme1 +
   geom_text(aes(label = round(
     get(var),
-    digits = 2), 
+    digits = decimal), 
     y = position), size = 5, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
@@ -1194,7 +1200,7 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit, position
   theme1 +
   geom_text(aes(label = round(
     get(var),
-    digits = 2), 
+    digits = decimal), 
     y = position), size = 2.8, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
