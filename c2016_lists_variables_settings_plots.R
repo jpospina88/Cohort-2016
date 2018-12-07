@@ -206,7 +206,7 @@ tribble_dv <- tribble(
   
   # Senior Year Survey
   ## Success & Potential
-  "success_usethis_percent",                 "Success: Percentile Ranking",                         seq(0, 100, 25),   c(0, 100),       10,                   "(Senior Year Survey)",                               3,       
+  "success_usethis_percent",                 "Success: Percentile Ranking",                         seq(0, 100, 25),   c(0, 100),       10,                   "(Senior Year Survey)",                               2,       
   "potential_usethis_percent",               "Potential: Percentile Ranking",                       seq(0, 100, 25),   c(0, 100),       10,                   "(Senior Year Survey)",                               3,
   
   ## Health
@@ -224,7 +224,7 @@ tribble_dv <- tribble(
   "anxdepscreener_comp4",                    "Composite:\nAnxiety and Depression Screeners",        seq(0, 3, 1),      c(0, 3),         0.5,                  "(4 Items; Senior Year Survey)",                      3,
   "bmi_1y",                                  "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, First-Year Survey)",                           3,
   "bmi",                                     "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, Senior Year In-Lab Follow-Up)",                          3,
-  "bmi_chge_scr",                            "BMI Change Score",                                    seq(0, 6, 1),      c(0, 6),         1,                  "(Senior Year In-Lab Follow-Up)",                               1,
+  "bmi_chge_scr",                            "BMI Change Score",                                    seq(-3, 6, 1),      c(-3, 6),         -1.5,                  "(Senior Year In-Lab Follow-Up)",                               2,
   "weight",                                  "4-Year Weight",                                       seq(0, 200, 50),   c(0, 200),       25,                   "(Senior Year In-Lab Follow-Up)",                          3,
   "weight_comp3",                            "Total Weight Satisfaction",                           seq(1, 7, 1),      c(1, 7),         2,                    "(3 items; Senior Year In-Lab Follow-Up)",                          3,
   "weight_happy_rc",                         "Happiness with Weight",                               seq(1, 7, 1),      c(1, 7),         2,                    "(Senior Year In-Lab Follow-Up)",                          3,

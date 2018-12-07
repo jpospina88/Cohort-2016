@@ -1,0 +1,1581 @@
+---
+title: "C2016 Linear Regression Analyses: First-Generation Status and Race"
+author: "Juan Ospina"
+date: "2018/9/12"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+---
+
+```{r clean system, message=TRUE, warning=TRUE, include=FALSE}
+rm(list = ls()) # clean environment
+```
+
+```{r global options, echo=FALSE}
+knitr::opts_chunk$set(
+  # fig.path = 'figs/', fig.show = 'asis', 
+  dpi = 75, 
+  # include = FALSE, 
+  echo = FALSE, # run the code, show me only the graphs
+  warning = FALSE, message = FALSE, cache = FALSE)
+```
+
+```{r packages}
+# install.packages(c("RColorBrewer", "reshape2", "tidyverse"))
+# install.packages("apaTables", dependencies = TRUE)
+# install.packages("ez",dependencies = TRUE)
+# , "kableExtra", "psych", "ez", "grid", "gridExtra"
+# devtools::install_github("dstanley4/apaTables")
+library(magrittr)
+library(RColorBrewer)
+library(reshape2)
+library(tidyverse)
+library(emmeans) # to get adjusted means and to plot the summary statistics of models
+library(kableExtra)
+library(psych)
+library(apaTables)
+library(ez)
+library(grid) # For iterative plots
+library(gridExtra) # For iterative plots
+# library(MASS)
+# library(dplyr) # Load dplyr after MASS to be able to use select()
+```
+
+```{r data files}
+# For Juan
+d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+
+# For RAs
+# d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+
+options(contrasts = c("contr.helmert", "contr.poly")) # ANOVA contrasts
+```
+
+```{r custom functions}
+n_obs <- function(x) sum(!is.na(x))
+mn <- function(x) round(mean(x, na.rm = TRUE), 2)
+mdn <- function(x) median(x, na.rm = TRUE)
+std <- function(x) round(sd(x, na.rm = TRUE), 2)
+lb <- function(x) round(mean(x, na.rm = TRUE) - sd(x, na.rm = TRUE), 2)
+ub <- function(x) round(mean(x, na.rm = TRUE) + sd(x, na.rm = TRUE), 2)
+
+ cv_compute <- function(data, cv_name, cv_vector){
+   cv_name <- enquo(cv_name)
+   data %>% 
+       rowwise() %>% 
+       mutate(!!quo_name(cv_name) := mean(c(!!!cv_vector), na.rm = TRUE)) %>% 
+       ungroup()
+ }
+
+sum_stats_round_new2 <- function(data, factor1, factor2, variable) {
+  ftr1 <- enquo(factor1)
+  ftr2 <- enquo(factor2)
+  var <- enquo(variable)
+  
+  data %>% 
+    group_by(!!!ftr1, !!!ftr2) %>% 
+    summarise(
+      n = n_obs(!!!var),
+      mean = mn(!!!var),
+      median = mdn(!!!var),
+      sd = std(!!!var),
+      lower = lb(!!!var),
+      upper = ub(!!!var))
+}
+
+geom_flat_violin <-
+  function(mapping = NULL,
+           data = NULL,
+           stat = "ydensity",
+           position = "dodge",
+           trim = TRUE,
+           scale = "area",
+           show.legend = NA,
+           inherit.aes = TRUE,
+           ...) {
+    ggplot2::layer(
+      data = data,
+      mapping = mapping,
+      stat = stat,
+      geom = GeomFlatViolin,
+      position = position,
+      show.legend = show.legend,
+      inherit.aes = inherit.aes,
+      params = list(trim = trim,
+                    scale = scale,
+                    ...)
+    )
+  }
+
+GeomFlatViolin <-
+  ggproto(
+    "GeomFlatViolin",
+    Geom,
+    setup_data = function(data, params) {
+      data$width <- data$width %||%
+        params$width %||% (resolution(data$x, FALSE) * 0.9)
+      
+      # ymin, ymax, xmin, and xmax define the bounding rectangle for each group
+      data %>%
+        dplyr::group_by(.data = ., group) %>%
+        dplyr::mutate(
+          .data = .,
+          ymin = min(y),
+          ymax = max(y),
+          xmin = x,
+          xmax = x + width / 2
+        )
+    },
+    
+    draw_group = function(data, panel_scales, coord)
+    {
+      # Find the points for the line to go all the way around
+      data <- base::transform(data,
+                              xminv = x,
+                              xmaxv = x + violinwidth * (xmax - x))
+      
+      # Make sure it's sorted properly to draw the outline
+      newdata <-
+        base::rbind(
+          dplyr::arrange(.data = base::transform(data, x = xminv), y),
+          dplyr::arrange(.data = base::transform(data, x = xmaxv), -y)
+        )
+      
+      # Close the polygon: set first and last point the same
+      # Needed for coord_polar and such
+      newdata <- rbind(newdata, newdata[1,])
+      
+      ggplot2:::ggname("geom_flat_violin",
+                       GeomPolygon$draw_panel(newdata, panel_scales, coord))
+    },
+    
+    draw_key = draw_key_polygon,
+    
+    default_aes = ggplot2::aes(
+      weight = 1,
+      colour = "grey20",
+      fill = "white",
+      size = 0.5,
+      alpha = NA,
+      linetype = "solid"
+    ),
+    
+    required_aes = c("x", "y")
+  )
+
+```
+
+```{r raincloud plots custom functions}
+plot_raincloud <- function(data, factor, variable, x_color, labs_y, labels_x, 
+                           scale, coord_cartesian, group_var, group_names, theme) {
+  ftr <- enquo(factor)
+  var <- enquo(variable)
+  group_var <- enquo(group_var)
+  
+  data %>% 
+    ggplot(aes_(y = var, x = ftr, fill = ftr)) +
+    raincloud_violin +
+    geom_point(aes_(y = var, color = ftr), 
+               position = position_jitter(width = .15), size = .5, alpha = 0.8) +
+    stat_summary_se + raincloud_boxplot + raincloud_guides + raincloud_theme_light + raincloud_theme +
+    x_color + labs_y + labels_x + theme1 + theme +
+    scale + coord_cartesian +
+    facet_grid(, vars(!!group_var), labeller = as_labeller(group_names)) # ignore warning, this is to make the plot facet the variables in the way that we want it
+}
+
+# Example:
+# d %>% 
+# ggplot(aes(y = healthmosoverall_comp5, x = treat, fill = treat)) +
+#   raincloud_violin +
+#   geom_point(aes(y = healthmosoverall_comp5, color = treat), 
+#              position = position_jitter(width = .15), size = .5, alpha = 0.8) +
+#   geom_point(data = sum_stats_healthmosoverall_comp5_treat, aes(x = treat, y = mean),
+#              position = position_nudge(x = 0.3), size = 1.5) +
+#   stat_summary_se + raincloud_boxplot + raincloud_guides + raincloud_theme_light + raincloud_theme +
+#   facet_grid(~ disadv) +
+#   labs(x = "Condition", y = "Overall physical health", fill = "Condition")
+
+
+raincloud_point <- function(data, factor, mn) {
+  ftr <- enquo(factor)
+  mn <- enquo(mn)
+  
+geom_point(data = data, aes_(x = ftr, y = mn), 
+             position = position_nudge(x = 0.3), size = 1.5)
+}
+
+raincloud_theme <- 
+  theme(text = element_text(size = 10),
+        axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text = element_text(size = 10),
+        axis.text.x = element_text(angle = 0, vjust = 0),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 16),
+        legend.position = "right",
+        plot.title = element_text(lineheight = .8, face = "bold", size = 16),
+        panel.border = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.line.x = element_line(colour = 'black', size = 0.5, linetype = 'solid'),
+        axis.line.y = element_line(colour = 'black', size = 0.5, linetype = 'solid'),
+        strip.text = element_text(color = "Black"), strip.background = element_blank())
+
+raincloud_boxplot <-
+  geom_boxplot(width = .1, guides = FALSE, outlier.shape = NA, alpha = 0.5)
+
+raincloud_guides <- 
+  guides(fill = FALSE, color = FALSE)
+  
+raincloud_theme_light <- 
+  theme_light()
+
+raincloud_violin <- 
+  geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha = .8)
+
+stat_summary_se <- 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = .1, position = position_nudge(x = .3, y = 0))
+```
+
+```{r bar plot settings}
+# These elements are not going to change from plot to plot, so I added them here so we don't have to copy paste unnecesary code
+pd1 <- position_dodge()
+pd2 <- position_dodge(0.1)
+pd3 <- position_dodge(width = 0.9)
+black1 <- element_text(color = "White")
+black2 <- element_rect(fill = "black", colour = "Black", size = NULL, linetype = NULL, color = "Black", inherit.blank = FALSE)
+
+# theme <- theme(strip.text = black1, strip.background = black2, axis.text = element_text(size = 14),
+#         axis.title = element_text(size = 14), strip.text.x = element_text(size = 14, colour = "white"),
+#         panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+theme.cond <- theme(strip.text = black1, strip.background = black2, axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14), strip.text.x = element_text(size = 14, colour = "white"),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+theme1 <- theme_light()
+# theme1 <- theme_classic()
+guides_no <- guides(fill = FALSE)
+pd4 <- position_stack(vjust = 1.1)
+
+color_treat <- scale_fill_manual(name = "", 
+                                 values = c("ctl" = "salmon", 
+                                            "treat" = "#56B4E9")) # add only to graphs between treatment and control
+
+legend_treat <- scale_color_manual(name = "", 
+                                  values = c("ctl" = "salmon", 
+                                             "treat" = "steelblue2"))
+
+positions_treat <- c("ctl", "treat")
+
+# labels_treat <- scale_x_discrete(labels = c('Control','Treatment'), limits = positions_treat)
+labels_treat <- 
+  scale_x_discrete(labels = c('X','T'), limits = positions_treat)
+
+positions_cond <- c("ctl", "bel", "cul", "wf")
+
+# labels_cond <- scale_x_discrete(labels = c('Control', 'Belonging','Culture', 'Wise\nFeedback'), limits = positions_cond)
+labels_cond <- 
+  scale_x_discrete(
+    labels = c('X', 'B','C', 'F'), 
+    limits = positions_cond
+    )
+
+color_cond <- scale_fill_manual("legend", 
+                                values = c("ctl" = "#F8766D", 
+                                           "bel" = "#7CAE00", 
+                                           "cul" = "#00BFC4", 
+                                           "wf" = "#C77CFF"))
+
+legend_cond <- scale_color_manual(name = "", 
+                                  values = c("ctl" = "#F8766D", 
+                                             "bel" = "#7CAE00", 
+                                             "cul" = "#00BFC4", 
+                                             "wf" = "#C77CFF"))
+
+adv_names <- 
+  c('adv'="Advantaged",
+    'disadv'="Disadvantaged")
+
+gend_names <- 
+  c('m'="Male",
+    'f'="Female")
+
+# tob_names <-
+#   c('0' = "Non-smoking",
+#     '1' = "Smoking")
+
+fgen_names <-
+  c('not first-gen' = "Continuing-Generation",
+    'first-gen' = "First-Generation")
+
+race_names <-
+  c('white/asian' = "Majority",
+    'black/hispanic/native/pacificislander' = "Minority")
+
+group_levels_disadv <- c('adv','disadv')
+
+firstgen_race_names <- 
+  c('adv' = "Advantaged",
+    'black' = "Black",
+    'hispanic' = "Hispanic",
+    'pi.native' = "Pacific/Native",
+    'white first-gen' = "White FG")
+
+firstgen_race_names <- 
+  c('white CG' = "White CG",
+    'white FG' = "White FG",
+    'asian CG' = "Asian CG",
+    'asian FG' = "Asian FG",
+    'minority CG' = "Minority CG",
+    'minority FG' = "Minority FG")
+
+```
+
+```{r custom functions describe sample}
+table.describe <- function(data, vector){
+  data %>% select(!!!vector) %>% describe %>% round(., digits = 2) %>% kable 
+}
+```
+
+```{r load custom functions}
+source("R/custom_functions.R")
+```
+
+# General Notes
+
+```{r}
+d %>% 
+  count(firstgen_race_sc, firstgen_race_num) %>% 
+  kable_format
+```
+
+All the analyses are using simple contrasts. Follow this link if you would like to know more:
+
+https://stats.idre.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/
+
+All the following analyses are shown in two different versions: 
+
+1.    Not controlling for covariates
+1.    Controlling the following covariates: Gender, High School Rank, Whether the High School ranked students or not, and SAT/ACT scores
+
+If we are controlling for other covariates, we will add notes about this before showing the graph.
+
+# Descriptive Statistics
+
+```{r list of variables}
+source("c2016_lists_variables_settings_plots.R")
+```
+
+## Overall
+
+```{r}
+vars_cont <- 
+  quos(
+    overallmentalhealth_comp5_z,
+    bmi_chge_scr,
+    threat_nogen_comp8,
+    integ_idrace,
+    activism_engaged
+  ) 
+```
+
+```{r}
+# rownames_to_column(as.data.frame(describe(select(d, !!!vars_cont))), var = "dv_name")
+
+d %>% 
+  select(!!!vars_cont) %>% 
+  describe %>% 
+  as.data.frame() %>% 
+  rownames_to_column(var = "dv_name") %>% 
+  mutate_at(vars(-dv_name), funs(round(., digits = 2))) %>% 
+  kable_format
+```
+
+## By Treatment and Advantaged Status and Minority
+
+```{r}
+treat_adv <- list(d$treat_sc, 
+                  d$firstgen_race_sc
+                  # d$adv_hispanic_sc
+                  )
+
+d %>% 
+  select(!!!vars_cont) %>% 
+  describeBy(treat_adv, mat = TRUE, digits = 2) %>% 
+  kable_format
+```
+
+## By Condition and Advantaged Status and Minority
+
+```{r}
+cond_adv <- list(d$cond_sc, 
+                 d$firstgen_race_sc
+                 # d$adv_hispanic_sc
+                 )
+
+d %>% 
+  select(!!!vars_cont) %>% 
+  describeBy(cond_adv, mat = TRUE, digits = 2) %>% 
+  kable_format
+```
+
+# Raincloud plots
+
+## By Treatment and Advantaged and Minority Students
+
+```{r}
+tribble_cont %<>% 
+  filter(
+    dv == "overallmentalhealth_comp5_z" |
+      dv == "bmi_chge_scr" |
+      dv == "threat_nogen_comp8" |
+      dv == "integ_idrace" |
+      dv == "activism_engaged"
+  )
+```
+
+```{r}
+theme <- 
+  theme(
+    strip.text = black1, 
+    strip.background = black2, 
+    axis.text.y = # change size of y-axis text
+      element_text(
+        size = 20, 
+        family = "Helvetica"),
+    axis.text.x = # change size of x-axis text
+      element_text(
+        size = 
+          # 20
+          14
+        , 
+        family = "Helvetica"),
+    axis.title = element_text(size = 22, family = "Helvetica"), 
+    strip.text.x = element_text(size = 12, colour = "white", family = "Helvetica"),
+    plot.title = element_text(size = 22, hjust = 0.5),
+    plot.subtitle = element_text(size = 16, hjust = 0.5),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),
+    axis.title.x = element_blank(),
+    # axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.position = 'top',
+    legend.key = element_rect(size = 10),
+    legend.key.size = unit(1, 'lines')
+  )
+
+plot_raincloud_map_treat_adv <- function(ftr, var, y_lab, scales, limit, subheader) d %>% 
+  ggplot(aes(y = get(var), x = get(ftr), fill = get(ftr))) +
+  raincloud_violin +
+  geom_point(aes(y = get(var), color = get(ftr)), 
+             position = position_jitter(width = .15), size = .5, alpha = 0.8) +
+  stat_summary_se + raincloud_boxplot + raincloud_guides + 
+  raincloud_theme_light + raincloud_theme +
+  color_treat + labels_treat + theme1 + theme + 
+  # ylab(y_lab) + xlab("") + 
+  coord_cartesian(ylim = limit) +
+  scale_y_continuous(breaks = scales) +
+  facet_grid(, vars(firstgen_race_sc), labeller = as_labeller(firstgen_race_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) + 
+  ylab("") + ggtitle(y_lab) + xlab("") + theme + guides_no +
+  labs(subtitle = subheader)
+
+plots <- mapply(plot_raincloud_map_treat_adv, # function
+       tribble_cont[,"treat_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
+       tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
+       tribble_cont[,"limit"] %>% t, tribble_cont[,"subheader"] %>% t, 
+       SIMPLIFY = FALSE
+       )
+
+plots
+```
+
+## By Condition and Advantaged and Minority Students
+
+```{r}
+theme_cond <- 
+  theme(
+    strip.text = black1, 
+    strip.background = black2, 
+    axis.text.y = # change size of y-axis text
+      element_text(
+        size = 20, 
+        family = "Helvetica"),
+    axis.text.x = # change size of x-axis text
+      element_text(
+        size = 
+          12
+        , 
+        family = "Helvetica"),
+    axis.title = element_text(size = 18, family = "Helvetica"), 
+    strip.text.x = 
+      element_text(size = 12, colour = "white", family = "Helvetica"), # change size of factor labels 
+    plot.title = element_text(size = 18, hjust = 0.5),
+    plot.subtitle = element_text(size = 14, hjust = 0.5),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),
+    axis.title.x = element_blank(),
+    # axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.position = 'top',
+    legend.key = element_rect(size = 10),
+    legend.key.size = unit(1, 'lines')
+  )
+
+
+plot_raincloud_map_cond_adv <- function(ftr, var, y_lab, scales, limit, subheader) d %>% 
+  ggplot(aes(y = get(var), x = get(ftr), fill = get(ftr))) +
+  raincloud_violin +
+  geom_point(aes(y = get(var), color = get(ftr)), 
+             position = position_jitter(width = .15), size = .5, alpha = 0.8) +
+  stat_summary_se + raincloud_boxplot + raincloud_guides + 
+  raincloud_theme_light + raincloud_theme +
+  color_cond + labels_cond + theme1 + theme_cond + 
+  # ylab(y_lab) + xlab("") + 
+  coord_cartesian(ylim = limit) +
+  scale_y_continuous(breaks = scales) +
+  facet_grid(, vars(firstgen_race_sc), labeller = as_labeller(firstgen_race_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) + 
+  ylab("") + ggtitle(y_lab) + xlab("") + theme_cond + guides_no +
+  labs(subtitle = subheader)
+
+plots <- mapply(plot_raincloud_map_cond_adv, # function
+       tribble_cont[,"cond_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
+       tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
+       tribble_cont[,"limit"] %>% t, tribble_cont[,"subheader"] %>% t, 
+       SIMPLIFY = FALSE
+       )
+
+plots
+```
+
+# Effect sizes
+
+## Is there inequality?
+
+We want to focus on the effect sizes between advantaged and advantaged and minority students  in the control group.
+
+### Inequalities between advantaged and advantaged and minority students  in control
+
+Effect sizes (Cohen's *d*) between advantaged and advantaged and minority students  in control:
+
+```{r}
+cohend_ineq <- 
+  cohen.d.by(x = d %>% 
+               select(treat_num, 
+                      firstgen_race_num,
+                      # adv_hispanic_num,
+                      !!!vars_cont), 
+             group = "firstgen_race_num",
+             # group = "adv_hispanic_num",
+             group2 = "treat_num", 
+             alpha = .05) 
+
+cohend_ineq
+
+# cohend_ineq <- 
+#   cohend_ineq %>%
+#   rownames_to_column() %>% 
+#   filter(rowname == "firstgen_race_numfortreat_num0") %>%
+#   select(-rowname) %>%
+#   round(., digits = 2)
+```
+
+## Is there a Advantaged and Minority Students effect?
+
+### Differences between advantaged and disadvantaged for all conditions
+
+```{r}
+cohend_disadv_all <- 
+  cohen.d(d %>% 
+            select(
+              firstgen_race_num,
+              # adv_hispanic_num,
+              !!!vars_cont), 
+          group = 
+            "firstgen_race_num",
+            # "adv_hispanic_num",
+          alpha = .05)
+
+cohend_disadv_all
+
+# cohend_disadv_all <- cohend_disadv_all$cohen.d
+# 
+# cohend_disadv_all %<>% as.data.frame() %>% rownames_to_column()
+# 
+# cohend_disadv_all
+```
+
+## Is there a treatment effect?
+
+### Differences between control and any treatment for all students
+
+```{r}
+cohend_treat_all <- 
+  cohen.d(
+    d %>% 
+      select(treat_num, 
+             !!!vars_cont), 
+    group = "treat_num", 
+    alpha = .05
+    )
+
+# cohend_treat_all <- cohend_treat_all$cohen.d
+# 
+# cohend_treat_all %<>% as.data.frame() %>% rownames_to_column()
+
+cohend_treat_all
+```
+
+### Differences between control and belonging for all students
+
+```{r}
+cohend_bel_all <- cohen.d(d %>% select(cd_bel_num, !!!vars_cont), group = "cd_bel_num", alpha = .05)
+
+cohend_bel_all
+```
+
+### Differences between control and culture for all students
+
+```{r}
+cohend_cul_all <- cohen.d(d %>% select(cd_cul_num, !!!vars_cont), group = "cd_cul_num", alpha = .05)
+
+cohend_cul_all
+```
+
+### Differences between control and wise feedback for all students
+
+```{r}
+cohend_wf_all <- cohen.d(d %>% select(cd_wf_num, !!!vars_cont), group = "cd_wf_num", alpha = .05)
+
+cohend_wf_all
+```
+
+### Differences between control and any treatment for advantaged and minority students 
+
+Effect sizes (Cohen's *d*) between control and any treatment for advantaged and advantaged and minority students :
+
+```{r eval=FALSE, include=FALSE}
+# d %>% count(disadv, firstgen_race_num) %>% select(-n)
+
+cohend_treat <- 
+  cohen.d.by(
+    x = d %>% 
+      select(
+        treat_num, 
+        firstgen_race_num,
+        # adv_hispanic_num,
+        !!!vars_cont), 
+    group = "treat_num", 
+    group2 = 
+      "firstgen_race_num",
+      # "adv_hispanic_num",
+    alpha = .05)
+
+# %>% summary
+
+# cohend_treat %<>% 
+#   rownames_to_column() %>% 
+#   # filter(rowname == "treat_numforfirstgen_race_num1") %>% 
+#   select(-rowname) %>%
+#   round(., digits = 2)
+
+cohend_treat
+```
+
+### Differences between control and each condition for advantaged and advantaged and minority students 
+
+#### Belonging
+
+```{r eval=FALSE, include=FALSE}
+cohend_bel <- 
+  cohen.d.by(
+    x = d %>% 
+      select(
+        cd_bel_num,
+        firstgen_race_num,
+        # adv_hispanic_num,
+        !!!vars_cont
+        ), 
+    group = "cd_bel_num", 
+    group2 = 
+      "firstgen_race_num",
+      # "adv_hispanic_num",
+    alpha = .05
+    )
+
+# %>% summary
+
+# cohend_bel %<>% 
+#   rownames_to_column() %>% 
+#   # filter(rowname == "cd_bel_numforfirstgen_race_num1") %>% 
+#   select(-rowname) %>% 
+#   round(., digits = 2)
+
+cohend_bel
+```
+
+#### Culture
+```{r eval=FALSE, include=FALSE}
+cohend_cul <- 
+  cohen.d.by(
+    x = d %>% 
+      select(
+        cd_cul_num, 
+        firstgen_race_num,
+        # adv_hispanic_num,
+        !!!vars_cont
+        ), 
+    group = "cd_cul_num", 
+    group2 = 
+      "firstgen_race_num",
+      # "adv_hispanic_num",
+    alpha = .05
+    ) 
+
+# %>% summary
+
+# cohend_cul %<>% 
+#   rownames_to_column() %>% 
+#   # filter(rowname == "cd_cul_numforfirstgen_race_num1") %>% 
+#   select(-rowname) %>% 
+#   round(., digits = 2)
+
+cohend_cul
+```
+
+#### Wise Feedback
+```{r eval=FALSE, include=FALSE}
+cohend_wf <- 
+  cohen.d.by(
+    x = d %>% 
+      select(
+        cd_wf_num, 
+        firstgen_race_num,
+        # adv_hispanic_sc,
+        !!!vars_cont
+        ), 
+    group = "cd_wf_num", 
+    group2 = 
+      "firstgen_race_num",
+      # "adv_hispanic_sc",
+    alpha = .05) 
+
+# %>% summary
+
+# cohend_wf %<>% 
+#   rownames_to_column() %>% 
+#   # filter(rowname == "cd_wf_numforfirstgen_race_num1") %>% 
+#   select(-rowname) %>% 
+#   round(., digits = 2)
+
+cohend_wf
+```
+
+# Models
+
+## Example
+```{r}
+lm(cum_gpa_y4_spring ~ 
+     treat_sc*firstgen_race_sc,
+   # treat_sc*adv_hispanic_sc,
+   data = d
+   ) %>% summary
+```
+
+```{r}
+# d.model <- d %>% select(treat_sc, firstgen_race_sc, !!!vars_cont)
+# 
+# models_lm <- d.model %>% select(-c(treat_sc, firstgen_race_sc)) %>%
+#   map(function(dv) lm(dv ~ d$treat_sc*d$firstgen_race_sc, data = .)) 
+```
+
+```{r}
+vars_ivs <- 
+  quos(
+    idnum, # IDs
+    firstgen_race_sc, # groups
+    treat_sc, cond_sc, # conditions
+    sattoact, hsrank, hsrank_no, gender # covariates
+  )
+
+d.gather <- d %>%
+  select(!!!vars_ivs, !!!vars_cont) %>% 
+  gather(key = dv_name, value = dv_value, !!!vars_cont)
+
+# d.gather %>% select(idnum, dv_name, dv_value)
+
+d.nest <- 
+  d.gather %>% 
+  group_by(dv_name) %>% 
+  nest()
+
+# d.nest$data[[1]]
+
+lm_model <- function(data){
+  lm(dv_value ~ treat_sc*firstgen_race_sc, data = data)
+  # lm(dv_value ~ treat_sc*adv_hispanic_sc, data = data)
+}
+
+lm_model_cond <- function(data){
+  lm(dv_value ~ cond_sc*firstgen_race_sc, data = data)
+  # lm(dv_value ~ cond_sc*adv_hispanic_sc, data = data)
+}
+
+d.nest %<>% mutate(lm_model = map(.x = data, .f = lm_model),
+                   lm_model_cond = map(.x = data, .f = lm_model_cond))
+
+d.nest %<>%
+  mutate(
+    glance = lm_model %>% map(broom::glance),
+    rsq = glance %>% map_dbl("r.squared"),
+    tidy = lm_model %>% map(broom::tidy),
+    augment = lm_model %>% map(broom::augment),
+    glance_cond = lm_model_cond %>% map(broom::glance),
+    rsq_cond = glance_cond %>% map_dbl("r.squared"),
+    tidy_cond = lm_model_cond %>% map(broom::tidy),
+    augment_cond = lm_model_cond %>% map(broom::augment)
+  )
+
+d.nest %<>% 
+  mutate(
+    emmean_treat = pmap( # treatment effects by Advantaged and Minority Students
+      .l = list(
+        object = lm_model, 
+        specs = "treat_sc", 
+        by = 
+          "firstgen_race_sc"
+          # "adv_hispanic_sc"
+      ),
+      .f = emmeans
+    ),
+    emmean_treat_df = map(
+      .x = emmean_treat, 
+      .f = data.frame),
+    emmean_treat_sc = map(
+      .x = emmean_treat,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_treat_sc_df = map(
+      .x = emmean_treat_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_treat = pmap( # Inequality of Advantaged and Minority Students by treatment
+      .l = list(
+        object = lm_model, 
+        specs = 
+          "firstgen_race_sc"
+          # "adv_hispanic_sc"
+        , 
+        by = "treat_sc"
+      ),
+      .f = emmeans
+    ),
+    emmean_ineq_treat_df = map(
+      .x = emmean_ineq_treat, 
+      .f = data.frame),
+    emmean_ineq_treat_sc = map(
+      .x = emmean_ineq_treat,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_ineq_treat_sc_df = map(
+      .x = emmean_ineq_treat_sc, 
+      .f = data.frame),
+    
+    emmean_cond = pmap( # Condition effects by Advantaged and Minority Students
+      .l = list(
+        object = lm_model_cond, 
+        specs = "cond_sc", 
+        by = 
+          "firstgen_race_sc"
+          # "adv_hispanic_sc"
+      ),
+      .f = emmeans
+    ),
+    emmean_cond_df = map(
+      .x = emmean_cond, 
+      .f = data.frame),
+    emmean_cond_sc = map(
+      .x = emmean_cond,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_cond_sc_df = map(
+      .x = emmean_cond_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_cond = pmap( # Inequality of Advantaged and Minority Students by any condition
+      .l = list(
+        object = lm_model_cond, 
+        specs = 
+          "firstgen_race_sc"
+          # "adv_hispanic_sc"
+        , 
+        by = "cond_sc"
+      ),
+      .f = emmeans
+    ),
+    emmean_ineq_cond_df = map(
+      .x = emmean_ineq_cond, 
+      .f = data.frame),
+    emmean_ineq_cond_sc = map(
+      .x = emmean_ineq_cond,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_ineq_cond_sc_df = map(
+      .x = emmean_ineq_cond_sc, 
+      .f = data.frame)
+  ) 
+```
+
+## Glance Overall Fit of Models
+
+## By Treatment
+
+```{r}
+dvs_col <- 
+  d.gather %>% 
+  select(dv_name) %>% 
+  unique
+
+dvs_col %>% 
+  bind_cols(d.nest$glance %>% bind_rows) %>% 
+  round_table(quos(dv_name), 2) %>% 
+  kable_format
+```
+
+## By Condition
+
+```{r}
+dvs_col %>% 
+  bind_cols(d.nest$glance_cond %>% bind_rows) %>% 
+  round_table(quos(dv_name), 2) %>% 
+  kable_format
+```
+
+
+## Main Effects and Interactions
+
+### By Treatment and Advantaged and Minority Students
+```{r}
+# d.nest$tidy[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 
+        12 # change this number depending on the number of rows of your tidy datasets
+      ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
+
+# The variable "donate_srgifttot" is the one that has less rows. Right now it is row 99.
+# check error from variable below
+# bind_cols(d.nest$tidy)
+# d.nest$tidy[[99]]
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$tidy %>% bind_rows) %>% 
+  round_table(quos(dv_name, term), 2) %>% 
+  kable_format
+```
+
+### By Condition and Advantaged and Minority Students
+```{r}
+# d.nest$tidy_cond[[1]]
+
+repetitions <- 
+  bind_rows(d.nest$tidy_cond) %>% 
+  rownames_to_column %>% 
+  filter(term == "(Intercept)") %>% 
+  bind_cols(dvs_col) %>% 
+  select(rowname, dv_name) %>% 
+  mutate(
+    rowname_num = as.numeric(rowname),
+    repetitions = lead(rowname_num) - rowname_num
+    ) %>% 
+  select(-rowname) %>% 
+  rownames_to_column %>% 
+  mutate(
+    repetitions = ifelse(dv_name == "activism_engaged", 24, repetitions) # remember to change the last variable and the times
+  )
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(
+    times = 
+      repetitions$repetitions # change this number depending on the number of rows of your tidy datasets
+      # 12
+    ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
+
+# dvs_col_rep <- dvs_col$dv_name %>% 
+#   rep(
+#     times = 
+#       24 # change this number depending on the number of rows of your tidy datasets
+#       # 12
+#     ) %>% 
+#   as.tibble %>% 
+#   rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$tidy_cond %>% bind_rows) %>% 
+  round_table(quos(dv_name, term), 2) %>% 
+  kable_format
+```
+
+## Simple Effects
+
+### Inequality of Advantaged and Minority Students by Treatment
+
+```{r}
+# d.nest$emmean_ineq_treat_sc_df[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>%
+  rep(
+    each = 
+      30 # change this number depending on the number of rows of your tidy datasets
+      # 6
+    ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_ineq_treat_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, treat_sc), 2) %>% 
+  kable_format
+```
+
+### Treatment Effects by Advantaged and Minority Students
+
+```{r}
+d.nest$emmean_treat_sc_df[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(
+    each = 
+      6 # change this number depending on the number of rows of your tidy datasets
+    ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_treat_sc_df %>% bind_rows) %>% 
+  round_table(
+    quos(
+      dv_name, 
+      contrast, 
+      firstgen_race_sc
+      # adv_hispanic_sc
+    ), 2) %>% 
+  kable_format
+```
+
+### Inequality effects of Advantaged and Minority Students
+```{r}
+# d.nest$emmean_ineq_cond_sc_df[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>%
+  rep(each = 
+        60 # change this number depending on the number of rows of your tidy datasets
+        # 12
+      ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_ineq_cond_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, cond_sc), 2) %>% 
+  kable_format
+```
+
+### Condition Effects by Advantaged and Minority Students
+
+```{r}
+# d.nest$emmean_cond_sc_df[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 
+        36 # change this number depending on the number of rows of your tidy datasets
+        # 18
+      ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_cond_sc_df %>% bind_rows) %>% 
+  round_table(
+    quos(
+      dv_name, 
+      contrast, 
+      firstgen_race_sc
+      # adv_hispanic_sc
+      ), 
+    2) %>% 
+  kable_format
+```
+
+# Bar Plots
+
+## By Treatment and Advantaged and Minority Students
+
+```{r}
+d.unnest_treat <-
+  d.nest %>% 
+  unnest(emmean_treat_df) %>% 
+  spread(key = dv_name, value = emmean)
+```
+
+```{r}
+guides_no <- guides(fill = FALSE, color = FALSE)
+
+plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit, position, decimal, subheader) d.unnest_treat %>% 
+  filter(!is.na(get(var))) %>% 
+  ggplot(aes(x = get(ftr), y = get(var), color = get(ftr), group = get(ftr))) + # Remember to add get()
+  # geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), size = 42, color = "black") +
+  geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), 
+               size = 
+                 # 41
+                 14
+               ) +
+  geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
+  theme1 +
+  geom_text(aes(label = round(
+    get(var),
+    digits = 2), 
+    y = position), size = 5, color = "black") +
+  coord_cartesian(ylim = limit) +
+  scale_y_continuous(breaks = scales) +
+  facet_grid(, vars(firstgen_race_sc), labeller = as_labeller(firstgen_race_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) +
+  ylab("") + ggtitle(y_lab) + xlab("") + theme + guides_no +
+  labs(subtitle = subheader) + 
+  labels_treat + color_treat + legend_treat
+
+plots <- mapply(plot_bar_x_y_group_treat_adv, # function
+       tribble_cont[,"treat_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
+       tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
+       tribble_cont[,"limit"] %>% t, tribble_cont[,"position"] %>% t, 
+       tribble_cont[,"decimal"] %>% t, tribble_cont[,"subheader"] %>% t,
+       SIMPLIFY = F)
+
+plots
+```
+
+## By Condition and Advantaged and Minority Students
+
+```{r}
+d.unnest_cond <-
+  d.nest %>% 
+  unnest(emmean_cond_df) %>% 
+  spread(key = dv_name, value = emmean)
+```
+
+```{r}
+plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit, position, decimal, subheader) d.unnest_cond %>% 
+  filter(!is.na(get(var))) %>% 
+  ggplot(aes(x = get(ftr), y = get(var), color = get(ftr), group = get(ftr))) + # Remember to add get()
+  # geom_segment(aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), size = 42, color = "black") +
+  geom_segment(
+    aes(x = get(ftr), xend = get(ftr), y = -10, yend = get(var)), 
+    size = 
+      # 24 # change from disadvantaged to other groups
+      7.5
+    ) +
+  geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
+  theme1 +
+  geom_text(aes(label = round(
+    get(var),
+    digits = 2), 
+    y = position), size = 2.8, color = "black") +
+  coord_cartesian(ylim = limit) +
+  scale_y_continuous(breaks = scales) +
+  facet_grid(, vars(firstgen_race_sc), labeller = as_labeller(firstgen_race_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) +
+  ylab("") + ggtitle(y_lab) + xlab("") + theme_cond + guides_no +
+  labs(subtitle = subheader) + 
+  labels_cond + color_cond + legend_cond
+
+plots <- mapply(plot_bar_x_y_group_cond_adv, # function
+       tribble_cont[,"cond_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
+       tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
+       tribble_cont[,"limit"] %>% t, tribble_cont[,"position"] %>% t, 
+       tribble_cont[,"decimal"] %>% t, tribble_cont[,"subheader"] %>% t,
+       SIMPLIFY = F)
+
+plots
+```
+
+# Models with covariates
+
+## Example
+```{r}
+lm(cum_gpa_y4_spring ~ 
+     treat_sc*firstgen_race_sc +
+     # treat_sc*adv_hispanic_sc +
+     gender + sattoact + hsrank + hsrank_no, data = d) %>% summary
+```
+
+```{r}
+lm_model_treat_cv <- function(data){
+  lm(dv_value ~ treat_sc*firstgen_race_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+  # lm(dv_value ~ treat_sc*adv_hispanic_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+}
+
+lm_model_cond_cv <- function(data){
+  lm(dv_value ~ cond_sc*firstgen_race_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+  # lm(dv_value ~ cond_sc*adv_hispanic_sc + gender + sattoact + hsrank + hsrank_no, data = data)
+}
+
+d.nest %<>% mutate(lm_model_treat_cv = map(.x = data, .f = lm_model_treat_cv),
+                   lm_model_cond_cv = map(.x = data, .f = lm_model_cond_cv))
+
+d.nest %<>%
+  mutate(
+    glance_treat_cv = lm_model_treat_cv %>% map(broom::glance),
+    rsq_treat_cv = glance_treat_cv %>% map_dbl("r.squared"),
+    tidy_treat_cv = lm_model_treat_cv %>% map(broom::tidy),
+    augment_cv = lm_model_treat_cv %>% map(broom::augment),
+    glance_cond_cv = lm_model_cond_cv %>% map(broom::glance),
+    rsq_cond_cv = glance_cond_cv %>% map_dbl("r.squared"),
+    tidy_cond_cv = lm_model_cond_cv %>% map(broom::tidy),
+    augment_cond_cv = lm_model_cond_cv %>% map(broom::augment)
+  )
+
+d.nest %<>% 
+  mutate(
+    emmean_treat_cv = pmap( # Treatment effects by Advantaged and Minority Students
+      .l = list(
+        object = lm_model_treat_cv, 
+        specs = "treat_sc", 
+        by = 
+          "firstgen_race_sc"
+          # "adv_hispanic_sc"
+      ),
+      .f = emmeans
+    ),
+    emmean_treat_cv_df = map(
+      .x = emmean_treat_cv, 
+      .f = data.frame),
+    emmean_treat_cv_sc = map(
+      .x = emmean_treat_cv,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_treat_cv_sc_df = map(
+      .x = emmean_treat_cv_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_treat_cv = pmap( # Inequality of Advantaged and Minority Students by treatment
+      .l = list(
+        object = lm_model_treat_cv, 
+        specs = 
+          "firstgen_race_sc"
+          # "adv_hispanic_sc"
+        , 
+        by = "treat_sc"
+      ),
+      .f = emmeans
+    ),
+    emmean_ineq_treat_cv_df = map(
+      .x = emmean_ineq_treat_cv, 
+      .f = data.frame),
+    emmean_ineq_treat_cv_sc = map(
+      .x = emmean_ineq_treat_cv,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_ineq_treat_cv_sc_df = map(
+      .x = emmean_ineq_treat_cv_sc, 
+      .f = data.frame),
+    
+    emmean_cond_cv = pmap( # Condition effects by Advantaged and Minority Students
+      .l = list(
+        object = lm_model_cond_cv, 
+        specs = "cond_sc", 
+        by = 
+          "firstgen_race_sc"
+          # "adv_hispanic_sc"
+      ),
+      .f = emmeans
+    ),
+    emmean_cond_cv_df = map(
+      .x = emmean_cond_cv, 
+      .f = data.frame),
+    emmean_cond_cv_sc = map(
+      .x = emmean_cond_cv,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_cond_cv_sc_df = map(
+      .x = emmean_cond_cv_sc, 
+      .f = data.frame),
+    
+    emmean_ineq_cond_cv = pmap( # Inequality of Advantaged and Minority Students by condition
+      .l = list(
+        object = lm_model_cond_cv, 
+        specs = 
+          "firstgen_race_sc"
+          # "adv_hispanic_sc"
+        , 
+        by = "cond_sc"
+      ),
+      .f = emmeans
+    ),
+    emmean_ineq_cond_cv_df = map(
+      .x = emmean_ineq_cond_cv, 
+      .f = data.frame),
+    emmean_ineq_cond_cv_sc = map(
+      .x = emmean_ineq_cond_cv,
+      .f = pairs,
+      reverse = TRUE,
+      adjust = "none"
+    ),
+    emmean_ineq_cond_cv_sc_df = map(
+      .x = emmean_ineq_cond_cv_sc, 
+      .f = data.frame)
+  ) 
+```
+
+## Glance Overall Fit of Models
+
+## By Treatment
+
+```{r}
+# d.nest$glance_treat_cv[[1]]
+
+dvs_col <- 
+  d.gather %>% 
+  select(dv_name) %>% 
+  unique
+
+dvs_col %>% 
+  bind_cols(d.nest$glance_treat_cv %>% bind_rows) %>% 
+  round_table(quos(dv_name), 2) %>% 
+  kable_format
+```
+
+## By Condition
+
+```{r}
+# d.nest$glance_cond_cv[[1]]
+
+dvs_col %>% 
+  bind_cols(d.nest$glance_cond_cv %>% bind_rows) %>% 
+  round_table(quos(dv_name), 2) %>% 
+  kable_format
+```
+
+## Main Effects and Interactions
+
+### By Treatment and Advantaged and Minority Students
+```{r}
+# d.nest$tidy_treat_cv[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 
+        16 # change this number depending on the number of rows of your tidy datasets
+        # 10
+      ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$tidy_treat_cv %>% bind_rows) %>% 
+  round_table(quos(dv_name, term), 2) %>% 
+  kable_format
+```
+
+### By Condition and Advantaged and Minority Students
+```{r}
+# d.nest$tidy_cond_cv[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 
+        28 # change this number depending on the number of rows of your tidy datasets
+        # 16
+      ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
+
+repetitions <- 
+  bind_rows(d.nest$tidy_cond_cv) %>% # change the column of the nested dataset
+  rownames_to_column %>% 
+  filter(term == "(Intercept)") %>% 
+  bind_cols(dvs_col) %>% 
+  select(rowname, dv_name) %>% 
+  mutate(
+    rowname_num = as.numeric(rowname),
+    repetitions = lead(rowname_num) - rowname_num
+    ) %>% 
+  select(-rowname) %>% 
+  rownames_to_column %>% 
+  mutate(
+    repetitions = ifelse(dv_name == "activism_engaged", 28, repetitions) # remember to change the last variable and the times
+  )
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(
+    times = 
+      repetitions$repetitions # change this number depending on the number of rows of your tidy datasets
+      # 12
+    ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$tidy_cond_cv %>% bind_rows) %>% 
+  round_table(quos(dv_name, term), 2) %>% 
+  kable_format
+```
+
+## Simple Effects
+
+### Inequality of Advantaged and Minority Students by Treatment
+
+```{r}
+# d.nest$emmean_ineq_treat_cv_sc_df[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 
+        30  # change this number depending on the number of rows of your tidy datasets
+        # 6
+      ) %>%
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_ineq_treat_cv_sc_df %>% bind_rows) %>% 
+  round_table(quos(dv_name, contrast, treat_sc), 2) %>% 
+  kable_format
+```
+
+### Treatment Effects
+
+```{r}
+# d.nest$emmean_treat_cv_sc_df[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 
+        6 # change this number depending on the number of rows of your tidy datasets
+        # 3
+      ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_treat_cv_sc_df %>% bind_rows) %>% 
+  round_table(
+    quos(
+      dv_name, 
+      contrast, 
+      firstgen_race_sc
+      # adv_hispanic_sc
+      ), 
+    2) %>% 
+  kable_format
+```
+
+### Inequality of Advantaged and Minority Students by Treatment
+
+```{r}
+# d.nest$emmean_ineq_cond_cv_sc_df[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 
+        60 # change this number depending on the number of rows of your tidy datasets
+        # 12
+      ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_ineq_cond_cv_sc_df %>% bind_rows) %>% 
+  round_table(
+    quos(
+      dv_name, 
+      contrast, 
+      cond_sc
+      ),
+    2) %>% 
+  kable_format
+```
+
+### Condition Effects
+
+```{r}
+# d.nest$emmean_cond_cv_sc_df[[1]]
+
+dvs_col_rep <- dvs_col$dv_name %>% 
+  rep(each = 
+        36 # change this number depending on the number of rows of your tidy datasets
+        # 18
+      ) %>% 
+  as.tibble %>% 
+  rename(dv_name = value)
+
+dvs_col_rep %>% 
+  bind_cols(d.nest$emmean_cond_cv_sc_df %>% bind_rows) %>% 
+  round_table(
+    quos(
+      dv_name, 
+      contrast, 
+      firstgen_race_sc
+      # adv_hispanic_sc
+      ),
+    2) %>% 
+  kable_format
+```
+
+# Bar Plots with covariates
+
+## By Treatment and Advantaged and Minority Students
+
+```{r}
+d.unnest_treat <-
+  d.nest %>% 
+  unnest(emmean_treat_cv_df) %>% 
+  spread(key = dv_name, value = emmean)
+```
+
+```{r}
+plots <- mapply(plot_bar_x_y_group_treat_adv, # function
+       tribble_cont[,"treat_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
+       tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
+       tribble_cont[,"limit"] %>% t, tribble_cont[,"position"] %>% t, 
+       tribble_cont[,"decimal"] %>% t, tribble_cont[,"subheader"] %>% t,
+       SIMPLIFY = F)
+
+plots
+```
+
+## By Condition and Advantaged and Minority Students
+
+```{r}
+d.unnest_cond <-
+  d.nest %>% 
+  unnest(emmean_cond_cv_df) %>% 
+  spread(key = dv_name, value = emmean)
+```
+
+```{r}
+plots <- mapply(plot_bar_x_y_group_cond_adv, # function
+       tribble_cont[,"cond_sc"] %>% t, tribble_cont[,"dv"] %>% t, # arguments
+       tribble_cont[,"dv_name"] %>% t, tribble_cont[,"scale"] %>% t, 
+       tribble_cont[,"limit"] %>% t, tribble_cont[,"position"] %>% t, 
+       tribble_cont[,"decimal"] %>% t, tribble_cont[,"subheader"] %>% t,
+       SIMPLIFY = F)
+
+plots
+```

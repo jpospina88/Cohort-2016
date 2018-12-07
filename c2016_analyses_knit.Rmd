@@ -63,6 +63,19 @@ rmarkdown::render(
   )
 ```
 
+```{r}
+rmarkdown::render(
+  "c2016_analyses_linear_regressions_adv_minorities_missing_graphs.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
+  "c2016_analyses_linear_regressions_firstgen_race_missing_graphs.Rmd", 
+  "html_document"
+  )
+
+```
+
 
 ```{r}
 # how to interpret ORs
