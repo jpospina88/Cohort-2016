@@ -3,7 +3,7 @@ library(psych)
 library(kableExtra)
 
 # For Juan
-# d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 # For RAs
 # getwd()
@@ -12,7 +12,25 @@ library(kableExtra)
 source("R/custom_functions.R")
 
 d %>%
-  check_vars_by_keywords(c("anx"))
+  check_vars_by_keywords(c("org"))
+
+d %>% 
+  count(org1__type)
+
+# mentor_faculty             
+# [3] mentor_undergrad            mentor_admin               
+# [5] mentor_staff                mentor_athletic            
+# [7] mentor_alum                 mentor_other
+# mentor_grad
+
+# org1__type         org2__type        
+# [27] org3__type         org4__type        
+# [29] org5__type
+
+# if a Ss answered the question but didn't list an activity type, they should get a 0.
+# count of each type: how many activities were related to academics
+# how many of these activities did they had a leadership role
+
 
 
 # vars_check <-
@@ -206,8 +224,8 @@ tribble_dv <- tribble(
   
   # Senior Year Survey
   ## Success & Potential
-  "success_usethis_percent",                 "Success: Percentile Ranking",                         seq(0, 100, 25),   c(0, 100),       10,                   "(Senior Year Survey)",                               2,       
-  "potential_usethis_percent",               "Potential: Percentile Ranking",                       seq(0, 100, 25),   c(0, 100),       10,                   "(Senior Year Survey)",                               3,
+  "success_usethis_percent",                 "Success: Percentile Ranking",                         seq(0, 100, 25),   c(0, 100),       10,                   "(Senior Year Survey)",                               1,       
+  "potential_usethis_percent",               "Potential: Percentile Ranking",                       seq(0, 100, 25),   c(0, 100),       10,                   "(Senior Year Survey)",                               1,
   
   ## Health
   "healthmosoverall_comp5",                  "Composite:\nSelf-Reported General Health",            seq(1, 5, 1),      c(1, 5),         1.5,                  "(5 items; Senior Year Survey)",                      3,
@@ -220,7 +238,7 @@ tribble_dv <- tribble(
   "mhealthgeneral",                          "Overall Mental Health",                               seq(1, 5, 1),      c(1, 5),         1.5,                  "(Single Item; Senior Year Survey)",                  3,
   "anxscreener_comp2",                       "Composite:\nAnxiety Screener",                        seq(1, 4, 1),      c(1, 4),         1.5,                  "(2 items; Senior Year Survey)",                      3,
   "depscreener_comp2",                       "Composite:\nDepression Screener",                     seq(1, 4, 1),      c(1, 4),         1.5,                  "(2 items; Senior Year Survey)",                      3,
-  "overallmentalhealth_comp5_z",             "Composite:\nOverall Mental Health",                   seq(-1, 1, 0.5),   c(-1, 1),       -0.75,                 "(5 items; Average Standardized Score; Senior Year Survey)",   1,
+  "overallmentalhealth_comp5_z",             "Composite:\nOverall Mental Health",                   seq(-1, 1, 0.5),   c(-1, 1),       -0.75,                 "(5 items; Average Standardized Score; Senior Year Survey)",   2,
   "anxdepscreener_comp4",                    "Composite:\nAnxiety and Depression Screeners",        seq(0, 3, 1),      c(0, 3),         0.5,                  "(4 Items; Senior Year Survey)",                      3,
   "bmi_1y",                                  "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, First-Year Survey)",                           3,
   "bmi",                                     "Body Mass Index",                                     seq(0, 40, 10),    c(0, 40),        5,                    "(BMI, Senior Year In-Lab Follow-Up)",                          3,
@@ -250,16 +268,16 @@ tribble_dv <- tribble(
   "overallpositivity",                       "Overall Positivity of College Experience",            seq(1, 10, 1),      c(1, 10),       2.5,                  "(Senior Year Survey)",                               3,
   "collexp_comp4",                           "Composite:\nPositive Perception of Stanford",         seq(1, 7, 1),       c(1, 7),        2,                    "(4 items; Senior Year Survey)",                      3,
   "collhomeinteg_comp4",                     "Composite:\nCollege-Home Integration",                seq(1, 5, 1),       c(1, 5),        1.5,                  "(4 items; Senior Year Survey)",                      3,
-  "threat_nogen_comp8",                      "Composite:\nFeelings of Psychological Threat",        seq(-1, 1, 0.5),    c(-1, 1),       -0.75,                "(8 Items; Senior Year Survey)",                      1,
+  "threat_nogen_comp8",                      "Composite:\nFeelings of Psychological Threat",        seq(-1, 1, 0.5),    c(-1, 1),       -0.75,                "(8 Items; Senior Year Survey)",                      2,
   "cthreat_minorities",                      "Contextual Threat:\nOthers",                          seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "cthreat_self",                            "Contextual Threat:\nSelf",                            seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "cthreat_comp2",                           "Contextual Threat:\nCombined",                        seq(1, 5, 1),       c(1, 5),        1.5,                  "(2 items; Senior Year Survey)",                      3,
   "stthreat_gender",                         "Stereotype Threat: Gender",                           seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
   "stthreat_race",                           "Stereotype Threat: Race",                             seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "stthreat_ses",                            "Stereotype Threat: Social Class",                     seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
-  "famrelate_comp2",                         "Home-School Disconnect:\nFamily-College Disconnect",  seq(1, 6, 1),       c(1, 6),        2,                    "(2 items; Senior Year Survey)",                      3,
+  "famrelate_comp2",                         "Composite:\nHome-School Disconnect",                  seq(1, 6, 1),       c(1, 6),        2,                    "(2 items; Senior Year Survey)",                      2,
   "integ_idgender",                          "College-Identity Friction:\nGender",                  seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               3,
-  "integ_idrace",                            "College-Identity Friction:\nRace",                    seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3, 
+  "integ_idrace",                            "College-Identity Friction:\nRace",                    seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               2, 
   "integ_idclass",                           "College-Identity Friction:\nSocial Class",            seq(1, 5, 1),       c(1, 5),        1.5,                  "(Senior Year Survey)",                               3,
   "wisefeedbacktask_comp4",                  "Wise Feedback Task",                                  seq(1, 5, 1),       c(1, 5),        1.5,                  "(4 items; Senior Year Survey)",                      3,
   "critf_distinguish_r",                     "Critical Feedback:\nDistinguish Between Students",    seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3, 
@@ -286,8 +304,8 @@ tribble_dv <- tribble(
   "friends_noshare_r",                       "Can't Share Worries and Fears With Friends",          seq(1, 7, 1),       c(1, 7),        2.5,                    "(Senior Year Survey, reverse coded)",                3,                  
   
   ## Involvement
-  "org_howinvcount",                         "Involvement in Extracurricular Activities",           seq(0, 25, 5),       c(0, 25),      2,                    "(Five Activites; Senior Year Survey)",               2,
-  "activism_engaged",                        "Involvement in Service/Social Change",                seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               3                 
+  "org_howinvcount",                         "Involvement in Extracurricular Activities",           seq(0, 25, 5),       c(0, 25),      2,                    "(Five Activities; Senior Year Survey)",               2,
+  "activism_engaged",                        "Involvement in Service/Social Change",                seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               2                 
   )  
 
 tribble_cond <- data.frame(matrix(c("treat_sc"), nrow = nrow(tribble_dv)),
@@ -350,7 +368,7 @@ tribble_dv <- tribble(
   #---------------------------|----------------------------------------------------|-------------------|--------------|--------------|-----------------------------------------------------------------
   # Institutional data
   "major_grad_4y",             "% Graduating in Four Years",                        seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
-  "major_grad_5y",             "% Graduating in five Years",                        seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
+  "major_grad_5y",             "% Graduating in Five Years",                        seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
   "class_research_ever",       "% Involved in Research",                            seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
   "exchange_ever",             "% Off-campus experiences ever",                     seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
   "quintile_top",              "% with GPA in Top Quintile of Class",               seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
@@ -374,7 +392,7 @@ tribble_dv <- tribble(
   
   # Senior Year Survey
   "tobaccouse_yes",             "% Used Tobacco",                                   seq(0, 50, 10),     c(0, 50),      5,             "(Senior Year Survey)",
-  "bingedrink_yes",             "% Drank Alcohol",                                  seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
+  "bingedrink_yes",             "% Binge Drank Alcohol Last Month",                 seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
   "next_plans2",                "% Taking a Job",                                   seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
   "next_plans8",                "% Pursuing Graduate Studies Next Year",            seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
   "srgift_planordonated",       "% Donated or Planned to Donate\nto Senior Gift",   seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
