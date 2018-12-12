@@ -3,7 +3,7 @@ library(psych)
 library(kableExtra)
 
 # For Juan
-# d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 # For RAs
 # getwd()
@@ -12,7 +12,25 @@ library(kableExtra)
 source("R/custom_functions.R")
 
 d %>%
-  check_vars_by_keywords(c("anx"))
+  check_vars_by_keywords(c("org"))
+
+d %>% 
+  count(org1__type)
+
+# mentor_faculty             
+# [3] mentor_undergrad            mentor_admin               
+# [5] mentor_staff                mentor_athletic            
+# [7] mentor_alum                 mentor_other
+# mentor_grad
+
+# org1__type         org2__type        
+# [27] org3__type         org4__type        
+# [29] org5__type
+
+# if a Ss answered the question but didn't list an activity type, they should get a 0.
+# count of each type: how many activities were related to academics
+# how many of these activities did they had a leadership role
+
 
 
 # vars_check <-
@@ -286,7 +304,7 @@ tribble_dv <- tribble(
   "friends_noshare_r",                       "Can't Share Worries and Fears With Friends",          seq(1, 7, 1),       c(1, 7),        2.5,                    "(Senior Year Survey, reverse coded)",                3,                  
   
   ## Involvement
-  "org_howinvcount",                         "Involvement in Extracurricular Activities",           seq(0, 25, 5),       c(0, 25),      2,                    "(Five Activites; Senior Year Survey)",               2,
+  "org_howinvcount",                         "Involvement in Extracurricular Activities",           seq(0, 25, 5),       c(0, 25),      2,                    "(Five Activities; Senior Year Survey)",               2,
   "activism_engaged",                        "Involvement in Service/Social Change",                seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               2                 
   )  
 
@@ -350,7 +368,7 @@ tribble_dv <- tribble(
   #---------------------------|----------------------------------------------------|-------------------|--------------|--------------|-----------------------------------------------------------------
   # Institutional data
   "major_grad_4y",             "% Graduating in Four Years",                        seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
-  "major_grad_5y",             "% Graduating in five Years",                        seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
+  "major_grad_5y",             "% Graduating in Five Years",                        seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
   "class_research_ever",       "% Involved in Research",                            seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
   "exchange_ever",             "% Off-campus experiences ever",                     seq(0, 100, 25),    c(0, 100),     10,            "(Institutional Data)",
   "quintile_top",              "% with GPA in Top Quintile of Class",               seq(0, 50, 10),     c(0, 50),      2.5,           "(Institutional Data)",
@@ -374,7 +392,7 @@ tribble_dv <- tribble(
   
   # Senior Year Survey
   "tobaccouse_yes",             "% Used Tobacco",                                   seq(0, 50, 10),     c(0, 50),      5,             "(Senior Year Survey)",
-  "bingedrink_yes",             "% Drank Alcohol",                                  seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
+  "bingedrink_yes",             "% Binge Drank Alcohol Last Month",                 seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
   "next_plans2",                "% Taking a Job",                                   seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
   "next_plans8",                "% Pursuing Graduate Studies Next Year",            seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
   "srgift_planordonated",       "% Donated or Planned to Donate\nto Senior Gift",   seq(0, 100, 25),    c(0, 100),     10,            "(Senior Year Survey)",
