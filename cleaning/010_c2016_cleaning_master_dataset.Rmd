@@ -1,0 +1,1545 @@
+---
+title: "Cleaning c2016 master dataset"
+author: "Juan Ospina"
+date: "4/4/2018"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+```{r clean system, message=TRUE, warning=TRUE, include=FALSE}
+rm(list = ls()) # clean environment
+```
+
+```{r global options, echo=FALSE}
+knitr::opts_chunk$set(
+  # fig.path = 'figs/', fig.show = 'asis', dpi = 300, 
+  # include = FALSE, 
+  echo = FALSE, # run the code, show me only the graphs
+  warning = FALSE, message = FALSE, cache = FALSE
+) 
+```
+
+
+```{r}
+# install.packages(c("corrplot", "effsize", "formattable", "googlesheets"))
+library(magrittr)
+# library(Hmisc)
+library(RColorBrewer)
+library(reshape2)
+library(corrplot)
+# library(plyr)
+library(psych)
+library(tidyverse)
+# library(effsize)
+library(broman)
+library(kableExtra)
+library(knitr)
+# library(formattable) # color-coding tables
+library(googlesheets)
+library(foreign) # to export SPSS files
+```
+
+```{r}
+# data files
+file_cleaned_syfus_data <- "../../data/c2016_syfus_merged_cleaned_no_t7.rds"
+file_intv_data <- "../../../data/deidentified_2016_cohort_premat_intv.rds"
+file_hr_data <- "~/Documents/Stanford Medical Records/data_for_analysis/c2016_visits_to_doctor.rds"
+file_inst_data <- "../../data/c2016_inst_data_for_analysis_3_22_2018.rds"
+file_inlabfollowup_data <- "../../../data/c2016_syfus_inlabfollowup_original_idnums.rds"
+file_idata_syfus_data <- "../../data/2016_cohort_syfus_dbss.rds"
+file_inlabfollowup_weight_data <- "../../data/4_3_2018_c2016_syfus_inlab_followup_weight.csv"
+file_inlabfollowup_weight2_data <- "../../data/Stanford+2016+-+Follow-up+Lab+Study+-+Prematriculation+Intervention+Seniors_April+24%2C+2018_11.30.csv"
+
+d <- read_rds(file_cleaned_syfus_data)
+
+d_intv <- read_rds(file_intv_data)
+d_hr <- read_rds(file_hr_data)
+d_inst <- read_rds(file_inst_data)
+inlab <- read_rds(file_inlabfollowup_data)
+d0 <- read_rds(file_idata_syfus_data)
+inlab_w <- read_csv(file_inlabfollowup_weight_data)
+inlab_w2 <- read_csv(file_inlabfollowup_weight2_data)
+
+# gs_ls()
+
+# data files
+best_coll <- gs_title("SYFUS2016 - Coding Spreadsheet - Best")
+
+# list worksheets
+# gs_ws_ls(best_coll)
+
+d_best_coll <- gs_read(ss = best_coll, ws = "Final Ans")
+
+# data files
+worst_coll <- gs_title("SYFUS2016 - Coding Spreadsheet - Worst")
+
+# list worksheets
+# gs_ws_ls(worst_coll)
+
+d_worst_coll <- gs_read(ss = worst_coll, ws = "Final Ans")
+
+# data files
+purpose_coll <- gs_title("SYFUS2016 - Coding Spreadsheet - Purpose")
+
+# list worksheets
+# gs_ws_ls(purpose_coll)
+
+d_purpose_coll <- gs_read(ss = purpose_coll, ws = "Final Ans")
+```
+
+```{r custom functions}
+moveme <- function(data, tomove, where = "last", ba = NULL) {
+  temp <- setdiff(names(data), tomove)
+  x <- switch(
+    where,
+    first = data[c(tomove, temp)],
+    last = data[c(temp, tomove)],
+    before = {
+      if (is.null(ba)) stop("must specify ba column")
+      if (length(ba) > 1) stop("ba must be a single character string")
+      data[append(temp, values = tomove, after = (match(ba, temp)-1))]
+    },
+    after = {
+      if (is.null(ba)) stop("must specify ba column")
+      if (length(ba) > 1) stop("ba must be a single character string")
+      data[append(temp, values = tomove, after = (match(ba, temp)))]
+    })
+  x
+}
+
+# df <- moveme(df, c("b", "c"))
+# df <- moveme(df, c("b", "c"), "first")
+# df <- moveme(df, c("b", "c"), "before", "e") # will move b and c before e.
+# df <- moveme(df, c("b", "c"), "after", "e")
+
+cv_compute <- function(data, cv_name, cv_vector){
+  cv_name <- enquo(cv_name)
+  data %>% 
+      rowwise() %>% 
+      mutate(!!quo_name(cv_name) := mean(c(!!!cv_vector), na.rm = TRUE)) %>% 
+      ungroup()
+}
+
+alphatize <- function(data, vector){
+  temp <- 
+    data %>% 
+    select(!!!vector) %>% # note that variables in ... must be pre-quoted using quos() function
+    na.omit() %>% 
+    psych::alpha() 
+  
+  temp$total$raw_alpha %>% broman::myround(2)
+  # Example: 
+  # var_list <- quos(disp, wt, cyl)
+  # new_alpha <- alphatize(mtcars, var_list)
+}
+
+alphatize_2 <- function(data, vector){
+    data %>% 
+    select(!!!vector) %>% # note that variables in ... must be pre-quoted using quos() function
+    na.omit() %>% 
+    psych::alpha() 
+}
+
+standardize_list_vars <- function(data, vector){
+  # this function requires a vector of the variables that you want to standardize AND an ID vector with your participants' ID to merge them back with the full dataset
+fact <- data %>% select(!!!vector)
+
+fact_z <- fact %>% mutate_all(funs(scale(.)))
+
+colnames(fact_z) <- paste(colnames(fact_z), "z", sep = "_")
+
+fact_z_id <- bind_cols(id, fact_z)
+}
+```
+
+```{r custom functions factor analysis}
+factor_analysis <- function(data, vector){
+  fact <- data %>% select(!!!vector)
+  
+  corr_table <- round(cor(fact, use = "pairwise.complete.obs"), digits = 3) # you need to determine how NAs should be treated. SPSS uses deleting NAs pairwise as a default, so R should do the same in order to compare the results
+  
+  corrplot(corr_table, method = "circle") # plot matrix
+          
+  scree_plot <- scree(corr_table, factors = TRUE, pc = FALSE, main = "Scree plot", hline = NULL, add = FALSE); scree_plot # pc: principal components, pc is used in Confirmatory Factor Analysis (CFA), instead of Exploratory Factor Analysis (EFA)
+  # if the Eigen value is above the cutoff in the scree_plot, then you have a factor!
+  
+  # Begin Factor Analysis
+  # dim(fact); str(fact)
+  
+  # when reviewing the output of factanal, the Factor of each item should be > .6 to consider these items as part of the composite that we want to compute.
+  factanal(na.omit(fact), 
+    factors = 1, # how many factors to calculate
+    rotation = "varimax") # "varimax" uncorrelate the items by computing an orthogonal vector with all the items
+}
+```
+
+```{r}
+d_intv %<>% 
+  mutate(cd_bel = ifelse(cd_belonging == "all others" & cd_anycondition == "ctl", "ctl",
+                               ifelse(cd_belonging == "bel", "bel", NA)),
+         cd_cul = ifelse(cd_culture == "all others" & cd_anycondition == "ctl", "ctl",
+                               ifelse(cd_culture == "cul", "cul", NA)),
+         cd_wf = ifelse(cd_wisefeedback == "all others" & cd_anycondition == "ctl", "ctl",
+                               ifelse(cd_wisefeedback == "wf", "wf", NA)))
+
+d_intv %>% count(cd_belonging, cd_bel, cd_culture, cd_cul, cd_wisefeedback, cd_wf, cd_anycondition)
+```
+
+```{r Lists of variables from open-ended responses}
+vars_best_coll <-
+  c("me_focused",
+    "other_focused",
+    "relationships",
+    "belonging",
+    "interconnectedness",
+    "growth",
+    "gth_kdge_skls",
+    "gth_slf_actn",
+    "academics",
+    "social_id",
+    "novelty",
+    "independence",
+    "instrumental",
+    "specificity")
+
+vars_best_coll_categ <-
+  c("me_focused",
+    "other_focused",
+    "relationships",
+    "belonging",
+    "interconnectedness",
+    "growth",
+    "gth_kdge_skls",
+    "gth_slf_actn",
+    "academics",
+    "social_id",
+    "novelty",
+    "independence",
+    "instrumental")
+
+vars_best_coll_cont <- c("specificity")
+
+vars_worst_coll <-
+  c("wst_me_focused",
+    "wst_other_focused",
+    "wst_bias_disc_prej",
+    "wst_people_focused",
+    "wst_institution",
+    "wst_elite_prtge",
+    "wst_bu",
+    "wst_lonely",
+    "wst_soc_id",
+    "wst_stress",
+    "wst_stress_achmt",
+    "wst_stress_intpl",
+    "wst_stress_fam",
+    "wst_stress_othr",
+    "wst_mheath",
+    "wst_phealth",
+    "wst_specificity")
+
+vars_worst_coll_categ <-
+  c("wst_me_focused",
+    "wst_other_focused",
+    "wst_bias_disc_prej",
+    "wst_people_focused",
+    "wst_institution",
+    "wst_elite_prtge",
+    "wst_bu",
+    "wst_lonely",
+    "wst_soc_id",
+    "wst_stress",
+    "wst_stress_achmt",
+    "wst_stress_intpl",
+    "wst_stress_fam",
+    "wst_stress_othr",
+    "wst_mheath",
+    "wst_phealth")
+
+vars_worst_coll_cont <- c("wst_specificity")
+
+vars_purpose_coll <- 
+  c("ppse_me_focused",
+    "ppse_other_focused",
+    "ppse_relationships",
+    "ppse_interconnectedness",
+    "ppse_growth",
+    "ppse_kdge_skls",
+    "ppse_slf_actn",
+    "ppse_soc_id",
+    "ppse_intmtal",
+    "ppse_job_career",
+    "ppse_specificity")
+
+vars_purpose_coll_categ <- 
+  c("ppse_me_focused",
+    "ppse_other_focused",
+    "ppse_relationships",
+    "ppse_interconnectedness",
+    "ppse_growth",
+    "ppse_kdge_skls",
+    "ppse_slf_actn",
+    "ppse_soc_id",
+    "ppse_intmtal",
+    "ppse_job_career")
+
+vars_purpose_coll_cont <- c("ppse_specificity")
+
+vars_open_resp_all <- c(vars_best_coll, vars_worst_coll, vars_purpose_coll)
+
+vars_open_resp_cont <- c(vars_worst_coll_cont, vars_purpose_coll_cont, vars_best_coll_cont)
+vars_open_resp_categ <- c(vars_worst_coll_categ, vars_purpose_coll_categ, vars_best_coll_categ)
+```
+
+```{r inlab weight}
+inlab_w %<>% 
+  slice(-1) %>% 
+  slice(-1) %>% # remove first 2 columns
+  rename(sunet = participant_2,
+         weight_int = Winteger_1,
+         weight_dec = Wdecimal_1,
+         weight_other = Wother,
+         height_int = Hinteger_1,
+         height_dec = Hdecimal_1,
+         weight_1y = weight_firstyr) %>% 
+  mutate(sunet = tolower(sunet)) %>% 
+  filter(!is.na(sunet)) %>%
+  select(sunet, contains("weight"), box, contains("height"))
+  
+inlab_w$weight_1y <- inlab_w$weight_1y %>% 
+  str_replace(" lbs", "") %>% 
+  str_replace(" or below", "")
+
+# need to change @stanford.edu
+# inlab_w %>% select(sunet) %>% setdiff(d_intv %>% select(sunet))
+
+inlab_w$sunet <- inlab_w$sunet %>% 
+  str_replace("@stanford.edu", "")
+
+# 1 year BMI and new BMI, campare new BMI to the one I already have
+inlab_w %<>% 
+  mutate_at(vars(-c(sunet, box)), funs(as.numeric(.))) %>% 
+  select(-c(weight_happy, weight_feelbad, weight_trylose)) %>% 
+  rowwise() %>% 
+  mutate(weight_box = sum(weight_int, weight_dec, na.rm = TRUE),
+         weight_box = ifelse(!is.na(weight_other), weight_other, 
+                         ifelse(weight_box == 0, NA, weight_box)),
+         box_rc = ifelse(box == "A", 10,
+                         ifelse(box == "B", 6.4,
+                                ifelse(box == "C", 13.4, NA))),
+         weight = weight_box - box_rc,
+         height = sum(height_int, height_dec, na.rm = TRUE),
+         height = ifelse(height == 0.25, NA, height),
+         bmi_new = weight/(height^2)*703,
+         bmi_1y = weight_1y/(height^2)*703) %>% 
+  ungroup() 
+
+# check coding worked
+# inlab_w %>% 
+#   count(box, box_rc)
+
+inlab_w %<>% 
+  select(sunet, bmi_new, bmi_1y, weight) %>% 
+  arrange(sunet) %>% 
+  filter(!is.na(bmi_new) | !is.na(bmi_1y))
+  
+# inlab_w %>% select(bmi_new) %>% unique()
+```
+
+```{r joing inlab_w to d_intv}
+d_intv %<>% left_join(inlab_w, by = "sunet")
+```
+
+# Weight likert scales
+
+```{r inlab likert scales}
+inlab_w2 %<>% 
+  slice(-1) %>% 
+  slice(-1) %>% # remove first 2 columns
+  rename(sunet = participant_2) %>% 
+  mutate(sunet = tolower(sunet)) %>% 
+  filter(!is.na(sunet)) %>%
+  select(sunet, starts_with("weight"), -weight_firstyr) %>% 
+  filter(!is.na(weight_happy) | !is.na(weight_feelbad) | !is.na(weight_trylose)) %>% 
+  mutate_at(vars(-c(sunet)), funs(as.numeric(.)))
+
+inlab_w2$sunet <- inlab_w2$sunet %>% 
+  str_replace("@stanford.edu", "")
+
+d_intv %<>% left_join(inlab_w2, by = "sunet")
+```
+
+
+```{r check weight likert scales}
+# weight_feelbad, weight_trylose
+inlab_w2 %>% count(weight_happy)
+d_intv %>% count(weight_happy)
+
+# we are missing one participant when joining the weight answers, but this participant didn't give DBSS
+setdiff(inlab_w2 %>% select(sunet), d_intv %>% select(sunet))
+
+# inlab_w2 %>% filter(sunet == "jky")
+```
+
+Recoded weight_happy so higher values mean **more** happy with weight
+
+weight_feelbad: higher values mean feel **less** bad with weight
+
+weight_trylose: higher values mean **more** satisfied with weight (tried **less** to lose weight)
+
+```{r recoding and checking correlations and reliability}
+d_intv %<>% 
+  mutate(weight_happy_rc = 8 - weight_happy) 
+  
+d_intv %>% count(weight_happy, weight_happy_rc)
+
+vector_weight <- quos(weight_happy_rc, weight_feelbad, weight_trylose)
+
+d_intv %>% select(!!!vector_weight) %>% as.matrix() %>% Hmisc::rcorr()
+
+alphatize_2(d_intv, vector_weight)
+
+d_intv <- cv_compute(data = d_intv, cv_name = weight_comp3, cv_vector = vector_weight)
+```
+
+```{r variables premat intv}
+vars_iData <- 
+  quos(
+    iCohort_numeric, 
+    Y1_Spring_CumGPA, 
+    Y2_Sp_CumGPA,
+    t1startsmodule, 
+    t1quotesstart,
+    t1essaycomplete, 
+    t1measuresstart, 
+    t1measuresfinish, 
+    t1allcomplete, 
+    t1howcomplete, 
+    t1text_assent1, 
+    t1text_consent, 
+    t1timecomp_writingessay, 
+    t1timecomp_readingexpmaterials, 
+    iHSGpa, 
+    iHSPostal, 
+    iHSCity, 
+    iHSState, 
+    iHSCountry, 
+    t1finished, 
+    t1essay, 
+    t1culture_essay, 
+    t1belonging_essay1, 
+    t1belonging_essay2, 
+    t1feedback_essay, 
+    t1ECreasonableMNC, 
+    t1ECreasonableKBL, 
+    t1ECpersonalMNC, 
+    t1ECpersonalKBL,
+    t1manipcheck,
+    t1opportunity_joincommunities, 
+    t1opportunity_joincommunities, 
+    t1opportunity_giveback, 
+    t1opportunity_exploreinterests, 
+    t1opportunity_becomeindepthinker, 
+    t1thinkahead_text,
+    t1fall_fitin,
+    t1fall_belong,
+    t1fall_feelathome,
+    t1critfeedback_improvegrow,
+    t1critfeedback_distinguishbtwnSs,
+    t1excited,
+    t1enjoy,
+    t1fun,
+    t1transitiondifficultatfirst,
+    t1experiencedifficultiesatfirst,
+    t1fitin_sophomore,
+    t1belong_sophomore,
+    t1athome_sophomore,
+    t1posfeelings_profsTAs,
+    t1posfeelings_gettingtoknowotherSs,
+    t1posfeelings_beingawayfromhome,
+    t1posfeelings_receivingfeedback,
+    t1negfeelings_profsTAs,
+    t1negfeelings_gettingtoknowotherSs,
+    t1negfeelings_beingawayfromhome,
+    t1negfeelings_receivingfeedback, 
+    t1handleit_profsTAs, 
+    t1handleit_gettingtoknowotherSs,
+    t1handleit_beingawayfromhome,
+    t1handleit_receivingfeedback, 
+    t1mostlookingforwardto,
+    t1mostlookfwd_timing,
+    t1learnanything,
+    t1learnanything_yeswhat,
+    t1learnanything_timing
+  )
+
+# d_intv %>% 
+#   select(
+#     Y1_Spring_CumGPA, 
+#     Y2_Sp_CumGPA
+#   )
+```
+
+
+```{r prepare dataset with all variables}
+# take demographics out to merge back with d_intv
+d %<>% select(-c(disadvantaged:cd_anycondition), -startedSYFUS, -completedSYFUS)
+# d_intv %>% select(contains("gpa"))
+d_intv %<>% 
+  mutate(cd_bel = factor(cd_bel,
+               levels = c("ctl", "bel")
+               # , ordered = TRUE
+               ),
+           cd_cul = factor(cd_cul,
+               levels = c("ctl", "cul")
+               # , ordered = TRUE
+               ),
+      cd_wf = factor(cd_wf,
+               levels = c("ctl", "wf")
+               # , ordered = TRUE
+               ))
+
+d_intv %<>% select(idnum, sunet, gender:cd_anycondition, starts_with("cd_"), disadv2, hsrank:sattoact, cumgpa1y, starts_with("bmi"), starts_with("weight"), !!!vars_iData)
+
+# d_intv %>% count(cd_belonging, cd_culture, cd_wisefeedback, cd_anycondition)
+
+# d_intv %>% 
+#   select(cd_belonging, cd_culture, cd_wisefeedback, cd_anycondition) %>% 
+#   str()
+
+# d_intv %<>% 
+#   mutate(cd_belonging = relevel(cd_belonging, ref = "belonging"))
+  # select(starts_with("cd_")) %>% 
+  # str()
+
+d_all <-
+  d_intv %>%
+  left_join(d %>%
+              select(-contains("visits"), -disadv2) %>% 
+              mutate(idnum = as.character(idnum)), by = "idnum") %>%
+  left_join(d_hr, by = "idnum") %>% 
+  left_join(d_inst, by = "idnum")
+
+# Add open-ended constructs
+d_all %<>% rename(idt7 = t7___ResponseID)
+
+d_best_coll %<>% 
+  rename(
+    idt7 = idnum,
+    me_focused = `Me-focused`,
+    other_focused = `Other-focused`,
+    relationships = `Relationships`,
+    belonging = Belonging,
+    interconnectedness = Interconnectedness,
+    growth = Growth,
+    gth_kdge_skls = `Growth: Knowledge/skills`,
+    gth_slf_actn = `Growth: self-actualization`,
+    academics = Academics,
+    social_id = `Social Identity`,
+    novelty = Novelty,
+    independence = Independence,
+    instrumental = Instrumental,
+    specificity = Specificity)
+
+# d_best_coll %>% 
+#   names
+
+d_all <-
+  d_best_coll %>% 
+  select(idt7, !!!(quos(vars_best_coll))) %>% 
+  right_join(d_all, by = "idt7")
+
+# d_all %>% head
+# 
+# d_worst_coll %>% 
+#   names %>% 
+#   noquote
+
+d_worst_coll %<>% 
+  rename(
+    idt7 = idnum,
+    wst_me_focused = `Me-focused`,
+    wst_other_focused = `Other-focused`,
+    wst_bias_disc_prej = `Bias/discrimination/prejudice`,
+    wst_people_focused = `People-focused`,
+    wst_institution = Institution,
+    wst_elite_prtge = `Eliteness/prestige`,
+    wst_bu = `Belonging Uncertainty`,
+    wst_lonely = Loneliness,
+    wst_soc_id = `Social identity`,
+    wst_stress = Stress,
+    wst_stress_achmt = `Achievement Stress`,
+    wst_stress_intpl = `Interpersonal stress`,
+    wst_stress_fam  = `Family stress`,
+    wst_stress_othr = `Other stress`,
+    wst_mheath = `Mental health`,
+    wst_phealth = `Physical Health`,
+    wst_specificity = `Specificity`)
+
+d_all <-
+  d_worst_coll %>% 
+  select(idt7, !!!(quos(vars_worst_coll))) %>% 
+  right_join(d_all, by = "idt7")
+
+# d_purpose_coll %>% 
+#   names %>% 
+#   noquote
+
+d_purpose_coll %<>% 
+  rename(
+    idt7 = idnum,
+    ppse_me_focused = `Me-focused`,
+    ppse_other_focused = `Other-focused`,
+    ppse_relationships = `relationships`,
+    ppse_interconnectedness = `interconnectedness`,
+    ppse_growth = `Growth`,
+    ppse_kdge_skls = `knowledge/skills`,
+    ppse_slf_actn = `self-actualization`,
+    ppse_soc_id = `social identity`,
+    ppse_intmtal = `instrumental`,
+    ppse_job_career = `job/career`,
+    ppse_specificity = `specificity`)
+
+d_all <-
+  d_purpose_coll %>% 
+  select(idt7, !!!(quos(vars_purpose_coll))) %>% 
+  right_join(d_all, by = "idt7")
+```
+
+
+```{r add bmi}
+inlab %<>%
+  rename(
+    idnum = idnum.iData,
+    bmi = BMI
+  ) %>% 
+  select(idnum, bmi)
+
+# inlab %>% select(bmi) %>% filter(!is.na(bmi))
+
+inlab %<>% mutate(idnum = as.character(idnum))
+
+d_all %<>% left_join(inlab, by = "idnum")
+
+# d_all %>% select(bmi_1y) %>% filter(!is.na(bmi_1y))
+
+# inlab_w %>% select(bmi_1y) %>% filter(!is.na(bmi_1y))
+
+d_all %>% select(sunet, bmi, bmi_new) %>% filter(!is.na(bmi))
+
+# I get the same BMI. This was one of the first tasks that I did when I arrived at Stanford.
+# d_all %>% 
+#   rowwise() %>% 
+#   mutate(bmi_sub = round(bmi - bmi_new, 1)) %>% 
+#   select(contains("bmi")) %>% filter(!is.na(bmi) | !is.na(bmi_new)) %>% 
+#   count(bmi_sub)
+```
+
+# BMI
+
+BMI change score = 4-yr BMI - self-reported 1-yr BMI
+
+```{r bmi change score}
+# 4y bmi - 1y bmi
+d_all %<>% 
+  rowwise() %>% 
+  mutate(bmi_chge_scr = bmi - bmi_1y) %>% 
+  ungroup() 
+  
+# d_all %>% 
+#   select(starts_with("bmi")) %>% 
+#   summary()
+```
+
+Cut-offs for BMI: https://www.cdc.gov/obesity/adult/defining.html
+
+*    If your BMI < 18.5, it falls within the underweight range.
+*    If your BMI >= 18.5 to < 25, it falls within the normal.
+*    If your BMI >= 25.0 to < 30, it falls within the overweight range.
+*    If your BMI >= 30.0 or higher, it falls within the obese range.
+
+```{r compute new bmi variables based on cutoffs}
+# review variable
+# d_all$bmi %>% summary
+
+d_all %<>% 
+  mutate(bmi_uw = ifelse(bmi < 18.5, 1, 0), # underweight
+         bmi_n = ifelse(bmi >= 18.5 & bmi < 25, 1, 0), # normal
+         bmi_ow = ifelse(bmi >= 25 & bmi < 30, 1, 0), # overweight
+         bmi_obe = ifelse(bmi >= 30, 1, 0), # obese
+         bmi_uw_n = ifelse(bmi < 25, 1, 0), # underweight and normal
+         bmi_ow_obe = ifelse(bmi >= 25, 1, 0)) # overweight and obese
+
+# check that recoding worked
+# d_all %>% 
+#   count(bmi_uw, bmi_n, bmi_ow, bmi_obe, bmi_uw_n, bmi_ow_obe)
+```
+
+```{r Add CTRA variables}
+# Adding ctra variables to SYFUS
+ctra <- d0 %>% 
+  rename(
+    ctrarank_comp = t7_ctrarank_comp,
+    ctraz_comp = t7_ctraz_comp
+  ) %>% 
+  select(idnum, ctrarank_comp, ctraz_comp) %>% 
+  mutate(idnum = as.integer(idnum)) %>% 
+  filter(!is.na(ctrarank_comp))
+
+ctra %<>% mutate(idnum = as.character(idnum))
+
+d_all %<>% left_join(ctra, by = "idnum") 
+
+# To check that we have all participants
+# d_all %>% select(ctrarank_comp) %>% filter(!is.na(ctrarank_comp))
+
+# ctra1 <- ctra %>% filter(!is.na(ctrarank_comp)) %>% select(idnum, ctrarank_comp)
+# ctra2 <- d %>% filter(!is.na(ctrarank_comp)) %>% select(idnum, ctrarank_comp)
+# 
+# setdiff(ctra1, ctra2)
+
+# 20120776
+# This participant did not participate in SYFUS but did participate in the follow-up. That's why he/she has in-lba data but no survey data.
+
+# d0 %>% filter(idnum == 20120776)
+```
+
+```{r id_demog at the beginning}
+# d_all %>% names
+
+id_demog <- c("idnum", "gender", "race", "race_intl", "race_asianmaj", "race_asianmin", 
+              "disadvantaged", "disadv2", "firstgen", "startedFYFUS", "completedFYFUS", "startedSHYFUS", 
+              "completedSHYFUS", "startedJYFUS", "completedJYFUS", "recruitedSYFUS", "startedSYFUS",
+              "completedSYFUS", "recruitedDBSS", "startedDBSS", "gaveDBSS", "usefulDBSS", "recruitedHR",
+              "releasedHR", "usefulHR", "cd_belonging", "cd_culture", "cd_wisefeedback",
+              "cd_anytreatment", "cd_anycondition", "hsrank", "hsrank_no", "sattoact", "cumgpa1y",
+              "t1age2", "t1ses", "t1hsadvantage", "t1uscitizen", "t1milestostanford", "t1currentzip", "t1friendsgoingtoSU")
+
+# move "id_demog" variables at the beginning
+d_all %<>% moveme(tomove = id_demog, where = "first")
+```
+
+# Threat composites
+
+Both variations are standardized before computing the composite.
+
+One version has all threat variables:
+
+*    Belonging Uncertainty
+*    Contextual Threat: Others
+*    Contextual Threat: Self
+*    Stereotype Threat: Gender
+*    Stereotype Threat: Race
+*    Stereotype Threat: Social Class
+*    Family-College Disconnect
+*    Identity Friction: Gender
+*    Identity Friction: Race
+*    Identity Friction: Social Class
+
+Another with all threat variables except the ones about gender:
+
+*    Belonging Uncertainty
+*    Contextual Threat: Others
+*    Contextual Threat: Self
+*    Stereotype Threat: Race
+*    Stereotype Threat: Social Class
+*    Family-College Disconnect
+*    Identity Friction: Race
+*    Identity Friction: Social Class
+
+```{r list of variables threat}
+vars_threat <- 
+  quos(buwonder_r_use_this, 
+       cthreat_minorities,
+       cthreat_self,
+       stthreat_gender,
+       stthreat_race,
+       stthreat_ses,
+       integ_idgender,
+       integ_idrace,
+       integ_idclass,
+       famrelate_comp2)
+
+vars_threat_z <- 
+  quos(buwonder_r_use_this_z, 
+       cthreat_minorities_z,
+       cthreat_self_z,
+       stthreat_gender_z,
+       stthreat_race_z,
+       stthreat_ses_z,
+       integ_idgender_z,
+       integ_idrace_z,
+       integ_idclass_z,
+       famrelate_comp2_z)
+
+vars_threat_nogen <- 
+  quos(buwonder_r_use_this, 
+       cthreat_minorities,
+       cthreat_self,
+       stthreat_race,
+       stthreat_ses,
+       integ_idrace,
+       integ_idclass,
+       famrelate_comp2)
+
+vars_threat_nogen_z <- 
+  quos(buwonder_r_use_this_z, 
+       cthreat_minorities_z,
+       cthreat_self_z,
+       stthreat_race_z,
+       stthreat_ses_z,
+       integ_idrace_z,
+       integ_idclass_z,
+       famrelate_comp2_z)
+```
+
+```{r standardize and compute threat composite with reliability}
+id <- d_all %>% select(idnum)
+
+alpha_threat <- alphatize(d_all, vars_threat) # .62 is magic number
+
+# Standardize list of variables. Check custom functions
+fact_z_id <- standardize_list_vars(data = d_all, vector = vars_threat)
+
+# merge data 
+d_all %<>% left_join(fact_z_id, by = "idnum") 
+  
+# compute composite with standardized variables. Check custom functions
+d_all <- cv_compute(data = d_all, cv_name = threat_comp10, cv_vector = vars_threat_z)
+
+hist(d_all$threat_comp10)
+
+alpha_threat_nogen <- alphatize(d_all, vars_threat_nogen) # .62 is magic number
+  
+# compute composite with standardized variables. Check custom functions
+d_all <- cv_compute(data = d_all, cv_name = threat_nogen_comp8, cv_vector = vars_threat_nogen_z)
+
+hist(d_all$threat_nogen_comp8)
+```
+
+# At-risk Friends Score
+
+What percent of people are “at risk” with regards to friends? Three ways that you could code this:
+
+1.    You don't have enough friends (< 3 friends):
+
+https://psychcentral.com/lib/how-many-friends-do-you-need/
+
+"On average, people have three to five close, personal relationships. That’s all. Those of you who worry that you only have a few close friends can relax. You are well within normal."
+
+friends_atrisk_notenough = if closefriendscount < 3, then student gets a 1, otherwise 0.
+
+2.    Your friends aren't close (< -1 SD):
+
+First, I standardized the variable friends_atrisk_notclose, then I set the cutoff to < -1 SD 
+
+3.    You feel there are no people you can turn to. Coded in two ways:
+  i)  closefriends_comp3 < 4 (includes Somewhat disagree to Strongly disagree)
+  i)  closefriends_comp3 < 5 (includes Neither agree nor disagree to Strongly disagree)
+
+
+```{r friends at-risk}
+# This code is for the last step of "friends_atrisk_score". I used it to double-check that we weren't missing responses from any of these variables. I ended filtering the data with "closefriends_comp3" since this variable has more responses and includes all the other responses of the other two variables.
+
+# d_all %>% select(idnum, closefriendscount, closenessfriends_comp7, closefriends_comp3, friends_atrisk_notppl) %>% filter(!is.na(closefriendscount))
+
+# 428 when filter(!is.na(closefriendscount))
+# 428 when filter(!is.na(closenessfriends_comp7))
+# 447 when filter(!is.na(closefriends_comp3))
+
+d_all %<>% 
+  mutate(friends_atrisk_notenough = ifelse(closefriendscount < 3, 1, 0),
+         # closenessfriends_comp7_sd = sd(closenessfriends_comp7, na.rm = TRUE),
+         # closenessfriends_comp7_mn = mean(closenessfriends_comp7, na.rm = TRUE),
+         # friends_atrisk_sdcutoff = closenessfriends_comp7_mn - closenessfriends_comp7_sd,
+         # friends_atrisk_notclose = ifelse(closenessfriends_comp7 < friends_atrisk_sdcutoff, 1, 0),
+         # closenessfriends_comp7_z = scale(closenessfriends_comp7),
+         friends_atrisk_notclose = ifelse(scale(closenessfriends_comp7) < -1, 1, 0),
+         friends_atrisk_notppl = ifelse(closefriends_comp3 < 4, 1, 0),
+         friends_atrisk_notppl2 = ifelse(closefriends_comp3 < 5, 1, 0)) %>% 
+rowwise() %>% 
+  mutate(friends_atrisk_score = sum(friends_atrisk_notenough, friends_atrisk_notclose, friends_atrisk_notppl, na.rm = TRUE),
+         friends_atrisk_score2 = sum(friends_atrisk_notenough, friends_atrisk_notclose, friends_atrisk_notppl2, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  mutate(friends_atrisk_score = ifelse(!is.na(closefriends_comp3), friends_atrisk_score, NA),
+         friends_atrisk_score2 = ifelse(!is.na(closefriends_comp3), friends_atrisk_score2, NA)) # change 0s to NAs
+
+d_all %>% 
+  count(friends_atrisk_score, friends_atrisk_score2, friends_atrisk_notppl, friends_atrisk_notppl2)
+```
+
+# % At-risk friends
+
+```{r}
+d_all %<>% 
+  mutate(friends_atrisk_pct = ifelse(friends_atrisk_score == 0, 0, 1),
+         friends_atrisk_pct2 = ifelse(friends_atrisk_score2 == 0, 0, 1)) 
+
+d_all %>% 
+  count(friends_atrisk_score, friends_atrisk_pct, friends_atrisk_pct2, friends_atrisk_score2)
+```
+
+# Mentor information
+
+Below, you can find summary tables of how many people gave us mentor information by disadvantaged status and condition in the SYFUS:
+
+```{r}
+d_all %<>% 
+  mutate(mentor_name = mentor_info_4_TEXT,
+         mentor_role = mentor_info_6_TEXT,
+         mentor_email = mentor_info_10_TEXT,
+         mentor_name2 = mentor_2info_4_TEXT,
+         mentor_role2 = mentor_2info_6_TEXT,
+         mentor_email2 = mentor_2info_10_TEXT,
+         mentor_name = ifelse(mentor_name == "N/A", NA, mentor_name),
+         mentor_email = ifelse(mentor_email == "-" | 
+                               mentor_email == "I do not know as she does not work here" | 
+                               mentor_email == "N/A" | 
+                               mentor_email == "Not sure" | 
+                               mentor_email == "Unknown" | 
+                               mentor_email == "Look up his Stanford email, last name might be slightly misspelled", NA, mentor_email))
+
+# To check that every student that gave information of the second mentor also gave information of first mentor
+# d_all %>% select(mentor_name, mentor_name2) %>% 
+#   filter(!is.na(mentor_name) | !is.na(mentor_name2))
+
+d_all %>%
+  filter(startedSYFUS == 1) %>% 
+  group_by(disadvantaged, cd_anytreatment) %>% 
+  summarise(n = sum(!is.na(mentor_name)),
+            n_syfus = sum(!is.na(disadvantaged))) %>% 
+  mutate(pct = round((n/n_syfus)*100, 1)) %>% 
+  ungroup()
+
+d_all %>%
+  filter(startedSYFUS == 1) %>% 
+  group_by(disadvantaged, cd_anycondition) %>% 
+  summarise(n = sum(!is.na(mentor_name)),
+            n_syfus = sum(!is.na(disadvantaged))) %>% 
+  mutate(pct = round((n/n_syfus)*100, 1)) %>% 
+  ungroup()
+
+
+```
+
+# Contact information other people
+
+Contact info of other people, these involve family, friends, or significant others.
+
+Below, you can find summary tables of how many people gave us contact information of other people by disadvantaged status and condition in the SYFUS:
+
+```{r contact info other people}
+# cio: contact info other
+d_all %<>% 
+  mutate(cio_name = contactinfo_other_14_TEXT,
+         cio_rel = contactinfo_other_16_TEXT,
+         cio_email = contactinfo_other_18_TEXT,
+         cio_phone = contactinfo_other_19_TEXT,
+         cio_name = ifelse(cio_name == "just call my cellphone" | cio_name == "Just contact me", NA, cio_name))
+
+d_all %>%
+  filter(startedSYFUS == 1) %>% 
+  group_by(disadvantaged, cd_anytreatment) %>% 
+  summarise(n = sum(!is.na(cio_name)),
+            n_syfus = sum(!is.na(disadvantaged))) %>% 
+  mutate(pct = round((n/n_syfus)*100, 1)) %>% 
+  ungroup()
+
+d_all %>%
+  filter(startedSYFUS == 1) %>% 
+  group_by(disadvantaged, cd_anycondition) %>% 
+  summarise(n = sum(!is.na(cio_name)),
+            n_syfus = sum(!is.na(disadvantaged))) %>% 
+  mutate(pct = round((n/n_syfus)*100, 1)) %>% 
+  ungroup()
+
+```
+
+
+
+# Clean demographics from pre-matriculation intervention
+
+*    old demographic (cleaned demographic)
+*    t1age2 (age): age when students completed pre-mat intv
+*    t1ses (ses): How would you describe your family's social class? 
+   +    1 = Working class
+   +    2 = Lower middle class
+   +    3 = Middle class
+   +    4 = Upper middle class
+   +    5 = Upper class
+*    t1hsadvantage (hs_disadv): How do you think the high school you attended compares to the high schools attended by most other incoming Stanford freshmen? (t1_hsstatus)
+   +    9 = My high school is more advantaged than the high schools attended by most other incoming students
+   +    10 = My high school is neither more advantaged nor more disadvantaged than the high schools attended by most other incoming students
+   +    11 = My high school is more disadvantaged than the high schools attended by most other incoming students
+*    t1uscitizen (us_yes): Are you a US citizen?
+   +    0 = no
+   +    1 = yes
+*    t1milestostanford: How far in miles is your high school from Stanford (please provide your best guess)
+*    t1currentzip (zipcode): Your current zip code (if you live in the US)
+*    t1friendsgoingtoSU (friends_su): How many friends do you have who will attend Stanford next year?
+   +    1 = None
+   +    2 = 1 or 2
+   +    3 = 3 to 5
+   +    4 = 6 to 8
+   +    5 = More than 8
+
+```{r}
+vector_demog <- quos(t1age2, t1ses, t1hsadvantage, t1uscitizen, t1milestostanford, t1currentzip, t1friendsgoingtoSU)
+
+d_all %>% select(!!!vector_demog) %>% summary
+```
+
+```{r clean demographics from premat intv}
+d_all %<>% 
+  mutate(gender_num = ifelse(gender == "f", 1, 0),
+         age = str_replace_all(t1age2, 
+             c("`8" = "18", "17 almost 18" = "17", "17 years" = "17", "18 in a few days" = "17", 
+               "18 years" = "18", "18 old" = "18", "Eighteen" = "18", "81" = "18", 
+               "why is this not a drop-down box" = "", 
+               ", but can't you look this up with my SUNet ID" = "", "[?()]" = "")) %>% 
+            as.integer(),
+         ses = factor(t1ses, 
+                      levels = c(1, 2, 3, 4, 5),
+                      labels = c("working", "low-middle", "middle", "upper-middle", "upper")),
+         ses_num = t1ses,
+         ses_collapsed = ifelse(ses == "working" | ses == "low-middle" | ses == "middle", "working/middle", "upper"),
+         ses_collapsed_num = ifelse(ses_collapsed == "working/middle", 1, 0),
+         hs_disadv = ifelse(t1hsadvantage == 9, 0,
+                           ifelse(t1hsadvantage == 10, 1,
+                                  ifelse(t1hsadvantage == 11, 2, NA))),
+         hs_disadv_num = hs_disadv,
+         hs_disadv = factor(hs_disadv, 
+                            levels = c(0, 1, 2),
+                      labels = c("adv", "neutral", "disadv")),
+         us_yes_num = t1uscitizen,
+         us_yes = factor(us_yes_num,
+                         levels = c(0, 1),
+                      labels = c("no", "yes")),
+         # hs_miles_su = str_replace_all(t1milestostanford, 
+         #    c("miles" = "", "mile" = "", "Mile" = "", "about " = "", "About " = "")),
+         zipcode = str_replace_all(t1currentzip, 
+              c("-1605" = "", 
+                "-4107" = "",
+                "California" = NA_character_, 
+                "IL" = NA_character_, 
+                "N/A" = NA_character_,
+                "School: 03301 Home: 94123" = "94123",
+                "V7V 2X9" = NA_character_,
+                "742CU001" = NA_character_)),
+         zipcode = ifelse(zipcode == "\\", NA_character_, zipcode),
+         zipcode = as.integer(zipcode),
+         friends_su_num = t1friendsgoingtoSU,
+         friends_su = factor(t1friendsgoingtoSU,
+                             levels = c(1, 2, 3, 4, 5),
+                             labels = c("none", "1 or 2", "3 to 5", "6 to 8", ">8")))
+
+d_all %>% count(age, t1age2)
+
+d_all %>% count(ses, t1ses, ses_num, ses_collapsed)
+
+d_all %>% count(hs_disadv, t1hsadvantage, hs_disadv_num)
+
+d_all %>% count(us_yes, us_yes_num, t1uscitizen)
+
+d_all %>% count(t1currentzip, zipcode)
+
+d_all %>% count(t1friendsgoingtoSU, friends_su)
+```
+
+```{r demographics iData}
+vars_demog <- quos(idnum, gender, race, race_intl, race_asianmaj, race_asianmin, 
+              disadvantaged, disadv2, firstgen, cd_belonging, cd_culture, cd_wisefeedback,
+              cd_anytreatment, cd_anycondition)
+
+d_all %>% select(!!!vars_demog) %>% write_csv("../../data/c2016_demographics_cleaned.csv")
+d_all %>% select(!!!vars_demog) %>% write_rds("../../data/c2016_demographics_cleaned.rds")
+
+vars_demog_eli <- quos(idnum, gender, race, race_intl, race_asianmaj, race_asianmin, 
+              at_risk_corrected, at_risk, firstgen, cd_belonging, cd_culture, cd_wisefeedback,
+              cd_anytreatment, cd_anycondition)
+
+d_all %>% rename(at_risk = disadv2,
+                 at_risk_corrected = disadvantaged) %>% 
+  select(!!!vars_demog_eli) %>% 
+  write_csv("../../data/c2016_demographics_cleaned_for_elizabeth.csv")
+```
+
+# Clean Manipulation check
+
+"Thank you very much. We appreciate your taking the time to share with us your thoughts and feelings about coming to Stanford. Next, we would like to ask you a few questions. These won’t take long. You’re almost done. What was the most central message from the Current Students Survey you read about?"
+ 
+*    1 = That students learn that instructors at Stanford give critical feedback to help students reach a higher standard.
+*    2 = That students worry initially that they don't belong at Stanford but come to feel at home at Stanford with time.
+*    3 = That students get used to the physical environment at Stanford with time.
+*    4 = That students worry about leaving their homes and communities behind but, with time, become a part of the Stanford community while maintaining their relationships with people back home.
+*    5 = That students learn new study and time management skills to help manage college work.
+*    6 = That students come to understand social and political issues in a more sophisticated way in college.
+
+```{r}
+# d_all %>% select(contains("man"))
+
+# d_all %>% count(t1manipcheck)
+
+d_all %<>% 
+  mutate(manipcheck = factor(t1manipcheck,
+                              levels = c(1, 2, 3, 4, 5, 6),
+                      labels = c("wf", "bel", "ctl", "cul", "t_mgt", "sp_iss")),
+         mc_wf = ifelse(manipcheck == "wf", 1, 0),
+         mc_bel = ifelse(manipcheck == "bel", 1, 0),
+         mc_ctl = ifelse(manipcheck == "ctl", 1, 0),
+         mc_cul = ifelse(manipcheck == "cul", 1, 0),
+         mc_other = ifelse(manipcheck == "t_mgt" | manipcheck == "sp_iss", 1, 0)) # wise feedback manipulation check
+  
+d_all %>% 
+  count(t1manipcheck, manipcheck, mc_wf, mc_bel, mc_ctl, mc_cul, mc_other)
+```
+
+# Clean Positive and Negative Feelings
+```{r}
+vars_posfeels <- 
+  quos(t1posfeelings_profsTAs, t1posfeelings_gettingtoknowotherSs, 
+       t1posfeelings_beingawayfromhome, t1posfeelings_receivingfeedback)
+
+d_all %>% select(!!!vars_posfeels) %>% describe
+
+d_all <- cv_compute(data = d_all, cv_name = posfeels_comp4, cv_vector = vars_posfeels)
+```
+
+## Positive Feelings
+### Factor Analysis
+
+```{r}
+factor_analysis(d_all, vars_posfeels)
+```
+
+### Reliability analysis
+```{r}
+# alpha(na.omit(d_all %>% select(!!!vars_posfeels))) # .62 is magic number
+
+alphatize_2(d_all, vars_posfeels)
+```
+
+```{r}
+vars_negfeels <- 
+  quos(t1negfeelings_profsTAs, t1negfeelings_gettingtoknowotherSs, 
+       t1negfeelings_beingawayfromhome, t1negfeelings_receivingfeedback)
+
+d_all %>% select(!!!vars_negfeels) %>% describe
+
+d_all <- cv_compute(data = d_all, cv_name = negfeels_comp4, cv_vector = vars_negfeels)
+```
+
+## Negative Feelings
+### Factor Analysis
+
+```{r}
+factor_analysis(d_all, vars_negfeels)
+```
+
+### Reliability analysis
+```{r}
+# alpha(na.omit(d_all %>% select(!!!vars_negfeels))) # .62 is magic number
+alphatize_2(d_all, vars_negfeels)
+```
+
+# Age four years after the pre-mat intervention
+```{r}
+d_all %<>% mutate(age_4y = age + 4)
+d_all %>% count(age_4y, age)
+```
+
+```{r create simplified variables for demographics and conditions}
+d_all %<>% 
+  mutate(disadv = disadvantaged,
+         disadv = relevel(disadv, ref = "adv"),
+         treat = cd_anytreatment,
+         treat = relevel(treat, ref = "ctl"),
+         treat_num = as.integer(treat),
+         treat_num = treat_num - 1,
+         disadv_num = as.integer(disadv),
+         disadv_num = disadv_num - 1,
+         gend = gender,
+         gend_num = as.integer(gend),
+         gend_num = gend_num - 1,
+         cd_bel_num = as.integer(cd_bel),
+         cd_cul_num = as.integer(cd_cul),
+         cd_wf_num = as.integer(cd_wf),
+         race_amaj = ifelse(race_asianmaj == "white/asian", "maj", "min") %>% as.factor,
+         race.w = ifelse(race == "white", "w", "not w") %>% as.factor %>% relevel(., ref = "not w"),
+         race.a = ifelse(race == "asian", "a", "not a") %>% as.factor %>% relevel(., ref = "not a"),
+         race.b = ifelse(race == "black", "b", "not b") %>% as.factor %>% relevel(., ref = "not b"),
+         race.h = ifelse(race == "hispanic", "h", "not h") %>% as.factor %>% relevel(., ref = "not h"),
+         race.n.pi = ifelse(race == "native" | race == "pacific islander", "n.pi", "not n.pi") %>% as.factor %>% relevel(., ref = "not n.pi"),
+         hsrank_no.f = as.factor(hsrank_no),
+         firstgen_num = ifelse(as.integer(firstgen) == 1, 0, 1),
+         race_amaj_num = ifelse(as.integer(race_amaj) == 1, 0, 1),
+         race.w_num = ifelse(as.integer(race.w) == 1, 0, 1),
+         race.a_num = ifelse(as.integer(race.a) == 1, 0, 1),
+         race.b_num = ifelse(as.integer(race.b) == 1, 0, 1),
+         race.h_num = ifelse(as.integer(race.h) == 1, 0, 1),
+         race.n.pi_num = ifelse(as.integer(race.n.pi) == 1, 0, 1)
+         )
+
+d_all %>% count(race_asianmaj, race_amaj, race_amaj_num)
+
+d_all %>% count(race, race.w, race.w_num, race.a, race.a_num, race.b, race.b_num, race.h, race.h_num, race.n.pi, race.n.pi_num)
+
+d_all %>% count(firstgen, firstgen_num)
+
+d_all %>% count(cd_anycondition, disadvantaged)
+
+d_all %>% count(treat, treat_num)
+
+d_all %>% count(gender, gender_num, gend, gend_num)
+
+d_all %>% count(firstgen, firstgen_num)
+```
+
+# Effect coding
+```{r}
+d_all %<>% mutate(
+         disadv_ec = ifelse(disadv == "disadv", 1, 2), # effect coding
+         disadv_ec = factor(disadv_ec, levels = c(1, 2), labels = c("disadv", "adv")), # effect coding
+         treat_ec = ifelse(treat == "treat", 1, 2), # effect coding
+         treat_ec = factor(treat_ec, levels = c(1, 2), labels = c("treat", "ctl")), # effect coding
+         cond = cd_anycondition,
+         cond_num = as.integer(cond),
+         cond_ec = ifelse(cond == "ctl", 4,
+                             ifelse(cond == "bel", 1,
+                                ifelse(cond == "cul", 2, 3))),
+              cond_ec = factor(cond_ec, levels = c(1, 2, 3, 4), labels = c("bel", "cul", "wf", "ctl")),
+         treat_sc = ifelse(treat == "treat", 2, 1),
+              treat_sc = factor(treat_sc, levels = c(1, 2), labels = c("ctl", "treat")),
+              cond_sc = ifelse(cond == "ctl", 1,
+                             ifelse(cond == "bel", 2,
+                                ifelse(cond == "cul", 3, 4))),
+              cond_sc = factor(cond_sc, levels = c(1, 2, 3, 4), labels = c("ctl", "bel", "cul", "wf")),
+              disadv_sc = ifelse(disadv == "disadv", 2, 1), # effect coding
+         disadv_sc = factor(disadv_sc, levels = c(1, 2), labels = c("adv", "disadv"))) # effect coding)
+
+contrasts(d_all$treat_ec) = contr.sum(2) # effect coding
+contrasts(d_all$disadv_ec) = contr.sum(2) # effect coding
+contrasts(d_all$cond_ec) = contr.sum(4)  # effect coding
+
+d_all %>% count(treat, treat_ec)
+
+d_all %>% count(disadv, disadv_ec)
+
+d_all %>% count(cond, cond_ec)
+
+d_all %>% select(treat, treat_ec, disadv, disadv_ec, cond, cond_ec) %>% str
+
+#creating the contrast matrix manually by modifying the dummy coding scheme
+# Two levels
+c <- contr.treatment(2)
+my.coding <- matrix(rep(1/2, 2), ncol = 1)
+my.simple <- c - my.coding
+
+contrasts(d_all$disadv_sc) <- my.simple
+contrasts(d_all$treat_sc) <- my.simple
+
+d %>% select(starts_with("disadv")) %>% str
+
+# Four levels
+c <- contr.treatment(4)
+my.coding <- matrix(rep(1/4, 12), ncol=3)
+my.simple <- c - my.coding
+# my.simple
+
+contrasts(d_all$cond_sc) <- my.simple
+
+d_all %>% select(starts_with("cond")) %>% str
+
+
+d_all$disadv %>% attr("contrasts")
+d_all$disadv_ec %>% attr("contrasts")
+d_all$disadv_sc %>% attr("contrasts")
+
+d_all$treat %>% attr("contrasts")
+d_all$treat_ec %>% attr("contrasts")
+d_all$treat_sc %>% attr("contrasts")
+
+d_all$cond %>% attr("contrasts")
+d_all$cond_ec %>% attr("contrasts")
+d_all$cond_sc %>% attr("contrasts")
+```
+
+# Add Institutional data
+
+```{r}
+inst <- read_rds("../../../Institutional data/c2016_individual_level_stem_gpa_cleaned_7_1_2018.rds")
+```
+
+```{r}
+# inst %>% 
+#   names %>% 
+#   noquote
+
+inst2 <- inst %>% 
+  select(
+    idnum,
+    cum_stem_gpa_points_y4_spring,
+    unit_total, 
+    cum_stem_gpa_y4_spring
+    )
+
+d_all %<>% 
+  left_join(inst2, by = "idnum")
+```
+
+```{r compute new variables}
+##Make belong_comp4
+vector_belong2 <- quos(belong_belong, belong_fitin, belong_outsider_r_use_this, belong_similar)
+d_all <- cv_compute(data = d_all, cv_name = belong_comp4, cv_vector = vector_belong2)
+
+d_all %<>% mutate(success_usethis_percent = success_usethis*10)
+d_all %<>% mutate(potential_usethis_percent = potential_usethis*10)
+
+d_all %<>% mutate(
+  mc_pass = ifelse(mc_wf == 1 & cond == "wf", 1,
+              ifelse(mc_cul == 1 & cond == "cul", 1,
+                ifelse(mc_bel == 1 & cond == "bel", 1,
+                  ifelse(mc_ctl == 1 & cond == "ctl", 1, 0))))
+)
+```
+
+
+# Compute New Demographics Variables
+
+## Disadvantaged Status and Race
+
+```{r load custom functions}
+source("../custom_functions/custom_functions.R")
+```
+
+```{r}
+d_all %>% 
+  demographics_pct(quos(race, disadv, firstgen))
+```
+
+**NOTE**: There is one white,	disadvaged,	not first-gen student. As we can see in the data below. This Ss is international. That's why he is coded as a disadvantaged student.
+
+```{r}
+d_all %>% 
+  filter(
+    race == "white" & 
+      disadv == "disadv" & 
+      firstgen == "not first-gen"
+  )
+```
+
+
+```{r}
+d_all %>% 
+  demographics_pct(quos(race_intl, disadv, firstgen))
+```
+
+**NOTE**: There is one international,	advantaged,	first-generation student. As we can see in the data below. This Ss is asian That's why he is coded as an advantaged student, regardless of his first-generation status.
+
+```{r}
+d_all %>% 
+  filter(
+    race_intl == "international student" & 
+      disadv == "adv" & 
+      firstgen == "first-gen"
+  )
+```
+
+```{r}
+d_all %<>%
+  mutate(
+    adv_hispanic_num = 
+      ifelse(
+        race == "hispanic", 2,
+        ifelse(
+          disadv == "adv", 1, 3
+        )
+      ),
+    adv_hispanic = 
+      factor(
+        adv_hispanic_num, 
+        labels = c("adv", "hispanic", "other")
+      ),
+    adv_hispanic_sc = adv_hispanic,
+    adv_black_num = 
+      ifelse(
+        race == "black", 1,
+        ifelse(
+          disadv == "adv", 0, 2
+        )
+      ),
+    adv_black = 
+      factor(
+        adv_black_num, 
+        labels = c("adv", "black", "other")
+      ),
+    adv_black_sc = adv_black,
+    adv_pi_num = 
+      ifelse(
+        race == "pacific islander", 1,
+        ifelse(
+          disadv == "adv", 0, 2
+        )
+      ),
+    adv_pi = 
+      factor(
+        adv_pi_num, 
+        labels = c("adv", "pacific islander", "other")
+      ),
+    adv_pi_sc = adv_pi,
+    adv_minority_num = 
+      ifelse(
+        race == "black", 2,
+        ifelse(
+          race == "hispanic", 3,
+          ifelse(
+            race == "pacific islander" | race == "native", 4,
+            ifelse(
+              disadv == "adv", 1, 5
+            )
+          )
+        )
+      ),
+    adv_minority = 
+      factor(
+        adv_minority_num, 
+        labels = c("adv", "black", "hispanic", "pi.native", "white first-gen")
+      ),
+    adv_minority_sc = adv_minority
+  )
+
+# Three levels
+c <- contr.treatment(3)
+my.coding <- matrix(rep(1/3, 6), ncol=2)
+my.simple <- c - my.coding
+# my.simple
+contrasts(d_all$adv_hispanic_sc) <- my.simple
+d_all$adv_hispanic_sc %>% attr("contrasts")
+
+contrasts(d_all$adv_black_sc) <- my.simple
+d_all$adv_black_sc %>% attr("contrasts")
+
+contrasts(d_all$adv_pi_sc) <- my.simple
+d_all$adv_pi_sc %>% attr("contrasts")
+
+d_all %>% 
+  demographics_pct(
+    quos(
+      race, disadv, adv_hispanic, adv_black, adv_pi
+      )
+    )
+
+d_all %>% 
+  demographics_pct(
+    quos(
+      race, disadv_sc, adv_hispanic_sc, adv_black_sc, adv_pi_sc
+      )
+    )
+
+# Five levels
+c <- contr.treatment(5)
+my.coding <- matrix(rep(1/5, 20), ncol=4)
+my.simple <- c - my.coding
+# my.simple
+contrasts(d_all$adv_minority_sc) <- my.simple
+d_all$adv_minority_sc %>% attr("contrasts")
+
+d_all %>% 
+  demographics_pct(
+    quos(
+      adv_minority_sc
+      )
+    )
+
+d_all %>% 
+  demographics_pct(
+    quos(
+      race, disadv_sc, adv_minority_sc
+      )
+    )
+```
+
+## First-Generation and Race
+
+```{r}
+d_all %<>%
+  mutate(
+    firstgen_race_num = 
+      ifelse(
+        race == "white" & firstgen == "not first-gen", 1,
+        ifelse(
+          race == "white" & firstgen == "first-gen", 2,
+          ifelse(
+            race == "asian" & firstgen == "not first-gen", 3,
+            ifelse(
+              race == "asian" & firstgen == "first-gen", 4,
+              ifelse(
+                race_asianmaj == "black/hispanic/native/pacificislander" & 
+                  firstgen == "not first-gen", 5, 6
+              )
+            )
+          )
+        )
+      ),
+    firstgen_race = 
+      factor(
+        firstgen_race_num, 
+        labels = c("white CG", "white FG", "asian CG", "asian FG", "minority CG", "minority FG")
+      ),
+    firstgen_race_sc = firstgen_race
+  )
+
+# Five levels
+c <- contr.treatment(6)
+my.coding <- matrix(rep(1/6, 30), ncol=5)
+my.simple <- c - my.coding
+# my.simple
+contrasts(d_all$firstgen_race_sc) <- my.simple
+d_all$firstgen_race_sc %>% attr("contrasts")
+
+d_all %>% 
+  demographics_pct(
+    quos(
+      race, firstgen, firstgen_race_sc, firstgen_race_num
+      )
+    )
+```
+
+
+# Export Dataset
+```{r export dataset}
+d_all %>% write_rds("../../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+d_all %>% write_csv("../../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.csv")
+```
+
+
+# Filter by string pattern
+
+This filter is useful when you want to search for keywords in sentences. First, you need to create a vector with the keywords you want to search. Then, you run the code below with the vector filter that you created above.
+
+```{r}
+# collexp_open
+
+library(stringi)
+library(dplyr)
+
+filter.exp <- c("Stanford has been the best experience of my entire life. And I mean 'best' not in a positive or a negative way","I came into Stanford very sure of myself as a student and very unsure of myself as a human being", "my years at stanford have been utterly transformative. i am thankful every day for the person that this university has helped me become", "My time at Stanford has been weird because it's like I had two disconnected experiences. At first", "I had a rough transition to Stanford where I felt that I was not academically prepared to take on the rigor of stanford")
+
+dfilter.exp <- 
+  d_all[grep(paste0(filter.exp, collapse = "|"), d_all$collexp_open),] %>% # Filter the data
+  select(idnum, cond, collexp_open) # Subset the dataset
+```
+
+```{r}
+shoshana <- d_all %>% filter(startedSYFUS == 1) %>% select(idnum, disadvantaged, gender, race, race_asianmaj, race_asianmin, firstgen, cd_anycondition, cd_anytreatment, contains("mentor"))
+
+# shoshana %>% write_csv("../../../Pre-matriculation Intervention/Cohort 2016 Files/SYFUS/Data for Shoshana/c2016_syfus_mentors_5-31-2018.csv")
+# 
+# shoshana %>% write_rds("../../../Pre-matriculation Intervention/Cohort 2016 Files/SYFUS/Data for Shoshana/c2016_syfus_mentors_5-31-2018.rds")
+# 
+# write.foreign(shoshana, "../../../Pre-matriculation Intervention/Cohort 2016 Files/SYFUS/Data for Shoshana/c2016_syfus_mentors_5-31-2018.txt", "../../../Pre-matriculation Intervention/Cohort 2016 Files/SYFUS/Data for Shoshana/c2016_syfus_mentors_5-31-2018.sps", package = "SPSS")
+```
+
