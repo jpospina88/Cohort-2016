@@ -1,0 +1,244 @@
+---
+title: "New Analyses"
+author: "Juan Ospina"
+date: "12/13/2018"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+---
+
+```{r clean system, message=TRUE, warning=TRUE, include=FALSE}
+rm(list = ls()) # clean environment
+```
+
+```{r global options, echo=FALSE}
+knitr::opts_chunk$set(
+  # fig.path = 'figs/', fig.show = 'asis', 
+  dpi = 75, 
+  # include = FALSE, 
+  echo = FALSE, # run the code, show me only the graphs
+  warning = FALSE, message = FALSE, cache = FALSE)
+```
+
+```{r packages}
+library(magrittr)
+library(RColorBrewer)
+library(reshape2)
+library(tidyverse)
+library(emmeans) # to get adjusted means and to plot the summary statistics of models
+library(kableExtra)
+library(psych)
+library(apaTables)
+library(ez)
+library(grid) # For iterative plots
+library(gridExtra) # For iterative plots
+library(ggplot2)
+library(ggstatsplot)
+```
+
+```{r data files}
+# For Juan
+d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+
+# For RAs
+# d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+
+options(contrasts = c("contr.helmert", "contr.poly")) # ANOVA contrasts
+```
+
+```{r bar plot settings}
+# These elements are not going to change from plot to plot, so I added them here so we don't have to copy paste unnecesary code
+pd1 <- position_dodge()
+pd2 <- position_dodge(0.1)
+pd3 <- position_dodge(width = 0.9)
+black1 <- element_text(color = "White")
+black2 <- element_rect(fill = "black", colour = "Black", size = NULL, linetype = NULL, color = "Black", inherit.blank = FALSE)
+
+# theme <- theme(strip.text = black1, strip.background = black2, axis.text = element_text(size = 14),
+#         axis.title = element_text(size = 14), strip.text.x = element_text(size = 14, colour = "white"),
+#         panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+theme.cond <- theme(strip.text = black1, strip.background = black2, axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14), strip.text.x = element_text(size = 14, colour = "white"),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+theme1 <- theme_light()
+# theme1 <- theme_classic()
+guides_no <- guides(fill = FALSE)
+pd4 <- position_stack(vjust = 1.1)
+
+color_treat <- scale_fill_manual(name = "", 
+                                 values = c("ctl" = "salmon", 
+                                            "treat" = "#56B4E9")) # add only to graphs between treatment and control
+
+legend_treat <- scale_color_manual(name = "", 
+                                  values = c("ctl" = "salmon", 
+                                             "treat" = "steelblue2"))
+
+positions_treat <- c("ctl", "treat")
+
+# labels_treat <- scale_x_discrete(labels = c('Control','Treatment'), limits = positions_treat)
+labels_treat <- 
+  scale_x_discrete(labels = c('X','T'), limits = positions_treat)
+
+positions_cond <- c("ctl", "bel", "cul", "wf")
+
+# labels_cond <- scale_x_discrete(labels = c('Control', 'Belonging','Culture', 'Wise\nFeedback'), limits = positions_cond)
+labels_cond <- 
+  scale_x_discrete(
+    labels = c('X', 'B','C', 'F'), 
+    limits = positions_cond
+    )
+
+color_cond <- scale_fill_manual("legend", 
+                                values = c("ctl" = "#F8766D", 
+                                           "bel" = "#7CAE00", 
+                                           "cul" = "#00BFC4", 
+                                           "wf" = "#C77CFF"))
+
+legend_cond <- scale_color_manual(name = "", 
+                                  values = c("ctl" = "#F8766D", 
+                                             "bel" = "#7CAE00", 
+                                             "cul" = "#00BFC4", 
+                                             "wf" = "#C77CFF"))
+
+adv_names <- 
+  c('adv'="Advantaged",
+    'disadv'="Disadvantaged")
+
+gend_names <- 
+  c('m'="Male",
+    'f'="Female")
+
+# tob_names <-
+#   c('0' = "Non-smoking",
+#     '1' = "Smoking")
+
+fgen_names <-
+  c('not first-gen' = "Continuing-Generation",
+    'first-gen' = "First-Generation")
+
+race_names <-
+  c('white/asian' = "Majority",
+    'black/hispanic/native/pacificislander' = "Minority")
+
+group_levels_disadv <- c('adv','disadv')
+
+minority_adv_names <- 
+  c('adv' = "Advantaged",
+    'black' = "Black",
+    'hispanic' = "Hispanic",
+    'pi.native' = "Pacific/Native",
+    'white first-gen' = "White FG")
+```
+
+
+```{r load custom functions}
+source("custom_functions/custom_functions.R")
+```
+
+# General Notes
+
+All the analyses are using simple contrasts. Follow this link if you would like to know more:
+
+https://stats.idre.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/
+
+All the following analyses are shown in two different versions: 
+
+1.    Not controlling for covariates
+1.    Controlling the following covariates: Gender, High School Rank, Whether the High School ranked students or not, and SAT/ACT scores
+
+If we are controlling for other covariates, we will add notes about this before showing the graph.
+
+# New Plots
+
+```{r list of variables}
+source("c2016_lists_variables_settings_plots.R")
+```
+
+```{r}
+# plot
+# ggstatsplot::ggbetweenstats(
+#   data = d, 
+#   x = treat_sc, 
+#   y = purpose_comp2,
+#   messages = FALSE
+# ) +                                               # further modification outside of ggstatsplot
+#   ggplot2::coord_cartesian(ylim = c(1, 5)) + 
+#   ggplot2::scale_y_continuous(breaks = seq(1, 5, by = 1)) 
+
+
+# plot
+ggstatsplot::grouped_ggbetweenstats(
+  data = d, 
+  x = treat_sc, 
+  y = purpose_comp2,
+  grouping.var = disadv_sc,             # grouping variable
+  pairwise.comparisons = TRUE,      # display significant pairwise comparisons
+  pairwise.annotation = "p.value",  # how do you want to annotate the pairwise comparisons
+  p.adjust.method = "bonferroni",   # method for adjusting p-values for multiple comparisons
+  bf.message = TRUE,                # display Bayes Factor in favor of the null hypothesis
+  conf.level = 0.95,                # changing confidence level to 99%
+  k = 2,                            # number of digits after decimal point
+  effsize.type = "d",
+  # notch = TRUE,
+  # outlier.tagging = TRUE,
+  caption = substitute(paste(italic("Source"), 
+                             ": Senior Year Survey")),
+  palette = "default_jama",
+  package = "ggsci",
+  messages = FALSE,
+  nrow = 1,
+  ncol = 2,
+  title.text = "Eudaimonic Well-Being",
+  xlab = "",
+  ylab = ""
+)
+
+ggstatsplot::ggcoefstats(
+  x = stats::lm(
+    formula = purpose_comp2 ~ treat_sc * disadv_sc + sattoact + hsrank + gender + hsrank_no,
+    data = d
+    )
+  )
+```
+
+```{r fig.width = 10, fig.asp = .8}
+# plot
+ggstatsplot::grouped_ggbetweenstats(
+  data = d, 
+  x = cond_sc, 
+  y = purpose_comp2,
+  grouping.var = disadv_sc,             # grouping variable
+  pairwise.comparisons = TRUE,      # display significant pairwise comparisons
+  pairwise.annotation = "p.value",  # how do you want to annotate the pairwise comparisons
+  p.adjust.method = "bonferroni",   # method for adjusting p-values for multiple comparisons
+  bf.message = TRUE,                # display Bayes Factor in favor of the null hypothesis
+  conf.level = 0.95,                # changing confidence level to 99%
+  k = 2,                            # number of digits after decimal point
+  effsize.type = "d",
+  # notch = TRUE,
+  # outlier.tagging = TRUE,
+  caption = substitute(paste(italic("Source"), 
+                             ": Senior Year Survey")),
+  palette = "default_jama",
+  package = "ggsci",
+  messages = FALSE,
+  nrow = 1,
+  ncol = 2,
+  title.text = "Eudaimonic Well-Being",
+  xlab = "",
+  ylab = ""
+)
+
+ggstatsplot::ggcoefstats(
+  x = stats::lm(
+    formula = purpose_comp2 ~ cond_sc * disadv_sc + sattoact + hsrank + gender + hsrank_no,
+    data = d
+    )
+  )
+```
+
+
