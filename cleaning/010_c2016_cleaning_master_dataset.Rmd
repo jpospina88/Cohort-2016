@@ -44,14 +44,14 @@ library(foreign) # to export SPSS files
 
 ```{r}
 # data files
-file_cleaned_syfus_data <- "../data/c2016_syfus_merged_cleaned_no_t7.rds"
-file_intv_data <- "../../data/deidentified_2016_cohort_premat_intv.rds"
+file_cleaned_syfus_data <- "../../data/c2016_syfus_merged_cleaned_no_t7.rds"
+file_intv_data <- "../../../data/deidentified_2016_cohort_premat_intv.rds"
 file_hr_data <- "~/Documents/Stanford Medical Records/data_for_analysis/c2016_visits_to_doctor.rds"
-file_inst_data <- "../data/c2016_inst_data_for_analysis_3_22_2018.rds"
-file_inlabfollowup_data <- "../../data/c2016_syfus_inlabfollowup_original_idnums.rds"
-file_idata_syfus_data <- "../data/2016_cohort_syfus_dbss.rds"
-file_inlabfollowup_weight_data <- "../data/4_3_2018_c2016_syfus_inlab_followup_weight.csv"
-file_inlabfollowup_weight2_data <- "../data/Stanford+2016+-+Follow-up+Lab+Study+-+Prematriculation+Intervention+Seniors_April+24%2C+2018_11.30.csv"
+file_inst_data <- "../../data/c2016_inst_data_for_analysis_3_22_2018.rds"
+file_inlabfollowup_data <- "../../../data/c2016_syfus_inlabfollowup_original_idnums.rds"
+file_idata_syfus_data <- "../../data/2016_cohort_syfus_dbss.rds"
+file_inlabfollowup_weight_data <- "../../data/4_3_2018_c2016_syfus_inlab_followup_weight.csv"
+file_inlabfollowup_weight2_data <- "../../data/Stanford+2016+-+Follow-up+Lab+Study+-+Prematriculation+Intervention+Seniors_April+24%2C+2018_11.30.csv"
 
 d <- read_rds(file_cleaned_syfus_data)
 
@@ -1270,7 +1270,7 @@ d_all$cond_sc %>% attr("contrasts")
 # Add Institutional data
 
 ```{r}
-inst <- read_rds("../../Institutional data/c2016_individual_level_stem_gpa_cleaned_7_1_2018.rds")
+inst <- read_rds("../../../Institutional data/c2016_individual_level_stem_gpa_cleaned_7_1_2018.rds")
 ```
 
 ```{r}
@@ -1312,7 +1312,7 @@ d_all %<>% mutate(
 ## Disadvantaged Status and Race
 
 ```{r load custom functions}
-source("R/custom_functions.R")
+source("../custom_functions/custom_functions.R")
 ```
 
 ```{r}
@@ -1511,8 +1511,8 @@ d_all %>%
 
 # Export Dataset
 ```{r export dataset}
-d_all %>% write_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
-d_all %>% write_csv("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.csv")
+d_all %>% write_rds("../../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+d_all %>% write_csv("../../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.csv")
 ```
 
 

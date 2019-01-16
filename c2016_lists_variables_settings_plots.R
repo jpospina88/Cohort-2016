@@ -9,7 +9,7 @@ d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 # getwd()
 # d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
-source("R/custom_functions.R")
+source("custom_functions/custom_functions.R")
 
 d %>%
   check_vars_by_keywords(c("org"))
@@ -22,16 +22,6 @@ d %>%
 # [5] mentor_staff                mentor_athletic            
 # [7] mentor_alum                 mentor_other
 # mentor_grad
-
-# org1__type         org2__type        
-# [27] org3__type         org4__type        
-# [29] org5__type
-
-# if a Ss answered the question but didn't list an activity type, they should get a 0.
-# count of each type: how many activities were related to academics
-# how many of these activities did they had a leadership role
-
-
 
 # vars_check <-
 #   quos(

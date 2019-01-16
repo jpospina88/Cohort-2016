@@ -1,0 +1,484 @@
+---
+title: "Cohort 2016; Reviewing and Cleaning Organizations"
+author: "Juan Ospina"
+date: "12/12/2018"
+output: html_document
+---
+
+# General Notes
+
+To check that the cleaning worked. Compare the graphs generated with the dataset "orgs" (long format), with the dataset "d_all" (wide format). Both set of graphs should be **identical**.
+
+```{r}
+# rmarkdown::render(
+#   "010_c2016_cleaning_master_dataset.Rmd", 
+#   "html_document"
+#   )
+
+library(magrittr)
+library(tidyverse)
+library(psych)
+
+d_all <- read_rds("../../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+```
+
+```{r}
+source("../custom_functions/custom_functions.R")
+```
+
+# Organizations 
+
+```{r}
+d_all %>% 
+  check_vars_by_keywords(c("org"))
+```
+
+```{r}
+d_all %>% 
+  filter(startedSYFUS == 1) %>% 
+  select(starts_with("org")) %>% 
+  describe()
+
+# Organizations Types
+# levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
+#       labels = c("Academic or\nprofessional", "Athletics or\nrecreation", "Media or\ncommunications", "Community, health,\neducation,\nconservation\nor outreach", "Cultural \n organizations", "Games", "Leadership\nor politics", "Performance\narts", "Religion or\nphilosophy", "Social\n(including Greek\nlife)", "Other", "Community or Cultural Organizations"))
+```
+
+#@ Types of Organizations
+```{r}
+orgs <- 
+  d_all %>% 
+  filter(startedSYFUS == 1) %>% 
+  select(starts_with("org"), activism_engaged) %>% 
+  select(
+    activism_engaged,
+    org_total,  
+    org1__name_1_TEXT,
+    org2__name_1_TEXT,
+    org3__name_1_TEXT,
+    org4__name_1_TEXT,
+    org5__name_1_TEXT,
+    org1__type,
+    org2__type,
+    org3__type,
+    org4__type,
+    org5__type,
+    org1_ever,         
+    org2_ever,          
+    org3_ever,          
+    org4_ever,
+    org5_ever,          
+    org6_ever,          
+    org7_ever,          
+    org8_ever,          
+    org9_ever,         
+    org10_ever,         
+    org11_ever,         
+    org12_ever,
+    org1,
+    org2,
+    org3,
+    org4,
+    org5,
+    org_count,
+    org_howinvcount,
+    org_leadercount,
+    orgleader_comp5,
+    org_howinvcount_z
+  ) %>% 
+  select(
+    activism_engaged,
+    org_total, 
+    org_count, 
+    org1__name_1_TEXT,
+    org2__name_1_TEXT,
+    org3__name_1_TEXT,
+    org4__name_1_TEXT,
+    org5__name_1_TEXT, 
+    org1__type,
+    org2__type,
+    org3__type,
+    org4__type,
+    org5__type, 
+    org1,
+    org2,
+    org3,
+    org4,
+    org5) %>% 
+  mutate(
+    same = ifelse(org_total == org_count, 1, 0)
+  ) 
+# filter(same == 0)
+```
+
+org_count is the sum of the organizations that students were involved into. org1, org2, org3, org4, and org5 represent whether the student listed an organization (1) or not (0).
+
+```{r}
+# org1__type         org2__type        
+# [27] org3__type         org4__type        
+# [29] org5__type
+
+# if a Ss answered the question but didn't list an activity type, they should get a 0.
+# count of each type: how many activities were related to academics
+# how many of these activities did they had a leadership role
+```
+
+```{r}
+org_type <-
+  d_all %>% 
+  gather(org1__type:org5__type, key = org, value = type) %>% 
+  select(idnum, org, type) %>% 
+  mutate(
+    org = ifelse(org == "org1__type", 1,
+                    ifelse(org == "org2__type", 2,
+                           ifelse(org == "org3__type", 3,
+                                  ifelse(org == "org4__type", 4,
+                                         ifelse(org == "org5__type", 5, org
+  )))))) %>% 
+  arrange(idnum)
+  # filter(!is.na(type))
+
+org_inv <-
+  d_all %>% 
+  gather(org1__howinv:org5__howinv, key = org, value = involved) %>% 
+  select(idnum, org, involved) %>% 
+  mutate(
+    org = ifelse(org == "org1__howinv", 1,
+                    ifelse(org == "org2__howinv", 2,
+                           ifelse(org == "org3__howinv", 3,
+                                  ifelse(org == "org4__howinv", 4,
+                                         ifelse(org == "org5__howinv", 5, org
+  )))))) %>% 
+  arrange(idnum)
+  # filter(!is.na(involved))
+
+orgs <- 
+  bind_cols(org_type, org_inv)
+
+rm(org_type, org_inv)
+
+# participants match correctly. You should get 1605 participants
+orgs %>% 
+  select(idnum, idnum1) %>% 
+  unique %>% 
+  mutate(same = ifelse(idnum == idnum1, 1, 0)) %>% 
+  count(same)
+
+# organizations match correctly. You should get 5 organizations
+orgs %>% 
+  select(org, org1) %>% 
+  unique %>% 
+  mutate(same = ifelse(org == org1, 1, 0)) %>% 
+  count(same)
+```
+
+```{r}
+# remove extra columns
+orgs %<>% 
+  select(-c(idnum1, org1))
+```
+
+```{r}
+orgs %<>% 
+  mutate(
+    type_fctr = factor(
+      type,
+      levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+      labels = c("Academic or\nProfessional", 
+                 "Athletics or\nRecreation", 
+                 "Media or\nCommunications", 
+                 "Community, Health,\nEducation, Conservation or\nOutreach", 
+                 "Cultural\nOrganizations", 
+                 "Games", 
+                 "Leadership or\nPolitics", 
+                 "Performance\nArts", 
+                 "Religion or\nPhilosophy", 
+                 "Social\n(Including Greek\nLife)", 
+                 "Other")
+    )
+  )
+
+orgs %>% 
+  count(type_fctr)
+
+ggplot(orgs %>% 
+         filter(!is.na(type_fctr)), 
+       aes(type_fctr)) + 
+  geom_bar(color = "black", fill = "gray")
+```
+
+```{r}
+orgs %<>% 
+  left_join(d_all %>% 
+              select(idnum, treat_sc, cond_sc, disadv_sc), 
+            by = "idnum")
+
+# orgs %>% 
+#   filter(!is.na(type_fctr)) %>% 
+#   ggplot(aes())
+
+ggplot(orgs %>% 
+         filter(!is.na(type_fctr)), 
+       aes(treat_sc, type_fctr)) + 
+  geom_count() +
+  facet_wrap(~ disadv_sc)
+
+ggplot(orgs %>% 
+         filter(!is.na(type_fctr)), 
+       aes(cond_sc, type_fctr)) + 
+  geom_count() +
+  facet_wrap(~ disadv_sc)
+```
+
+```{r}
+orgs %<>% 
+  mutate(
+    org_acad = ifelse(
+      type_fctr == "Academic or\nProfessional", 1, NA
+    ),
+    org_athletics = ifelse(
+      type_fctr ==  "Athletics or\nRecreation", 1, NA
+    ),
+    org_media = ifelse(
+      type_fctr ==  "Media or\nCommunications", 1, NA
+    ),
+    org_community = ifelse(
+      type_fctr == "Community, Health,\nEducation, Conservation or\nOutreach", 1, NA
+    ),
+    org_cult = ifelse(
+      type_fctr == "Cultural\nOrganizations", 1, NA
+    ),
+    org_comm_cult = ifelse(
+      type_fctr == "Community, Health,\nEducation, Conservation or\nOutreach" |
+        type_fctr == "Cultural\nOrganizations", 1, NA
+    ),
+     org_games = ifelse(
+      type_fctr == "Games", 1, NA
+    ),
+    org_leader = ifelse(
+      type_fctr == "Leadership or\nPolitics", 1, NA
+    ),
+    org_arts = ifelse(
+      type_fctr == "Performance\nArts", 1, NA
+    ),
+    org_religion = ifelse(
+      type_fctr == "Religion or\nPhilosophy", 1, NA
+    ),
+    org_social = ifelse(
+      type_fctr == "Social\n(Including Greek\nLife)", 1, NA
+    ),
+    org_other = ifelse(
+      type_fctr == "Other", 1, NA
+    )
+  )
+
+# "Academic or\nProfessional", 
+# "Athletics or\nRecreation", 
+# "Media or\nCommunications", 
+# "Community, Health,\nEducation, Conservation or\nOutreach", 
+# "Cultural\nOrganizations", 
+# "Games", 
+# "Leadership or\nPolitics", 
+# "Performance\nArts", 
+# "Religion or\nPhilosophy", 
+# "Social\n(Including Greek\nLife)", 
+# "Other"
+```
+
+
+```{r}
+# ggplot(orgs %>% 
+#          filter(!is.na(org_acad)), 
+#        aes(cond_sc, org_acad)) + 
+#   geom_col() +
+#   facet_wrap(~ disadv_sc)
+
+geom_col_group <- function(data, group1, outcome, group2){
+  outcome <- enquo(outcome)
+  group1 <- enquo(group1)
+  group2 <- enquo(group2)
+  
+  ggplot(data %>% 
+           filter(!is.na(!!outcome)), 
+         aes(!!group1, !!outcome, fill = !!group1)) + 
+    geom_col() +
+    facet_wrap(vars(!!group2))
+}
+
+vars_org <- 
+  quos(
+    org_acad, 
+    org_athletics, 
+    org_media, 
+    org_community, 
+    org_cult,
+    org_comm_cult,
+    org_games,
+    org_leader,
+    org_arts,
+    org_religion,
+    org_social,
+    org_other
+  )
+
+
+geom_col_group(orgs, cond_sc, org_acad, disadv_sc)
+geom_col_group(orgs, cond_sc, org_athletics, disadv_sc)
+geom_col_group(orgs, cond_sc, org_media, disadv_sc)
+geom_col_group(orgs, cond_sc, org_community, disadv_sc)
+geom_col_group(orgs, cond_sc, org_cult, disadv_sc)
+geom_col_group(orgs, cond_sc, org_comm_cult, disadv_sc)
+geom_col_group(orgs, cond_sc, org_games, disadv_sc)
+geom_col_group(orgs, cond_sc, org_leader, disadv_sc)
+geom_col_group(orgs, cond_sc, org_religion, disadv_sc)
+geom_col_group(orgs, cond_sc, org_social, disadv_sc)
+geom_col_group(orgs, cond_sc, org_other, disadv_sc)
+```
+
+```{r}
+orgs_sum <- 
+  orgs %>% 
+  group_by(idnum) %>% 
+  summarise(
+    org_acad = sum(org_acad, na.rm = TRUE),
+    org_athletics = sum(org_athletics, na.rm = TRUE),
+    org_media = sum(org_media, na.rm = TRUE),
+    org_community = sum(org_community, na.rm = TRUE),
+    org_cult = sum(org_cult, na.rm = TRUE),
+    org_comm_cult = sum(org_comm_cult, na.rm = TRUE),
+    org_games = sum(org_games, na.rm = TRUE),
+    org_leader = sum(org_leader, na.rm = TRUE),
+    org_arts = sum(org_arts, na.rm = TRUE),
+    org_religion = sum(org_religion, na.rm = TRUE),
+    org_social = sum(org_social, na.rm = TRUE),
+    org_other = sum(org_other, na.rm = TRUE)
+    )
+```
+
+```{r}
+d_all %<>% 
+  left_join(orgs_sum, by = "idnum")
+
+d_all %<>% 
+  mutate(
+    org_acad = ifelse(is.na(org_count), NA, org_acad),
+    org_athletics = ifelse(is.na(org_count), NA, org_athletics),
+    org_media = ifelse(is.na(org_count), NA, org_media),
+    org_community = ifelse(is.na(org_count), NA, org_community),
+    org_cult = ifelse(is.na(org_count), NA, org_cult),
+    org_comm_cult = ifelse(is.na(org_count), NA, org_comm_cult),
+    org_games = ifelse(is.na(org_count), NA, org_games),
+    org_leader = ifelse(is.na(org_count), NA, org_leader),
+    org_arts = ifelse(is.na(org_count), NA, org_arts),
+    org_religion = ifelse(is.na(org_count), NA, org_religion),
+    org_social = ifelse(is.na(org_count), NA, org_social),
+    org_other = ifelse(is.na(org_count), NA, org_other)
+    )
+
+d_all %>%
+  select(
+    idnum,
+    org_count, 
+    org_acad, 
+    org_athletics, 
+    org_media, 
+    org_community, 
+    org_cult,
+    org_comm_cult,
+    org_games,
+    org_leader,
+    org_arts,
+    org_religion,
+    org_social,
+    org_other
+    )
+
+d_all %<>% 
+  rowwise() %>% 
+  mutate(
+    org_count_use_this = sum(
+      org_acad, 
+      org_athletics, 
+      org_media, 
+      org_community, 
+      org_cult,
+      org_games,
+      org_leader,
+      org_arts,
+      org_religion,
+      org_social,
+      org_other,
+      na.rm = TRUE
+    ),
+    org_count_use_this = ifelse(is.na(org_count), NA, org_count_use_this),
+    org_same = ifelse(org_count == org_count_use_this, 1, 0)
+  ) %>% 
+  ungroup()
+
+d_all %>% 
+  count(org_same)
+
+check_orgs <- 
+  d_all %>% 
+  select(
+    idnum, 
+    org_count, 
+    org_count_use_this, 
+    org_same,
+    org1__type:org5__type,
+    org_acad, 
+    org_athletics, 
+    org_media, 
+    org_community, 
+    org_cult,
+    org_comm_cult,
+    org_games,
+    org_leader,
+    org_arts,
+    org_religion,
+    org_social,
+    org_other
+  )
+
+same_no <- 
+  check_orgs %>%
+  filter(org_same == 0)
+```
+
+```{r}
+geom_col_group(d_all, cond_sc, org_acad, disadv_sc)
+geom_col_group(d_all, cond_sc, org_athletics, disadv_sc)
+geom_col_group(d_all, cond_sc, org_media, disadv_sc)
+geom_col_group(d_all, cond_sc, org_community, disadv_sc)
+geom_col_group(d_all, cond_sc, org_cult, disadv_sc)
+geom_col_group(d_all, cond_sc, org_comm_cult, disadv_sc)
+geom_col_group(d_all, cond_sc, org_games, disadv_sc)
+geom_col_group(d_all, cond_sc, org_leader, disadv_sc)
+geom_col_group(d_all, cond_sc, org_religion, disadv_sc)
+geom_col_group(d_all, cond_sc, org_social, disadv_sc)
+geom_col_group(d_all, cond_sc, org_other, disadv_sc)
+```
+
+## How Involved
+
+```{r}
+# doesn't work. If someone was invovled in two or more organizations of the same type, we are not really taking into account that this participant was involved in two organizations instead of only 1.
+orgs %>% 
+  group_by(type_fctr) %>% 
+  summarise(
+    mean_involved = mean(involved, na.rm = TRUE)
+  )
+
+orgs %>% 
+  filter(is.na(type_fctr) & !is.na(involved))
+
+orgs %>% 
+  group_by(idnum) %>% 
+  count(type) %>% 
+  mutate(
+    n_use_this = ifelse(n >= 1 & is.na(type), NA, n)
+  )
+  
+
+```
+
