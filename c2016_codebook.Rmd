@@ -1,0 +1,38 @@
+---
+title: "Create Codebook"
+author: "Juan Ospina"
+date: "1/16/2019"
+output: html_document
+---
+
+```{r packages}
+# library(magrittr)
+# library(RColorBrewer)
+# library(reshape2)
+library(tidyverse)
+# library(emmeans) # to get adjusted means and to plot the summary statistics of models
+# library(kableExtra)
+# library(psych)
+```
+
+```{r data files}
+ds <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+
+vars <- ds %>% 
+  names %>% 
+  noquote
+
+vars %<>% 
+  as.tibble() %>% 
+  rename(
+    variable = value
+  )
+
+vars
+```
+
+```{r}
+vars %>% write_csv("../data/c2016_codebook.csv")
+```
+
+
