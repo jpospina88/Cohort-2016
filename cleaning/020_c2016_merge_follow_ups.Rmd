@@ -1,0 +1,114 @@
+---
+title: "Add Follow-Up Datasets to Master Dataset"
+author: "Juan Ospina"
+date: "1/22/2019"
+output: html_document
+---
+
+```{r}
+head(d_all)
+```
+
+# Merge Freshman Year Survey
+
+```{r}
+d.f <- read_rds("../../data/deidentified_2016_cohort_freshman_survey.rds")
+```
+
+```{r}
+head(d.f)
+```
+
+```{r}
+d_all <- 
+  d_all %>% 
+  left_join(d.f, by = "idnum")
+
+# 978 + 243 - 1 # cols master + cols freshman - idnum
+```
+
+```{r}
+names.f <- colnames(d.f) %>% 
+  noquote
+
+d.f2 <-
+  d_all %>% 
+  select(!!!names.f)
+
+head(d.f); head(d.f2) # You should get the same dataset twice!
+```
+
+# Merge Sophomore Year Survey
+
+```{r}
+d.s <- read_rds("../../data/deidentified_2016_cohort_sophomore_survey.rds")
+```
+
+```{r}
+head(d.s)
+```
+
+```{r}
+d_all <- 
+  d_all %>% 
+  left_join(d.s, by = "idnum")
+
+# 1220 + 193 - 1 # cols master + cols sophomore - idnum
+```
+
+```{r}
+names.s <- colnames(d.s) %>% 
+  noquote
+
+d.s2 <-
+  d_all %>% 
+  select(!!!names.s)
+
+head(d.s); head(d.s2) # You should get the same dataset twice!
+```
+
+# Merge Junior Year Survey
+
+```{r}
+d.j <- read_rds("../../data/deidentified_2016_cohort_junior_survey.rds")
+```
+
+```{r}
+head(d.j)
+```
+
+```{r}
+d_all <- 
+  d_all %>% 
+  left_join(d.j, by = "idnum")
+
+# 1412 + 210 - 1 # cols master + cols sophomore - idnum
+```
+
+```{r}
+names.j <- colnames(d.j) %>% 
+  noquote
+
+d.j2 <-
+  d_all %>% 
+  select(!!!names.j)
+
+head(d.j); head(d.j2) # You should get the same dataset twice!
+```
+
+# Get column names to export to codebook
+
+```{r}
+names.followups <- 
+  d_all %>% 
+  select(!!!names.f, !!!names.s, !!!names.j) %>% 
+  select(-idnum) %>% 
+  names() %>% 
+  noquote %>% 
+  as.tibble() %>% 
+  rename(variable = value)
+
+names.followups %>% 
+  write_csv("../../data/c2016_codebook_frosh_soph_junior.csv")
+```
+
