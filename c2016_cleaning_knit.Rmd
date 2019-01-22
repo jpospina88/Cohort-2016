@@ -5,7 +5,6 @@ date: "1/16/2019"
 output: html_document
 ---
 
-
 ```{r}
 rmarkdown::render(
   "cleaning/010_c2016_cleaning_master_dataset.Rmd", 
@@ -16,15 +15,20 @@ rmarkdown::render(
   "cleaning/011_c2016_organizations.Rmd", 
   "html_document"
   )
+
+rmarkdown::render(
+  "cleaning/020_c2016_merge_follow_ups.Rmd", 
+  "html_document"
+  )
 ```
 
 # Export Dataset
 ```{r export dataset}
-d_all %>% write_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
-d_all %>% write_csv("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.csv")
+d_all %>% write_rds("../data/2019_1_22_c2016_syfus_inst_healthrec_ctra_no_t7_frosh_soph_junior.rds")
+d_all %>% write_csv("../data/2019_1_22_c2016_syfus_inst_healthrec_ctra_no_t7_frosh_soph_junior.csv")
 
-d_all %>% write_rds("../../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
-d_all %>% write_csv("../../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.csv")
+d_all %>% write_rds("../../data/2019_1_22_c2016_syfus_inst_healthrec_ctra_no_t7_frosh_soph_junior.rds")
+d_all %>% write_csv("../../data/2019_1_22_c2016_syfus_inst_healthrec_ctra_no_t7_frosh_soph_junior.csv")
 
 # To check that the variables that are created in the other markdowns show up in the final dataset 
 # d_all %>% select(starts_with("org_")) %>% 
