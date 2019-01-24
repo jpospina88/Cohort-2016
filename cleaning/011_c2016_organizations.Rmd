@@ -45,6 +45,7 @@ d_all %>%
 ```
 
 #@ Types of Organizations
+
 ```{r}
 orgs <- 
   d_all %>% 
@@ -204,6 +205,12 @@ orgs %>%
 ggplot(orgs %>% 
          filter(!is.na(type_fctr)), 
        aes(type_fctr)) + 
+  geom_bar(color = "black", fill = "gray")
+
+ggplot(orgs %>% 
+         filter(!is.na(type_fctr)), 
+       aes(x=reorder(type_fctr, type_fctr,
+                     function(x) - length(x)))) + 
   geom_bar(color = "black", fill = "gray")
 ```
 
