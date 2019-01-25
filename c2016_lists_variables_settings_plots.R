@@ -3,7 +3,7 @@ library(psych)
 library(kableExtra)
 
 # For Juan
-d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+# d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 # For RAs
 # getwd()
@@ -180,7 +180,18 @@ vars_cont <-
     
     # Involvement
     org_howinvcount,
-    activism_engaged
+    activism_engaged,
+    org_acad_inv,
+    # org_arts_inv,
+    org_athletics_inv, 
+    org_community_inv, 
+    org_cult_inv,      
+    # org_games_inv,     
+    org_leader_inv,   
+    # org_media_inv,     
+    org_other_inv,    
+    org_religion_inv,  
+    org_social_inv
   ) 
 
 tribble_dv <- tribble(
@@ -295,7 +306,18 @@ tribble_dv <- tribble(
   
   ## Involvement
   "org_howinvcount",                         "Involvement in Extracurricular Activities",           seq(0, 25, 5),       c(0, 25),      2,                    "(Five Activities; Senior Year Survey)",               2,
-  "activism_engaged",                        "Involvement in Service/Social Change",                seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               2                 
+  "activism_engaged",                        "Involvement in Service/Social Change",                seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               2,
+  "org_acad_inv",                            "Involvement in Organizations:\nAcademics",            seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               2,
+  # "org_arts_inv",                            "Involvement in Organizations:\nAcademics",            seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_athletics_inv",                       "Involvement in Organizations:\nAthletics or Recreation",            seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_community_inv",                       "Involvement in Organizations:\nCommunity, Health,Education,\nConservation or Outreach",            seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_cult_inv",                            "Involvement in Organizations:\nCultural Organizations",            seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               2,
+  # "org_games_inv",                           "Involvement in Organizations:\nAcademics",            seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_leader_inv",                          "Involvement in Organizations:\nLeadership or Politics",            seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               2,
+  # "org_media_inv",                           "Involvement in Organizations:\nMedia or Communications",            seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_other_inv",                           "Involvement in Organizations:\nOther",            seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_religion_inv",                        "Involvement in Organizations:\nReligion or Philosophy",            seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_social_inv",                          "Involvement in Organizations:\nSocial (Including Greek Life)",            seq(1, 5, 1),       c(1, 5),        2,                    "(Senior Year Survey)",                               2
   )  
 
 tribble_cond <- data.frame(matrix(c("treat_sc"), nrow = nrow(tribble_dv)),
@@ -408,7 +430,19 @@ vars_count <-
     visits_per_day, 
     visits_per_day_mh, 
     visits_per_day_resp, 
-    visits_per_day_no_resp
+    visits_per_day_no_resp,
+    org_acad,
+    org_athletics,
+    # org_media,
+    # org_community,
+    org_cult,
+    org_comm_cult
+    # org_games,
+    # org_leader,
+    # org_arts,
+    # org_religion,
+    # org_social,
+    # org_other
     ) 
 
 tribble_dv <- tribble(
@@ -417,7 +451,19 @@ tribble_dv <- tribble(
   "visits_per_day",             "# of Days Visited Health Center",                         seq(0, 32, 4),      c(0, 32),   4,            "(5 Years; Medical Records)",
   "visits_per_day_mh",          "# of Days Visited Related to\nMental Health",             seq(0, 12, 3),      c(0, 12),   2,            "(5 Years; Medical Records)",
   "visits_per_day_resp",        "# of Days Visited Related to\nRespiratory Illness",       seq(0, 5, 1),       c(0, 5),    1,            "(5 Years; Medical Records)",
-  "visits_per_day_no_resp",     "# of Days Visited Related to\n Non-respiratory Illness",  seq(0, 32, 4),      c(0, 32),   4,            "(5 Years; Medical Records)"
+  "visits_per_day_no_resp",     "# of Days Visited Related to\n Non-respiratory Illness",  seq(0, 32, 4),      c(0, 32),   4,            "(5 Years; Medical Records)",
+  "org_acad",                   "# of Joined Organizations:\nAcademic or Professional",                seq(0, 1, 0.25),      c(0, 1),   0.1,            "(Senior Year Survey)",
+  "org_athletics",              "# of Joined Organizations:\nAthletics or Recreation",                seq(0, 1, 0.25),      c(0, 1),   0.1,            "(Senior Year Survey)",
+  # "org_media",                  "Organizations:\nAcademic or Professional",                seq(0, 1, 0.25),      c(0, 1),   0.25,            "(Senior Year Survey)",
+  # "org_community",              "Organizations:\nAcademic or Professional",                seq(0, 1, 0.25),      c(0, 1),   0.25,            "(Senior Year Survey)",
+  "org_cult",                   "# of Joined Organizations:\nCulture",                seq(0, 1, 0.25),      c(0, 1),   0.1,            "(Senior Year Survey)",
+  "org_comm_cult",              "# of Joined Organizations:\nCulture, Community, Health,\nEducation, Conservation or Outreach",                seq(0, 1, 0.25),      c(0, 1),   0.1,            "(Senior Year Survey)"
+  # "org_games",                  "Organizations:\nAcademic or Professional",                seq(0, 40, 4),      c(0, 40),   4,            "(Senior Year Survey)",
+  # "org_leader",                 "Organizations:\nAcademic or Professional",                seq(0, 40, 4),      c(0, 40),   4,            "(Senior Year Survey)",
+  # "org_arts",                   "Organizations:\nAcademic or Professional",                seq(0, 40, 4),      c(0, 40),   4,            "(Senior Year Survey)",
+  # "org_religion",               "Organizations:\nAcademic or Professional",                seq(0, 40, 4),      c(0, 40),   4,            "(Senior Year Survey)",
+  # "org_social",                 "Organizations:\nAcademic or Professional",                seq(0, 40, 4),      c(0, 40),   4,            "(Senior Year Survey)",
+  # "org_other",                  "Organizations:\nAcademic or Professional",                seq(0, 40, 4),      c(0, 40),   4,            "(Senior Year Survey)"
 )
 
 # visits_per_day, visits_per_day_mh, visits_per_day_resp, visits_per_day_no_resp
