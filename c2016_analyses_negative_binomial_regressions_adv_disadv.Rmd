@@ -46,7 +46,7 @@ library(gridExtra) # For iterative plots
 ```
 
 ```{r data files}
-d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+d <- read_rds("../data/2019_1_22_c2016_syfus_inst_healthrec_ctra_no_t7_frosh_soph_junior.rds")
 options(contrasts = c("contr.helmert", "contr.poly")) # ANOVA contrasts
 
 # file_hr_data <- "~/Documents/Stanford Medical Records/data_for_analysis/c2016_visits_to_doctor.rds"
@@ -343,6 +343,129 @@ kable_format <- . %>%
   kable_styling(bootstrap_options = c("hover", "responsive"), font_size = 12, full_width = F)
 ```
 
+```{r}
+geom_flat_violin <-
+  function(mapping = NULL,
+           data = NULL,
+           stat = "ydensity",
+           position = "dodge",
+           trim = TRUE,
+           scale = "area",
+           show.legend = NA,
+           inherit.aes = TRUE,
+           ...) {
+    ggplot2::layer(
+      data = data,
+      mapping = mapping,
+      stat = stat,
+      geom = GeomFlatViolin,
+      position = position,
+      show.legend = show.legend,
+      inherit.aes = inherit.aes,
+      params = list(trim = trim,
+                    scale = scale,
+                    ...)
+    )
+  }
+
+GeomFlatViolin <-
+  ggproto(
+    "GeomFlatViolin",
+    Geom,
+    setup_data = function(data, params) {
+      data$width <- data$width %||%
+        params$width %||% (resolution(data$x, FALSE) * 0.9)
+      
+      # ymin, ymax, xmin, and xmax define the bounding rectangle for each group
+      data %>%
+        dplyr::group_by(.data = ., group) %>%
+        dplyr::mutate(
+          .data = .,
+          ymin = min(y),
+          ymax = max(y),
+          xmin = x,
+          xmax = x + width / 2
+        )
+    },
+    
+    draw_group = function(data, panel_scales, coord)
+    {
+      # Find the points for the line to go all the way around
+      data <- base::transform(data,
+                              xminv = x,
+                              xmaxv = x + violinwidth * (xmax - x))
+      
+      # Make sure it's sorted properly to draw the outline
+      newdata <-
+        base::rbind(
+          dplyr::arrange(.data = base::transform(data, x = xminv), y),
+          dplyr::arrange(.data = base::transform(data, x = xmaxv), -y)
+        )
+      
+      # Close the polygon: set first and last point the same
+      # Needed for coord_polar and such
+      newdata <- rbind(newdata, newdata[1,])
+      
+      ggplot2:::ggname("geom_flat_violin",
+                       GeomPolygon$draw_panel(newdata, panel_scales, coord))
+    },
+    
+    draw_key = draw_key_polygon,
+    
+    default_aes = ggplot2::aes(
+      weight = 1,
+      colour = "grey20",
+      fill = "white",
+      size = 0.5,
+      alpha = NA,
+      linetype = "solid"
+    ),
+    
+    required_aes = c("x", "y")
+  )
+
+raincloud_point <- function(data, factor, mn) {
+  ftr <- enquo(factor)
+  mn <- enquo(mn)
+  
+geom_point(data = data, aes_(x = ftr, y = mn), 
+             position = position_nudge(x = 0.3), size = 1.5)
+}
+
+raincloud_theme <- 
+  theme(text = element_text(size = 10),
+        axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text = element_text(size = 10),
+        axis.text.x = element_text(angle = 0, vjust = 0),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 16),
+        legend.position = "right",
+        plot.title = element_text(lineheight = .8, face = "bold", size = 16),
+        panel.border = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.line.x = element_line(colour = 'black', size = 0.5, linetype = 'solid'),
+        axis.line.y = element_line(colour = 'black', size = 0.5, linetype = 'solid'),
+        strip.text = element_text(color = "Black"), strip.background = element_blank())
+
+raincloud_boxplot <-
+  geom_boxplot(width = .1, guides = FALSE, outlier.shape = NA, alpha = 0.5)
+
+raincloud_guides <- 
+  guides(fill = FALSE, color = FALSE)
+  
+raincloud_theme_light <- 
+  theme_light()
+
+raincloud_violin <- 
+  geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha = .8)
+
+stat_summary_se <- 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = .1, position = position_nudge(x = .3, y = 0))
+```
+
+
 # General Notes
 
 All the analyses are using simple contrasts. Follow this link if you would like to know more:
@@ -393,6 +516,71 @@ d %>%
   select(!!!vars_count) %>% 
   describeBy(cond_adv, mat = TRUE, digits = 2) %>% 
   kable_format
+```
+
+# Raincloud plots
+
+## By Treatment and Disadvantaged Status
+
+```{r}
+theme <- 
+  theme(
+    strip.text = black1, 
+    strip.background = black2, 
+    axis.text.y = # change size of y-axis text
+      element_text(
+        size = 20, 
+        family = "Helvetica"),
+    axis.text.x = # change size of x-axis and y-axis text
+      element_text(
+        size = 
+          20
+          # 16
+        , 
+        family = "Helvetica"),
+    axis.title = element_text(size = 22, family = "Helvetica"), 
+    strip.text.x = element_text(size = 22, colour = "white", family = "Helvetica"),
+    plot.title = element_text(size = 22, hjust = 0.5),
+    plot.subtitle = element_text(size = 16, hjust = 0.5),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),
+    axis.title.x = element_blank(),
+    # axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.position = 'top',
+    legend.key = element_rect(size = 10),
+    legend.key.size = unit(1, 'lines')
+  )
+
+plot_raincloud_map_treat_adv <- function(ftr, var, y_lab, scales, limit, subheader) d %>% 
+  ggplot(aes(y = get(var), x = get(ftr), fill = get(ftr))) +
+  raincloud_violin +
+  geom_point(aes(y = get(var), color = get(ftr)), 
+             position = position_jitter(width = .15), size = .5, alpha = 0.8) +
+  stat_summary_se + raincloud_boxplot + raincloud_guides + 
+  raincloud_theme_light + raincloud_theme +
+  color_treat + labels_treat + theme1 + theme + 
+  # ylab(y_lab) + xlab("") + 
+  coord_cartesian(ylim = limit) +
+  scale_y_continuous(breaks = scales) +
+  facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
+  # facet_grid(, vars(adv_hispanic_sc), labeller = as_labeller(hispanic_adv_names)) + 
+  ylab("") + ggtitle(y_lab) + xlab("") + theme + guides_no +
+  labs(subtitle = subheader)
+
+plots <- mapply(plot_raincloud_map_treat_adv, # function
+       tribble_count[,"treat_sc"] %>% t, tribble_count[,"dv"] %>% t, # arguments
+       tribble_count[,"dv_name"] %>% t, tribble_count[,"scale"] %>% t, 
+       tribble_count[,"limit"] %>% t, tribble_count[,"subheader"] %>% t, 
+       SIMPLIFY = FALSE
+       )
+
+# plots[[41]]
+# plots[[42]]
+# plots[[43]]
+# plots[[44]]
+# plots[[45]]
+plots
 ```
 
 # Models
