@@ -45,7 +45,7 @@ library(gridExtra) # For iterative plots
 
 ```{r data files}
 # For Juan
-d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+d <- read_rds("../data/2019_1_22_c2016_syfus_inst_healthrec_ctra_no_t7_frosh_soph_junior.rds")
 
 # For RAs
 # d <- read_rds("../../../Box Sync/Research Assistants/data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
@@ -395,7 +395,7 @@ table.describe <- function(data, vector){
 ```
 
 ```{r load custom functions}
-source("R/custom_functions.R")
+source("custom_functions/custom_functions.R")
 ```
 
 # General Notes
@@ -516,12 +516,12 @@ plots <- mapply(plot_raincloud_map_treat_adv, # function
        SIMPLIFY = FALSE
        )
 
-# plots[[41]]
+plots
 # plots[[42]]
 # plots[[43]]
 # plots[[44]]
 # plots[[45]]
-plots
+# plots
 ```
 
 ## By Condition and Disadvantaged Status
@@ -854,6 +854,9 @@ lm(cum_gpa_y4_spring ~
 # models_lm <- d.model %>% select(-c(treat_sc, disadv_sc)) %>%
 #   map(function(dv) lm(dv ~ d$treat_sc*d$disadv_sc, data = .)) 
 ```
+
+
+
 
 ```{r}
 vars_ivs <- 
