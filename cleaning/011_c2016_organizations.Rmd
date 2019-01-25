@@ -453,6 +453,55 @@ same_no <-
 ```
 
 ```{r}
+d_all %>% 
+  select(!!!vars_org) %>% 
+  describe()
+```
+
+```{r}
+d_all %>% 
+  select(idnum, !!!vars_org) %>% 
+  filter()
+
+ggplot(d_all, aes(x=org_acad)) + 
+  geom_histogram(binwidth = 1)
+
+ggplot(d_all, aes(x=org_athletics)) + 
+  geom_histogram(binwidth = 1)
+
+ggplot(d_all, aes(x=org_media)) + 
+  geom_histogram(binwidth = 1)
+
+ggplot(d_all, aes(x=org_community)) + 
+  geom_histogram(binwidth = 1)
+
+ggplot(d_all, aes(x=org_cult)) + 
+  geom_histogram(binwidth = 1)
+
+ggplot(d_all, aes(x=org_comm_cult)) + 
+  geom_histogram(binwidth = 1)
+
+ggplot(d_all, aes(x=org_games)) + 
+  geom_histogram(binwidth = 1)
+
+ggplot(d_all, aes(x=org_leader)) + 
+  geom_histogram(binwidth = 1)
+
+ggplot(d_all, aes(x=org_arts)) + 
+  geom_histogram(binwidth = 1)
+
+ggplot(d_all, aes(x=org_religion)) + 
+  geom_histogram(binwidth = 1)
+
+ggplot(d_all, aes(x=org_social)) + 
+  geom_histogram(binwidth = 1)
+
+ggplot(d_all, aes(x=org_other)) + 
+  geom_histogram(binwidth = 1)
+```
+
+
+```{r}
 geom_col_group(d_all, cond_sc, org_acad, disadv_sc)
 geom_col_group(d_all, cond_sc, org_athletics, disadv_sc)
 geom_col_group(d_all, cond_sc, org_media, disadv_sc)
@@ -466,26 +515,85 @@ geom_col_group(d_all, cond_sc, org_social, disadv_sc)
 geom_col_group(d_all, cond_sc, org_other, disadv_sc)
 ```
 
+
 ## How Involved
 
 ```{r}
 # doesn't work. If someone was invovled in two or more organizations of the same type, we are not really taking into account that this participant was involved in two organizations instead of only 1.
-orgs %>% 
-  group_by(type_fctr) %>% 
+# orgs %>% 
+#   group_by(type_fctr) %>% 
+#   summarise(
+#     mean_involved = mean(involved, na.rm = TRUE)
+#   )
+# 
+# orgs %>% 
+#   filter(is.na(type_fctr) & !is.na(involved))
+# 
+# orgs %>% 
+#   group_by(idnum) %>% 
+#   count(type) %>% 
+#   mutate(
+#     n_use_this = ifelse(n >= 1 & is.na(type), NA, n)
+#   )
+```
+
+```{r}
+# dataset of how involved was each student in each type of organization. If a student was involved in 2 or more organizations of the same type, the scores are averaged.
+orgs_inv <-
+  orgs %>% 
+  group_by(idnum, type_fctr) %>% 
   summarise(
     mean_involved = mean(involved, na.rm = TRUE)
   )
+```
+
+```{r}
+# Get the variables names before spreading the dataset to long format
 
 orgs %>% 
-  filter(is.na(type_fctr) & !is.na(involved))
+  count(type_fctr)
 
-orgs %>% 
-  group_by(idnum) %>% 
-  count(type) %>% 
-  mutate(
-    n_use_this = ifelse(n >= 1 & is.na(type), NA, n)
+vars_org_names <-
+  c("org_acad", 
+    "org_athletics", 
+    "org_media", 
+    "org_community", 
+    "org_cult",
+    "org_games",
+    "org_leader",
+    "org_arts",
+    "org_religion",
+    "org_social",
+    "org_other"
   )
-  
 
+vars_org_names %<>% 
+  as.tibble() %>% 
+  bind_cols(
+    orgs %>% 
+  count(type_fctr) %>% 
+    filter(!is.na(type_fctr))
+  ) %>% 
+  select(-n)
+
+vars_org_names %<>% 
+  mutate(inv = "inv") %>% 
+  unite(col = "org_names", c("value","inv"), sep = "_")
+```
+
+```{r}
+# turn long dataset into a wide dataset
+orgs_inv %<>% 
+  left_join(vars_org_names, by = "type_fctr") %>% 
+  select(-type_fctr) %>% 
+  spread(key = org_names, value = mean_involved) %>% 
+  select(-'<NA>')
+  
+```
+
+```{r}
+# merge involvement in each type of organization with the master dataset
+d_all %<>% 
+  left_join(orgs_inv, by = "idnum")
 ```
 
