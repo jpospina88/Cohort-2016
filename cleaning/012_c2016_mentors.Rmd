@@ -1,0 +1,108 @@
+---
+title: "SYFUS Mentors"
+author: "Juan Ospina"
+date: "1/28/2019"
+output: html_document
+---
+
+```{r}
+d_all %>% 
+  select(idnum, contains("mentor")) %>% 
+  names %>% noquote()
+```
+
+```{r}
+d_all %>% 
+  filter(!is.na(mentor_yes)) %>%
+  demographics_pct(quos(mentor_yes))
+```
+
+```{r}
+d_all %<>% 
+  mutate(
+    mentor_faculty = ifelse(
+      !is.na(mentor_yes) & is.na(mentor_faculty),
+      0, mentor_faculty
+      ),
+    mentor_grad = ifelse(
+      !is.na(mentor_yes) & is.na(mentor_grad),
+      0, mentor_grad
+      ),
+    mentor_undergrad = ifelse(
+      !is.na(mentor_yes) & is.na(mentor_undergrad),
+      0, mentor_undergrad
+      ),
+    mentor_admin = ifelse(
+      !is.na(mentor_yes) & is.na(mentor_admin),
+      0, mentor_admin
+      ),
+    mentor_staff = ifelse(
+      !is.na(mentor_yes) & is.na(mentor_staff),
+      0, mentor_staff
+      ),
+    mentor_athletic = ifelse(
+      !is.na(mentor_yes) & is.na(mentor_athletic),
+      0, mentor_athletic
+      ),
+    mentor_alum = ifelse(
+      !is.na(mentor_yes) & is.na(mentor_alum),
+      0, mentor_alum
+      ),
+    mentor_other = ifelse(
+      !is.na(mentor_yes) & is.na(mentor_other),
+      0, mentor_other
+      )
+  )
+```
+
+
+```{r}
+d_all %>% 
+  # filter(!is.na(mentor_yes)) %>%
+  demographics_pct(quos(mentor_yes, mentor_faculty))
+
+d_all %>% 
+  # filter(!is.na(mentor_yes)) %>%
+  demographics_pct(quos(mentor_yes, mentor_grad))
+
+d_all %>% 
+  # filter(!is.na(mentor_yes)) %>%
+  demographics_pct(quos(mentor_yes, mentor_undergrad))
+
+d_all %>% 
+  # filter(!is.na(mentor_yes)) %>%
+  demographics_pct(quos(mentor_yes, mentor_admin))
+
+d_all %>% 
+  # filter(!is.na(mentor_yes)) %>%
+  demographics_pct(quos(mentor_yes, mentor_staff))
+
+d_all %>% 
+  # filter(!is.na(mentor_yes)) %>%
+  demographics_pct(quos(mentor_yes, mentor_athletic))
+
+d_all %>% 
+  # filter(!is.na(mentor_yes)) %>%
+  demographics_pct(quos(mentor_yes, mentor_alum))
+
+d_all %>% 
+  # filter(!is.na(mentor_yes)) %>%
+  demographics_pct(quos(mentor_yes, mentor_other))
+```
+
+# Importance of mentors
+
+```{r}
+d_all %>% 
+  filter(startedSYFUS == 1) %>% 
+  demographics_pct(quos(mentor_important, mentor_important_usethis))
+
+d_all %>% 
+  filter(startedSYFUS == 1) %>% 
+  demographics_pct(quos(mentor_important_usethis, mentor_yes))
+```
+
+```{r}
+
+```
+
