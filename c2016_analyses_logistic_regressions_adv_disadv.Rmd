@@ -47,7 +47,7 @@ library(gridExtra) # For iterative plots
 
 ```{r data files}
 # For Juan
-d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
+# d <- read_rds("../data/2018_4_2_c2016_syfus_inst_healthrec_ctra_no_t7.rds")
 
 # For RAs
 # getwd()
@@ -421,7 +421,7 @@ kable_format <- . %>%
 ```
 
 ```{r load custom functions}
-source("R/custom_functions.R")
+source("custom_functions/custom_functions.R")
 ```
 
 # General Notes
