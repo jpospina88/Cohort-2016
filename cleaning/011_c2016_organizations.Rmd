@@ -597,3 +597,53 @@ d_all %<>%
   left_join(orgs_inv, by = "idnum")
 ```
 
+```{r}
+# d_all %>% 
+#   select(ends_with("_inv"))
+```
+
+```{r}
+vars_org_inv <-
+  quos(
+    org_acad_inv,
+    org_athletics_inv,
+    org_media_inv,
+    org_community_inv,
+    org_cult_inv,
+    org_games_inv,
+    org_leader_inv,
+    org_arts_inv,
+    org_religion_inv,
+    org_social_inv,
+    org_other_inv
+  )
+
+d_all1 <- d_all
+
+d_all %<>% 
+  mutate(
+    org_acad_inv = ifelse(is.na(org_acad_inv) & !is.na(org_howinvcount), 0, org_acad_inv), 
+    org_athletics_inv = ifelse(is.na(org_athletics_inv) & !is.na(org_howinvcount), 0, org_athletics_inv), 
+    org_media_inv = ifelse(is.na(org_media_inv) & !is.na(org_howinvcount), 0, org_media_inv),
+    org_community_inv = ifelse(is.na(org_community_inv) & !is.na(org_howinvcount), 0, org_community_inv), 
+    org_cult_inv = ifelse(is.na(org_cult_inv) & !is.na(org_howinvcount), 0, org_cult_inv),
+    org_games_inv = ifelse(is.na(org_games_inv) & !is.na(org_howinvcount), 0, org_games_inv),
+    org_leader_inv = ifelse(is.na(org_leader_inv) & !is.na(org_howinvcount), 0, org_leader_inv), 
+    org_arts_inv = ifelse(is.na(org_arts_inv) & !is.na(org_howinvcount), 0, org_arts_inv), 
+    org_religion_inv = ifelse(is.na(org_religion_inv) & !is.na(org_howinvcount), 0, org_religion_inv), 
+    org_social_inv = ifelse(is.na(org_social_inv) & !is.na(org_howinvcount), 0, org_social_inv), 
+    org_other_inv = ifelse(is.na(org_other_inv) & !is.na(org_howinvcount), 0, org_other_inv)
+  )
+
+```
+
+```{r}
+d_all1 %>% 
+  select(!!!vars_org_inv) %>% 
+  describe
+
+d_all %>% 
+  select(!!!vars_org_inv) %>% 
+  describe
+```
+

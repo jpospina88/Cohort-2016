@@ -517,11 +517,7 @@ plots <- mapply(plot_raincloud_map_treat_adv, # function
        )
 
 plots
-# plots[[42]]
-# plots[[43]]
-# plots[[44]]
-# plots[[45]]
-# plots
+# plots[[1]]
 ```
 
 ## By Condition and Disadvantaged Status
@@ -581,6 +577,7 @@ plots <- mapply(plot_raincloud_map_cond_adv, # function
        )
 
 plots
+# plots[[1]]
 ```
 
 
@@ -1225,7 +1222,7 @@ plot_bar_x_y_group_treat_adv <- function(ftr, var, y_lab, scales, limit, positio
                ) +
   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
   theme1 +
-  geom_text(aes(label = format(get(var), digits = decimal), y = position), size = 8, color = "black") +
+  geom_text(aes(label = round(get(var), digits = decimal), y = position), size = 8, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
   facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
@@ -1242,6 +1239,7 @@ plots <- mapply(plot_bar_x_y_group_treat_adv, # function
        SIMPLIFY = F)
 
 plots
+# plots[[1]]
 ```
 
 ```{r eval=FALSE, include=FALSE}
@@ -1292,7 +1290,7 @@ plot_bar_x_y_group_cond_adv <- function(ftr, var, y_lab, scales, limit, position
     ) +
   geom_errorbar(aes(ymin = get(var) - SE, ymax = get(var) + SE), width = .4, position = pd2, color = "black") +
   theme1 +
-  geom_text(aes(label = format(get(var), digits = decimal), y = position), size = 6, color = "black") +
+  geom_text(aes(label = round(get(var), digits = decimal), y = position), size = 6, color = "black") +
   coord_cartesian(ylim = limit) +
   scale_y_continuous(breaks = scales) +
   facet_grid(, vars(disadv_sc), labeller = as_labeller(adv_names)) + # ignore warning, this is to make the plot facet the variables in the way that we want it
