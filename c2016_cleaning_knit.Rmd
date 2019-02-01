@@ -17,20 +17,26 @@ rmarkdown::render(
   )
 
 rmarkdown::render(
+  "cleaning/012_c2016_mentors.Rmd", 
+  "html_document"
+  )
+
+rmarkdown::render(
   "cleaning/020_c2016_merge_follow_ups.Rmd", 
   "html_document"
   )
 ```
 
 ```{r}
-d_all %>%
-  select(ends_with("_inv")) %>%
-  names %>% 
-  noquote
+# d_all %>%
+#   select(ends_with("_inv")) %>%
+#   names %>% 
+#   noquote
 ```
 
 # Export Dataset
-```{r export dataset}
+
+```{r}
 d_all %>% write_rds("../data/2019_1_22_c2016_syfus_inst_healthrec_ctra_no_t7_frosh_soph_junior.rds")
 d_all %>% write_csv("../data/2019_1_22_c2016_syfus_inst_healthrec_ctra_no_t7_frosh_soph_junior.csv")
 
@@ -41,3 +47,6 @@ d_all %>% write_csv("../../data/2019_1_22_c2016_syfus_inst_healthrec_ctra_no_t7_
 # d_all %>% select(starts_with("org_")) %>% 
 #   names
 ```
+
+
+
