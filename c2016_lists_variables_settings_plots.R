@@ -190,7 +190,13 @@ vars_cont <-
     org_media_inv,
     org_other_inv,    
     org_religion_inv,  
-    org_social_inv
+    org_social_inv,
+    
+    # Mentorship
+    mentor_important_usethis,
+    mentor_important_faculty,
+    mentor_important_grad,
+    mentor_important_undergrad
   ) 
 
 tribble_dv <- tribble(
@@ -307,16 +313,22 @@ tribble_dv <- tribble(
   "org_howinvcount",                         "Involvement in Extracurricular Activities",           seq(0, 25, 5),       c(0, 25),      2,                    "(Five Activities; Senior Year Survey)",               2,
   "activism_engaged",                        "Involvement in Service/Social Change",                seq(0, 7, 1),       c(0, 7),        2,                    "(Senior Year Survey)",                               2,
   "org_acad_inv",                            "Involvement in Organizations:\nAcademics",            seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
-  "org_arts_inv",                            "Involvement in Organizations:\nArts",            seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
-  "org_athletics_inv",                       "Involvement in Organizations:\nAthletics or Recreation",            seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_arts_inv",                            "Involvement in Organizations:\nArts",                 seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_athletics_inv",                       "Involvement in Organizations:\nAthletics or Recreation",seq(0, 5, 1),     c(0, 5),        2,                    "(Senior Year Survey)",                               2,
   "org_community_inv",                       "Involvement in Organizations:\nCommunity, Health,Education,\nConservation or Outreach",            seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
-  "org_cult_inv",                            "Involvement in Organizations:\nCultural Organizations",            seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
-  "org_games_inv",                           "Involvement in Organizations:\nGames",            seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
-  "org_leader_inv",                          "Involvement in Organizations:\nLeadership or Politics",            seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
-  "org_media_inv",                           "Involvement in Organizations:\nMedia or Communications",            seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
-  "org_other_inv",                           "Involvement in Organizations:\nOther",            seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
-  "org_religion_inv",                        "Involvement in Organizations:\nReligion or Philosophy",            seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
-  "org_social_inv",                          "Involvement in Organizations:\nSocial (Including Greek Life)",            seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2
+  "org_cult_inv",                            "Involvement in Organizations:\nCultural Organizations",seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_games_inv",                           "Involvement in Organizations:\nGames",                seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_leader_inv",                          "Involvement in Organizations:\nLeadership or Politics",seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_media_inv",                           "Involvement in Organizations:\nMedia or Communications",seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_other_inv",                           "Involvement in Organizations:\nOther",                seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_religion_inv",                        "Involvement in Organizations:\nReligion or Philosophy",seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
+  "org_social_inv",                          "Involvement in Organizations:\nSocial (Including Greek Life)",seq(0, 5, 1),       c(0, 5),        2,                    "(Senior Year Survey)",                               2,
+  
+  ## Mentorship
+  "mentor_important_usethis",                "Importance of Mentors:\nOverall",                     seq(1, 7, 1),       c(1, 7),        2,                    "(Senior Year Survey)",                               2,
+  "mentor_important_faculty",                "Importance of Mentors:\nFaculty",                     seq(0, 7, 1),       c(0, 7),        2,                    "(Senior Year Survey)",                               1,
+  "mentor_important_grad",                   "Importance of Mentors:\nGraduate Students",           seq(0, 7, 1),       c(0, 7),        2,                    "(Senior Year Survey)",                               1,
+  "mentor_important_undergrad",              "Importance of Mentors:\nUndergraduates",              seq(0, 7, 1),       c(0, 7),        2,                    "(Senior Year Survey)",                               1
   )  
 
 tribble_cond <- data.frame(matrix(c("treat_sc"), nrow = nrow(tribble_dv)),
