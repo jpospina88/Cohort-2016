@@ -97,12 +97,47 @@ d_all %>%
   filter(startedSYFUS == 1) %>% 
   demographics_pct(quos(mentor_important, mentor_important_usethis))
 
+# there are some participants who said that they didn't have a mentor but they did rate their mentors in the importance scale. Shannon suggested to code the importance of mentorship open-ended question and try to understand who thinks their mentorship is important or meaningful. Once this is coded, we can figure out if this is relevant.
+
 d_all %>% 
   filter(startedSYFUS == 1) %>% 
   demographics_pct(quos(mentor_important_usethis, mentor_yes))
 ```
 
 ```{r}
-
+d_all %>% 
+  select(starts_with("mentor_")) %>% 
+  describe
 ```
+
+```{r}
+d_all %>% 
+  count(mentor_undergrad, mentor_important_usethis)
+```
+
+
+```{r}
+d_all %<>%
+  mutate(
+    mentor_important_faculty = 
+      ifelse(mentor_faculty == 1, mentor_important_usethis, 0), # Only carry-over the values related to this mentor, otherwise 0
+     mentor_important_grad = 
+      ifelse(mentor_grad == 1, mentor_important_usethis, 0),
+    mentor_important_undergrad = 
+      ifelse(mentor_undergrad == 1, mentor_important_usethis, 0)
+  )
+
+vars_mentor_important <-
+  quos(
+    mentor_important_usethis,
+    mentor_important_faculty,
+    mentor_important_grad,
+    mentor_important_undergrad
+  )
+
+d_all %>% 
+  select(!!!vars_mentor_important) %>% 
+  describe
+```
+
 
