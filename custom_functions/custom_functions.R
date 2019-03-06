@@ -90,7 +90,7 @@ alphatize_2 <- function(data, vector){
   data %>% 
     select(!!!vector) %>% # note that variables in ... must be pre-quoted using quos() function
     na.omit() %>% 
-    psych::alpha() 
+    psych::alpha(check.keys=TRUE) 
 }
 
 #### Count number of words ####
@@ -188,11 +188,11 @@ kable_format <- . %>%
 
 #### Correlation table ####
 corr.p.all <- function(x){ 
-  require(Hmisc) 
+  # require(Hmisc) 
   x <- as.matrix(x) 
-  R <- rcorr(x)$r 
-  p <- rcorr(x)$P
-  n <- rcorr(x)$n
+  R <- Hmisc::rcorr(x)$r 
+  p <- Hmisc::rcorr(x)$P
+  n <- Hmisc::rcorr(x)$n
   
   ## define notions for significance levels; spacing is important.
   mystars <- ifelse(p < .001, " ***",

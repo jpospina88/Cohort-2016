@@ -1,0 +1,452 @@
+---
+title: "Belonging Over Time"
+author: "Juan Ospina"
+date: "2/14/2019"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+---
+
+```{r clean system, message=TRUE, warning=TRUE, include=FALSE}
+rm(list = ls()) # clean environment
+```
+
+```{r global options, echo=FALSE}
+knitr::opts_chunk$set(
+  # fig.path = 'figs/', fig.show = 'asis', 
+  dpi = 75, 
+  # include = FALSE, 
+  echo = FALSE, # run the code, show me only the graphs
+  warning = FALSE, message = FALSE, cache = FALSE)
+```
+
+```{r load packages}
+source("packages.R")
+```
+
+```{r load dataset}
+source("master_dataset.R")
+```
+
+```{r}
+source("custom_functions/custom_functions.R")
+```
+
+```{r}
+# ds %>% 
+#   select(contains("belong")) %>% 
+#   View
+```
+
+# Create Belonging Composites
+
+## Freshman
+
+```{r}
+# Belonging Freshman:
+# t4Bbelong
+# t4Bfitin
+# t4BoutsiderR
+# t4Bhome
+# t4BundrstndR
+# t4Bsimsucc
+# t4Baccept
+# t4BmysteryR
+# t4belongcomp8  
+# Other variations:
+# Zt4belongcomp8
+# t4belongsocial6
+# t4belongcog2
+```
+
+```{r}
+vars_bel_frosh <-
+  quos(
+    t4Bbelong,
+    t4Bfitin,
+    t4BoutsiderR,
+    t4Bhome,
+    t4BundrstndR,
+    t4Bsimsucc,
+    t4Baccept,
+    t4BmysteryR
+  )
+
+ds %>% 
+  select(!!!vars_bel_frosh) %>% 
+  describe
+
+ds %>% 
+  corr_table_p(vars_bel_frosh)
+
+ds %>% 
+  alphatize_2(vars_bel_frosh)
+
+ds %<>% 
+  mutate(
+    t4boutsider_r = 8 - t4BoutsiderR,
+    t4bundrstnd_r = 8 - t4BundrstndR,
+    t4bmystery_r = 8 - t4BmysteryR
+  )
+```
+
+```{r}
+# Once you check that the variables were successfully recoded with the describe function below, comment the old variables
+vars_bel_frosh <-
+  quos(
+    t4Bbelong,
+    t4Bfitin,
+    # t4BoutsiderR,
+    t4boutsider_r,
+    t4Bhome,
+    # t4BundrstndR,
+    t4bundrstnd_r,
+    t4Bsimsucc,
+    t4Baccept,
+    # t4BmysteryR,
+    t4bmystery_r
+  )
+
+ds %>% 
+  select(!!!vars_bel_frosh) %>% 
+  describe()
+
+ds %>% 
+  alphatize_2(vars_bel_frosh)
+
+ds %>% 
+  corr_table_p(vars_bel_frosh)
+
+correlations <- 
+  cor(
+    ds %>% 
+      select(!!!vars_bel_frosh), 
+    use = "pairwise.complete.obs")
+
+cor.plot(correlations, numbers = TRUE)
+
+singfac <- 
+  fa(ds %>% 
+       select(!!!vars_bel_frosh), 
+     nfactors = 1, 
+     rotate = "none", 
+     SMC = TRUE, 
+     fm = "ml", 
+     alpha = .05, 
+     n.iter = 1000)
+
+singfac
+
+ds <- cv_compute(data = ds, cv_name = t4belong_c8, cv_vector = vars_bel_frosh)
+
+ds %>% 
+  select(
+    t4belong_c8,
+    t4belongcomp8
+  ) %>% 
+  describe
+```
+
+```{r}
+# Not all the 8 items. Same 6 items in SYFUS
+vars_bel_frosh <-
+  quos(
+    t4Bbelong,
+    t4Bfitin,
+    t4boutsider_r,
+    t4bundrstnd_r,
+    t4Bsimsucc,
+    t4bmystery_r
+  )
+
+# Scale reliability is lower without the other two items, better to leave all 8 items
+ds %>%
+  alphatize_2(vars_bel_frosh)
+
+# Factor analysis is also better with the 8 items
+singfac <- 
+  fa(ds %>% 
+       select(!!!vars_bel_frosh), 
+     nfactors = 1, 
+     rotate = "none", 
+     SMC = TRUE, 
+     fm = "ml", 
+     alpha = .05, 
+     n.iter = 1000)
+
+singfac
+```
+
+# Sophomore
+
+```{r}
+# Belonging Sophomore: Need to create the composite
+# t5Bbelong
+# t5Bfitin
+# t5BoutsiderR
+# t5Bhome
+# t5BundrstndR
+# t5Bsimsucc
+# t5Baccept
+# t5BmysteryR
+
+vars_bel_soph <-
+  quos(
+    t5Bbelong,
+    t5Bfitin,
+    t5BoutsiderR,
+    t5Bhome,
+    t5BundrstndR,
+    t5Bsimsucc,
+    t5Baccept,
+    t5BmysteryR
+  )
+
+ds %>% 
+  select(!!!vars_bel_soph) %>% 
+  describe()
+```
+
+```{r}
+ds %>% 
+  corr_table_p(vars_bel_soph)
+
+ds %>% 
+  alphatize_2(vars_bel_soph)
+
+ds %<>% 
+  mutate(
+    t5boutsider_r = 8 - t5BoutsiderR,
+    t5bundrstnd_r = 8 - t5BundrstndR,
+    t5bmystery_r = 8 - t5BmysteryR
+  )
+```
+
+```{r}
+# Once you check that the variables were successfully recoded with the describe function below, comment the old variables
+vars_bel_soph <-
+  quos(
+    t5Bbelong,
+    t5Bfitin,
+    # t5BoutsiderR,
+    t5boutsider_r,
+    t5Bhome,
+    # t5BundrstndR,
+    t5bundrstnd_r,
+    t5Bsimsucc,
+    t5Baccept,
+    # t5BmysteryR,
+    t5bmystery_r
+  )
+
+ds %>% 
+  select(!!!vars_bel_soph) %>% 
+  describe()
+
+ds %>% 
+  alphatize_2(vars_bel_soph)
+
+ds %>% 
+  corr_table_p(vars_bel_soph)
+
+correlations <- 
+  cor(
+    ds %>% 
+      select(!!!vars_bel_soph), 
+    use = "pairwise.complete.obs")
+
+cor.plot(correlations, numbers = TRUE)
+
+singfac <- 
+  fa(ds %>% 
+       select(!!!vars_bel_soph), 
+     nfactors = 1, 
+     rotate = "none", 
+     SMC = TRUE, 
+     fm = "ml", 
+     alpha = .05, 
+     n.iter = 1000)
+
+singfac
+
+ds <- cv_compute(data = ds, cv_name = t5belong_c8, cv_vector = vars_bel_soph)
+
+ds %>% 
+  select(
+    !!!vars_bel_soph,
+    t5belong_c8
+  ) %>% 
+  describe
+```
+
+```{r}
+# Not all the 8 items. Same 6 items in SYFUS
+vars_bel_soph <-
+  quos(
+    t5Bbelong,
+    t5Bfitin,
+    t5boutsider_r,
+    t5bundrstnd_r,
+    t5Bsimsucc,
+    t5bmystery_r
+  )
+
+# Scale reliability is lower without the other two items, better to leave all 8 items
+ds %>%
+  alphatize_2(vars_bel_soph)
+
+# Factor analysis is also better with the 8 items
+singfac <- 
+  fa(ds %>% 
+       select(!!!vars_bel_soph), 
+     nfactors = 1, 
+     rotate = "none", 
+     SMC = TRUE, 
+     fm = "ml", 
+     alpha = .05, 
+     n.iter = 1000)
+
+singfac
+```
+
+# Junior
+
+```{r}
+# Belonging Junior: Need to create the composite
+# t6Bbelong
+# t6Bfitin
+# t6BoutsiderR
+# t6BundrstndR
+# t6Bsimsucc
+# t6BmysteryR
+```
+
+```{r}
+vars_bel_jun <-
+  quos(
+    t6Bbelong,
+    t6Bfitin,
+    t6BoutsiderR,
+    t6BundrstndR,
+    t6Bsimsucc,
+    t6BmysteryR
+  )
+
+ds %>% 
+  select(!!!vars_bel_jun) %>% 
+  describe()
+```
+
+```{r}
+ds %>% 
+  corr_table_p(vars_bel_jun)
+
+ds %>% 
+  alphatize_2(vars_bel_jun)
+
+ds %<>% 
+  mutate(
+    t6boutsider_r = 8 - t6BoutsiderR,
+    t6bundrstnd_r = 8 - t6BundrstndR,
+    t6bmystery_r = 8 - t6BmysteryR
+  )
+```
+
+```{r}
+# Once you check that the variables were successfully recoded with the describe function below, comment the old variables
+vars_bel_jun <-
+  quos(
+    t6Bbelong,
+    t6Bfitin,
+    # t6BoutsiderR,
+    t6boutsider_r,
+    # t6BundrstndR,
+    t6bundrstnd_r,
+    t6Bsimsucc,
+    # t6BmysteryR,
+    t6bmystery_r
+  )
+
+ds %>% 
+  select(!!!vars_bel_jun) %>% 
+  describe()
+
+ds %>% 
+  alphatize_2(vars_bel_jun)
+
+ds %>% 
+  corr_table_p(vars_bel_jun)
+
+correlations <- 
+  cor(
+    ds %>% 
+      select(!!!vars_bel_jun), 
+    use = "pairwise.complete.obs")
+
+cor.plot(correlations, numbers = TRUE)
+
+singfac <- 
+  fa(ds %>% 
+       select(!!!vars_bel_jun), 
+     nfactors = 1, 
+     rotate = "none", 
+     SMC = TRUE, 
+     fm = "ml", 
+     alpha = .05, 
+     n.iter = 1000)
+
+singfac
+
+ds <- cv_compute(data = ds, cv_name = t6belong_c6, cv_vector = vars_bel_jun)
+
+ds %>% 
+  select(
+    !!!vars_bel_jun,
+    t6belong_c6
+  ) %>% 
+  describe
+```
+
+# Senior
+
+```{r}
+# belong_comp6 Belong SYFUS
+# belong_belong
+# belong_fitin
+# belong_outsider_r_use_this
+# belong_understand_r_use_this
+# belong_similar
+# belong_mystery_r_use_this
+```
+
+
+# Belonging Over Time
+
+```{r}
+ds_bel <- 
+  ds %>% 
+  select(idnum, race, gender, t4belong_c8, t5belong_c8, t6belong_c6, belong_comp6)
+
+vars_bel <-
+  quos(
+    t4belong_c8, t5belong_c8, t6belong_c6, belong_comp6
+  )
+```
+
+```{r}
+groups <- 
+  list(
+    ds_bel$race, 
+    ds_bel$gender
+  )
+
+ds_bel %>% 
+  select(!!!vars_bel) %>% 
+  describeBy(groups, mat = TRUE, digits = 2) %>% 
+  rownames_to_column() %>% 
+  filter(group1 == "black") %>%
+  kable_format
+```
+
